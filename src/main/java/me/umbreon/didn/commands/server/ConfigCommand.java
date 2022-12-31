@@ -4,11 +4,8 @@ import me.umbreon.didn.cache.GuildsCache;
 import me.umbreon.didn.commands.IClientCommand;
 import me.umbreon.didn.data.ClientGuild;
 import me.umbreon.didn.enums.Language;
-import me.umbreon.didn.languages.LanguageController;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.slf4j.Logger;
@@ -16,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
+import static me.umbreon.didn.utils.StringUtil.FORMATTED_MESSAGE;
 import static me.umbreon.didn.utils.StringUtil.NEW_LINE;
 
 /**
@@ -35,7 +33,7 @@ public class ConfigCommand implements IClientCommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
         Member member = event.getMember();
         createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(event.getUser()) +
                 " used /config on " + guildID);
@@ -45,18 +43,41 @@ public class ConfigCommand implements IClientCommand {
     private String buildServerInfoMessage(String guildID, Member member, Guild guild) {
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
         Language language = guildsCache.getGuildLanguage(guildID);
-        Role adminRole = guild.getRoleById(guildsCache.getGuildAdminRoleID(guildID));
+        String guildOwnerName = Objects.requireNonNull(guild.getOwner()).getEffectiveName();
 
-        return "```" + NEW_LINE +
-                "Server Configurations:" + NEW_LINE +
-                "GuildID: " + clientGuild.getGuildID() + NEW_LINE +
-                "Guild Owner: " + Objects.requireNonNull(guild.getOwner()).getEffectiveName() + NEW_LINE +
-                "Language: " + language.rawName + NEW_LINE +
-                "TimeZone: " + clientGuild.getGuildTimeZone() + NEW_LINE +
-                "Admin Role: " + adminRole.getName() + " - " + adminRole.getId() + NEW_LINE +
-                "Event Messages: " + (clientGuild.isEventMessageEnabled() ? "Enabled" : "Disabled") + NEW_LINE +
-                "Warn Messages: " + (clientGuild.isWarnMessagesEnabled() ? "Enabled" : "Disabled") + NEW_LINE +
-                "Is user admin?: " + (isUserPermitted(member, adminRole.getId()) ? "Yes" : "No") + NEW_LINE +
-                "```";
+        StringBuilder serverConfigMessageBuilder = new StringBuilder();
+        serverConfigMessageBuilder.append(FORMATTED_MESSAGE).append(NEW_LINE)
+                .append("Server Configurations: ").append(NEW_LINE)
+                .append("GuildID: ").append(guildID).append(NEW_LINE)
+                .append("Guild Owner: ").append(guildOwnerName).append(NEW_LINE)
+                .append("Language: ").append(language.rawName).append(NEW_LINE)
+                .append("TimeZone: ").append(clientGuild.getGuildTimeZone()).append(NEW_LINE);
+
+        String isUserBotAdminAsString = "No";
+        String adminRoleID = guildsCache.getGuildAdminRoleID(guildID);
+        if (adminRoleID == null) {
+
+            serverConfigMessageBuilder.append("Admin Role: @Bot Admin").append(NEW_LINE);
+            for (Role role : member.getRoles()) {
+                isUserBotAdminAsString = role.getName().equalsIgnoreCase("bot admin") ? "Yes" : "No";
+            }
+
+        } else {
+            Role adminRole = guild.getRoleById(adminRoleID);
+            String adminRoleName = Objects.requireNonNull(adminRole).getName();
+            serverConfigMessageBuilder.append("Admin Role: ").append(adminRoleName).append(" - ").append(adminRoleID).append(NEW_LINE);
+            isUserBotAdminAsString = isUserPermitted(member, adminRole.getId()) ? "Yes" : "No";
+        }
+
+        serverConfigMessageBuilder.append("Is User Bot Admin?: ").append(isUserBotAdminAsString).append(NEW_LINE);
+
+        String isEventMessageEnabledAsStringMessage = clientGuild.isEventMessageEnabled() ? "Enabled" : "Disabled";
+        String isWarnMessagesEnabledAsStringMessage = clientGuild.isWarnMessagesEnabled() ? "Enabled" : "Disabled";
+
+        serverConfigMessageBuilder.append("Event Messages: ").append(isEventMessageEnabledAsStringMessage).append(NEW_LINE)
+                .append("Warn Messages: ").append(isWarnMessagesEnabledAsStringMessage).append(NEW_LINE)
+                .append("Warn Time (In minutes): ").append(clientGuild.getHeadUpTime())
+                .append(FORMATTED_MESSAGE);
+        return serverConfigMessageBuilder.toString();
     }
 }

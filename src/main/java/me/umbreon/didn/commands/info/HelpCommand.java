@@ -1,15 +1,11 @@
 package me.umbreon.didn.commands.info;
 
 import me.umbreon.didn.commands.IClientCommand;
-import me.umbreon.didn.utils.ImagesUtil;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import me.umbreon.didn.utils.CommandsUtil;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
-import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import static me.umbreon.didn.utils.StringUtil.FORMATTED_MESSAGE;
+import static me.umbreon.didn.utils.StringUtil.NEW_LINE;
 
 /**
  * @author Umbreon Majora
@@ -18,32 +14,28 @@ import java.util.Properties;
  */
 public class HelpCommand implements IClientCommand {
 
-    private static final Properties commandsProperties = new Properties();
+    private final String helpMessage;
 
-    static {
-        try (InputStream inputStream = InstructionsCommand.class.getClassLoader().getResourceAsStream("commands.properties")) {
-            if (inputStream != null) {
-                commandsProperties.load(inputStream);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public HelpCommand() {
+        StringBuilder helpMessageBuilder = new StringBuilder();
+        helpMessageBuilder.append(FORMATTED_MESSAGE)
+                .append("Diablo Immortal Discord Notifier Bot:")
+                .append(NEW_LINE)
+                .append(NEW_LINE);
+        CommandsUtil.getCommandsProperties().forEach((command, description) ->
+                helpMessageBuilder.append("/").append(command)
+                        .append(NEW_LINE)
+                        .append(description.toString())
+                        .append(NEW_LINE)
+                        .append(NEW_LINE));
+        helpMessageBuilder.append("Diablo Immortal Discord Notifier Bot created by Umbreon.")
+                .append(FORMATTED_MESSAGE);
+        helpMessage = helpMessageBuilder.toString();
     }
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
-        replyEphemeralToUser(event, buildHelpEmbed());
+        replyEphemeralToUser(event, helpMessage);
     }
 
-    private MessageEmbed buildHelpEmbed() {
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.setTitle("Diablo Immortal Notifier Commands");
-        embedBuilder.setThumbnail(ImagesUtil.DIABLO_IMMORTAL_LOGO);
-        embedBuilder.setColor(Color.RED);
-        commandsProperties.forEach((command, description) ->
-                embedBuilder.addField("/" + command, String.valueOf(description), false));
-        embedBuilder.addBlankField(false);
-        embedBuilder.setFooter("Diablo Immortal Discord Notifier created by Umbreon.");
-        return embedBuilder.build();
-    }
 }

@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 /**
  * @author Umbreon Majora
  * Allow's user to quickly apply changes to a notification channel. This command also provides a list with all presets.
@@ -43,7 +45,7 @@ public class PresetCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
         TextChannel targetTextChannel = getTargetTextChannel(event);
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
         String targetTextChannelID = targetTextChannel.getId();
         User user = event.getUser();
         Language language = guildsCache.getGuildLanguage(guildID);
@@ -63,7 +65,7 @@ public class PresetCommand implements IClientCommand {
         }
 
         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID).getNotificationChannel(targetTextChannelID);
-        Preset selectedPreset = findPresetByChoiceName(preset);
+        Preset selectedPreset = Preset.findPresetByChoiceName(preset);
 
         if (selectedPreset == null) {
             createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " tried to use /preset on " + targetTextChannelID + " but the preset could not be found.");
@@ -189,13 +191,6 @@ public class PresetCommand implements IClientCommand {
                 "```";
     }
 
-    private Preset findPresetByChoiceName(String presetChoiceName) {
-        for (Preset availablePreset : Preset.values()) {
-            if (availablePreset.getAsChoiceName.equalsIgnoreCase(presetChoiceName)) {
-                return availablePreset;
-            }
-        }
-        return null;
-    }
+
 
 }

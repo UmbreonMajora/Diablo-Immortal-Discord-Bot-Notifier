@@ -13,6 +13,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 import static me.umbreon.didn.utils.CommandsUtil.SERVER_SETTING_OPTION_NAME;
 import static me.umbreon.didn.utils.CommandsUtil.SERVER_SETTING_VALUE_OPTION_NAME;
 
@@ -35,29 +37,27 @@ public class ServerCommand implements IClientCommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
         User user = event.getUser();
         Language language = guildsCache.getGuildLanguage(guildID);
 
         String serverSettingRawName = getServerSetting(event);
         ServerSetting serverSetting = ServerSetting.findServerSettingByRawName(serverSettingRawName);
 
+        String executingUser = getFullUsernameWithDiscriminator(user);
+
         if (serverSetting == null) {
-            createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " tried to use /server but " +
-                    "the setting is null.");
+            createLog(LOGGER, guildID, executingUser + " tried to use /server but the setting is null.");
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INVALID-SERVER-SETTING"));
             return;
-        }
-
-        if (serverSetting.equals(ServerSetting.WARN_TIME)) {
-
         }
 
         boolean serverSettingValue = getServerSettingValue(event);
         updateClientGuild(serverSetting, guildID, serverSettingValue);
 
-        createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " set serversetting " +
-                serverSettingRawName + " to " + serverSettingValue);
+        createLog(LOGGER, guildID, executingUser + " set serversetting " + serverSettingRawName + " to " +
+                serverSettingValue);
+
         String replyMessage = getReplyMessage(serverSetting, serverSettingValue, language);
         replyEphemeralToUser(event, replyMessage);
     }
@@ -73,10 +73,10 @@ public class ServerCommand implements IClientCommand {
     private void updateClientGuild(ServerSetting serverSetting, String guildID, boolean serverSettingValue) {
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
         switch (serverSetting) {
-            case MESSAGE:
+            case EVENT_MESSAGES:
                 clientGuild.setEventMessageEnabled(serverSettingValue);
                 break;
-            case HEAD_UP:
+            case WARN_MESSAGES:
                 clientGuild.setWarnMessagesEnabled(serverSettingValue);
                 break;
         }
@@ -88,7 +88,6 @@ public class ServerCommand implements IClientCommand {
         return serverSettingOption != null ? serverSettingOption.getAsString() : null;
     }
 
-    //todo: returning null may produce null pointer, fix?
     private boolean getServerSettingValue(SlashCommandInteractionEvent event) {
         OptionMapping serverSettingValue = event.getOption(SERVER_SETTING_VALUE_OPTION_NAME);
         return serverSettingValue != null && serverSettingValue.getAsBoolean();

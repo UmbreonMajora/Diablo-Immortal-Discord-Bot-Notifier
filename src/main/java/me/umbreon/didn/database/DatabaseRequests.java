@@ -34,7 +34,7 @@ public class DatabaseRequests {
                 while (resultSet.next()) {
                     String warnRange = resultSet.getString("warn_range");
                     String[] tmp = warnRange.split("-");
-                    String eventStartTime = tmp[0];
+                    String eventStartTime = tmp[1];
                     String weekday = everyDay ? null : resultSet.getString("warn_day");
                     EventGameData eventGameData = new EventGameData(warnRange, weekday, eventStartTime);
                     listEventTimeTables.add(eventGameData);
@@ -58,14 +58,20 @@ public class DatabaseRequests {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String guildID = resultSet.getString("guildID");
+
                     String languageShortFormAsString = resultSet.getString("language");
-                    String guildTimeZone = resultSet.getString("timezone");
-                    int headUpTime = resultSet.getInt("headup_time");
-                    boolean isHeadUpEnabled = (resultSet.getInt("event_headup") == 1);
-                    boolean eventMessagesEnabled = (resultSet.getInt("event_message") == 1);
-                    String adminRoleID = resultSet.getString("adminroleid");
                     Language guildLanguage = Language.findLanguageByShortName(languageShortFormAsString);
-                    ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, guildTimeZone, adminRoleID, headUpTime, isHeadUpEnabled, eventMessagesEnabled);
+
+                    String timeZone = resultSet.getString("timezone");
+
+                    String adminRoleID = resultSet.getString("admin_role_id");
+
+                    int warnTime = resultSet.getInt("warn_time");
+
+                    boolean isWarnMessagesEnabled = (resultSet.getInt("warn_messages_enabled") == 1);
+                    boolean isEventMessagesEnabled = (resultSet.getInt("event_messages_enabled") == 1);
+
+                    ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime, isWarnMessagesEnabled, isEventMessagesEnabled);
                     clientGuildData.put(guildID, clientGuild);
                 }
             }
@@ -120,11 +126,12 @@ public class DatabaseRequests {
                     boolean ancientnightmareembed = (resultSet.getInt("ancientnightmareembed") == 1);
                     boolean ancientarenaembed = (resultSet.getInt("ancientarenaembed") == 1);
                     boolean wrathborneInvasionEnabled = (resultSet.getInt("wrathborneinvasion") == 1);
+                    boolean isOnSlaughtMessagesEnabled = (resultSet.getInt("onslaught_event_enabled") == 1);
 
                     NotificationChannel notificationChannel = new NotificationChannel(roleID, guildID, textChannelID,
                             headup, message, assembly, vault, demongates, ancientarena, shadowlottery,
                             battlegrounds, hauntedcarriage, ancientnightmare, demongatesembed, ancientarenaembed,
-                            hauntedcarriageembed, ancientnightmareembed, wrathborneInvasionEnabled);
+                            hauntedcarriageembed, ancientnightmareembed, wrathborneInvasionEnabled, isOnSlaughtMessagesEnabled);
 
                     if (clientGuildData.containsKey(guildID)) {
                         clientGuildData.get(guildID).addNewNotificationChannel(notificationChannel);
@@ -173,7 +180,7 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(4, clientGuild.isWarnMessagesEnabled());
             preparedStatement.setBoolean(5, clientGuild.isEventMessageEnabled());
             preparedStatement.executeUpdate();
-            LOGGER.info("Created guild " + clientGuild.getGuildID());
+            LOGGER.info("Registered new guild with ID: " + clientGuild.getGuildID() + " in database!");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -323,9 +330,8 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(12, notificationChannel.isDemonGatesMessageEmbedEnabled());
             preparedStatement.setBoolean(13, notificationChannel.isAncientNightmareMessageEmbedEnabled());
             preparedStatement.setBoolean(14, notificationChannel.isHauntedCarriageMessageEmbedEnabled());
-            preparedStatement.setBoolean(15, notificationChannel.isAncientNightmareMessageEmbedEnabled());
-            preparedStatement.setBoolean(16, notificationChannel.isWrathborneInvasionEnabled());
-            preparedStatement.setString(17, notificationChannel.getTextChannelID());
+            preparedStatement.setBoolean(15, notificationChannel.isWrathborneInvasionEnabled());
+            preparedStatement.setString(16, notificationChannel.getTextChannelID());
             preparedStatement.executeUpdate();
             LOGGER.info("Updated Notification Channel on guild " + notificationChannel.getGuildID() + " with channel id " +
                     notificationChannel.getTextChannelID());

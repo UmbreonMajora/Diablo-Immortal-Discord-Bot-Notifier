@@ -14,6 +14,7 @@ public class GameDataCache {
     private Set<EventGameData> ancientArenaDataSet = new HashSet<>();
     private Set<EventGameData> battlegroundDataSet = new HashSet<>();
     private Set<EventGameData> demonGatesDataSet = new HashSet<>();
+    private Set<EventGameData> onSlaughtDataSet = new HashSet<>();
     private Set<EventGameData> vaultGameDataSet = new HashSet<>();
     private Set<EventGameData> assemblyDataSet = new HashSet<>();
 
@@ -87,5 +88,13 @@ public class GameDataCache {
 
     public void setAssemblyDataSet(Set<EventGameData> assemblyDataSet) {
         this.assemblyDataSet = assemblyDataSet;
+    }
+
+    public Set<EventGameData> getOnSlaughtDataSet() {
+        return onSlaughtDataSet;
+    }
+
+    public void setOnSlaughtDataSet(Set<EventGameData> onSlaughtDataSet) {
+        this.onSlaughtDataSet = onSlaughtDataSet;
     }
 }

@@ -1,9 +1,8 @@
 package me.umbreon.didn.enums;
 
 public enum ServerSetting {
-    HEAD_UP("headup"),
-    MESSAGE("messaage"),
-    WARN_TIME("Warn time");
+    WARN_MESSAGES("warnmessages"),
+    EVENT_MESSAGES("eventmessages");
 
     public final String rawName;
 

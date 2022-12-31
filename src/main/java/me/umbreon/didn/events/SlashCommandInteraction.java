@@ -1,8 +1,6 @@
 package me.umbreon.didn.events;
 
-import me.umbreon.didn.cache.GameEventCache;
 import me.umbreon.didn.cache.GuildsCache;
-import me.umbreon.didn.commands.IClientCommand;
 import me.umbreon.didn.commands.channel.*;
 import me.umbreon.didn.commands.custom_notifications.*;
 import me.umbreon.didn.commands.info.*;
@@ -15,7 +13,6 @@ import me.umbreon.didn.database.DatabaseRequests;
 import me.umbreon.didn.logger.FileLogger;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -82,8 +79,6 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.deleteCustomMessageCommand = new DeleteCustomMessageCommand(databaseRequests, guildsCache);
         this.listCustomMessagesCommand = new ListCustomMessagesCommand(guildsCache, databaseRequests);
 
-        GameEventCache gameEventCache = new GameEventCache();
-
         this.helpCommand = new HelpCommand();
         this.instructionsCommand = new InstructionsCommand();
         this.languagesCommand = new LanguagesCommand();
@@ -124,13 +119,6 @@ public class SlashCommandInteraction extends ListenerAdapter {
         }
 
         String guildID = guild.getId();
-        String guildAdminRoleID = guildsCache.getGuildAdminRoleID(guildID);
-
-        if (!isUserPermitted(member, guildAdminRoleID)) {
-            return;
-        }
-
-        event.deferReply().queue();
 
         if (!guildsCache.isGuildRegistered(guildID)) {
             LOGGER.info(guild + " is not registered. Registering...");
@@ -139,6 +127,13 @@ public class SlashCommandInteraction extends ListenerAdapter {
             guildsCache.addGuild(clientGuild);
             databaseRequests.createGuild(clientGuild);
         }
+
+        String guildAdminRoleID = guildsCache.getGuildAdminRoleID(guildID);
+        if (!isUserPermitted(member, guildAdminRoleID)) {
+            return;
+        }
+
+        event.deferReply().queue();
 
         executeCommand(event);
     }

@@ -13,6 +13,5 @@ SET roleID                = ?,
     demongatesembed       = ?,
     ancientnightmareembed = ?,
     hauntedcarriageembed  = ?,
-    ancientnightmareembed = ?,
     wrathborneinvasion    = ?
 WHERE textChannelID = ?;

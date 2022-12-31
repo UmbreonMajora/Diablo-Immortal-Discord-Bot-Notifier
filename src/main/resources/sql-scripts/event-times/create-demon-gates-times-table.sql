@@ -22,9 +22,3 @@ INSERT INTO demon_gates_times (warn_range, warn_day)
 VALUES ('21:15-20:30', 'Monday');
 INSERT INTO demon_gates_times (warn_range, warn_day)
 VALUES ('21:45-22:00', 'Monday');
-INSERT INTO demon_gates_times (warn_range, warn_day)
-VALUES ('11:45-12:00', 'Sunday');
-INSERT INTO demon_gates_times (warn_range, warn_day)
-VALUES ('21:15-20:30', 'Sunday');
-INSERT INTO demon_gates_times (warn_range, warn_day)
-VALUES ('21:45-22:00', 'Sunday');

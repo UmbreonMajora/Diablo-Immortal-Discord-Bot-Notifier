@@ -30,6 +30,7 @@ public class Notifier {
     private final ShadowLotteryEvent shadowLotteryEvent;
     private final WrathborneInvasionEvent wrathborneInvasionEvent;
     private final DemonGatesEvent demonGatesEvent;
+    private final OnSlaughtEvent onSlaughtEvent;
 
     public Notifier(GuildsCache guildsCache, GameDataCache gameDataCache) {
         this.guildsCache = guildsCache;
@@ -42,6 +43,7 @@ public class Notifier {
         this.shadowLotteryEvent = new ShadowLotteryEvent(gameDataCache);
         this.wrathborneInvasionEvent = new WrathborneInvasionEvent(gameDataCache);
         this.demonGatesEvent = new DemonGatesEvent(gameDataCache);
+        this.onSlaughtEvent = new OnSlaughtEvent(gameDataCache);
     }
 
     public void runNotificationScheduler(JDA client) {
@@ -74,6 +76,8 @@ public class Notifier {
                             notificationMessage.append(shadowLotteryEvent.appendShadowLotteryNotificationIfHappening(clientGuild, channel));
                         if (channel.isWrathborneInvasionEnabled())
                             notificationMessage.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
+                        if (channel.isOnSlaughtMessagesEnabled())
+                            notificationMessage.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
 
                         TextChannel textChannel = client.getTextChannelById(channel.getTextChannelID());
                         String guildID = channel.getGuildID();
@@ -83,9 +87,8 @@ public class Notifier {
                             textChannel.sendMessage(notificationMessage.toString()).queue(message -> {
                             }, throwable -> {
                                 if (throwable instanceof InsufficientPermissionException) {
-                                    client.getGuildById(guildID).getOwner().getUser().openPrivateChannel().queue(privateChannel -> {
-                                        privateChannel.sendMessage("I do not have enough permissions.").queue();
-                                    });
+                                    client.getGuildById(guildID).getOwner().getUser().openPrivateChannel().queue(privateChannel ->
+                                            privateChannel.sendMessage("I do not have enough permissions.").queue());
                                 }
                             });
                         }

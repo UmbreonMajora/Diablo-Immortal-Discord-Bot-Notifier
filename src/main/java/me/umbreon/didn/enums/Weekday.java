@@ -1,19 +1,21 @@
 package me.umbreon.didn.enums;
 
 public enum Weekday {
-    MONDAY("monday"),
-    TUESDAY("tuesday"),
-    WEDNESDAY("wednesday"),
-    THURSDAY("thursday"),
-    FRIDAY("fryday"),
-    SATURDAY("saturday"),
-    SUNDAY("sunday"),
-    EVERYDAY("everyday");
+    MONDAY("monday", "Monday"),
+    TUESDAY("tuesday", "Tuesday"),
+    WEDNESDAY("wednesday", "Wednesday"),
+    THURSDAY("thursday", "Thursday"),
+    FRIDAY("friday", "Friday"),
+    SATURDAY("saturday", "Saturday"),
+    SUNDAY("sunday", "Sunday"),
+    EVERYDAY("everyday", "Everyday");
 
     public final String rawName;
+    public final String name;
 
-    Weekday(String rawName) {
+    Weekday(String rawName, String name) {
         this.rawName = rawName;
+        this.name = name;
     }
 
     public static Weekday findWeekdayByRawName(String rawName) {

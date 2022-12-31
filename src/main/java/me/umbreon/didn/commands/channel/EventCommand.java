@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 import static me.umbreon.didn.utils.CommandsUtil.EVENT_NAME_OPTION_NAME;
 import static me.umbreon.didn.utils.CommandsUtil.EVENT_VALUE_OPTION_NAME;
 
@@ -37,7 +39,7 @@ public class EventCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
         TextChannel targetTextChannel = getTargetTextChannel(event);
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
         String targetTextChannelID = targetTextChannel.getId();
         User user = event.getUser();
         Language language = guildsCache.getGuildLanguage(guildID);
@@ -107,6 +109,9 @@ public class EventCommand implements IClientCommand {
                 break;
             case WRATHBORNE_INVASION:
                 notificationChannel.setWrathborneInvasionEnabled(gameEventValue);
+                break;
+            case ON_SLAUGHT:
+                notificationChannel.setOnSlaughtMessagesEnabled(gameEventValue);
                 break;
         }
         databaseRequests.updateNotificationChannel(notificationChannel);

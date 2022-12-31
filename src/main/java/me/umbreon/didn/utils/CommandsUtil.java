@@ -1,22 +1,25 @@
 package me.umbreon.didn.utils;
 
-import me.umbreon.didn.enums.GameEvent;
-import me.umbreon.didn.enums.Language;
-import me.umbreon.didn.enums.Preset;
-import me.umbreon.didn.enums.Weekday;
+import me.umbreon.didn.enums.*;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.text.html.Option;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class CommandsUtil {
 
-    public static final String COMMAND_EVENT = "event";
-    private static final String COMMAND_EVENT_DESC = "X";
+    private static final Properties commandsProperties = new Properties();
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandsUtil.class);
+
+    // -> Command Options
 
     public static final String EVENT_NAME_OPTION_NAME = "eventname";
     private static final OptionData REQUIRED_EVENT_NAME_OPTION =
@@ -26,39 +29,17 @@ public class CommandsUtil {
     private static final OptionData REQUIRED_EVENT_VALUE_OPTION =
             new OptionData(OptionType.BOOLEAN, EVENT_VALUE_OPTION_NAME, "Select that event you want to change.", true);
 
-    public static final String COMMAND_INFO = "info";
-    public static final String COMMAND_INFO_DESC = "X";
-
     public static final String TARGET_CHANNEL_OPTION_NAME = "targetchannel";
     private static final OptionData NOT_REQUIRED_CHANNEL_OPTION =
             new OptionData(OptionType.CHANNEL, TARGET_CHANNEL_OPTION_NAME, "Enter here your channel.", false);
 
-    public static final String COMMAND_LIST_EVENTS = "listevents";
-    public static final String COMMAND_LIST_EVENTS_DESC = "X";
-
-    public static final String COMMAND_MENTION_ROLE = "mentionrole";
-    public static final String COMMAND_MENTION_ROLE_DESC = "X";
     public static final String ROLE_OPTION_NAME = "role";
     private static final OptionData REQUIRED_ROLE_OPTION =
             new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "Enter here your role", true);
 
     public static final String PRESET_OPTION_NAME = "preset";
-    public static final String COMMAND_PRESET = "preset";
-    public static final String COMMAND_PRESET_DESC = "X";
     private static final OptionData REQUIRED_PRESET_OPTION =
             new OptionData(OptionType.STRING, PRESET_OPTION_NAME, "Apply a preset on your notification channel.", true);
-
-    public static final String COMMAND_REGISTER = "register";
-    private static final String COMMAND_REGISTER_DESC = "X";
-
-    public static final String COMMAND_UNREGISTER = "unregister";
-    private static final String COMMAND_UNREGISTER_DESC = "X";
-
-    public static final String COMMAND_CREATE_CUSTOM_MESSAGE = "createcustommessage";
-    private static final String COMMAND_CREATE_CUSTOM_MESSAGE_DESC = "X";
-
-    public static final String COMMAND_MESSAGE = "message";
-    public static final String COMMAND_MESSAGE_DESC = "X";
 
     public static final String WEEKDAY_OPTION_NAME = "weekday";
     private static final OptionData CREATE_CUSTOM_MESSAGE_WEEKDAY_OPTION =
@@ -69,49 +50,16 @@ public class CommandsUtil {
             new OptionData(OptionType.STRING, TIME_OPTION_NAME, "At what time would you like to get the message?", true);
 
     public static final String REPEATING_OPTION_NAME = "repeating";
-    public static final OptionData CREATE_CUSTOM_MESSAGE_REPEATING_OPTION =
+    private static final OptionData CREATE_CUSTOM_MESSAGE_REPEATING_OPTION =
             new OptionData(OptionType.BOOLEAN, REPEATING_OPTION_NAME, "Should the message be sent every week or only once?", true);
 
     public static final String MESSAGE_OPTION_NAME = "message";
-    public static final OptionData CREATE_CUSTOM_MESSAGE_MESSAGE_OPTION =
+    private static final OptionData CREATE_CUSTOM_MESSAGE_MESSAGE_OPTION =
             new OptionData(OptionType.STRING, MESSAGE_OPTION_NAME, "Enter here your message.", true);
-
-    public static final String COMMAND_CUSTOM_MESSAGE_INFO = "custommessageinfo";
-    public static final String COMMAND_CUSTOM_MESSAGE_INFO_DESC = "X";
 
     public static final String CUSTOM_MESSAGE_ID_OPTION_NAME = "custommessageid";
     private static final OptionData CUSTOM_MESSAGE_ID_OPTION =
             new OptionData(OptionType.INTEGER, CUSTOM_MESSAGE_ID_OPTION_NAME, "Enter your custom message ID here.", true);
-
-    public static final String COMMAND_DELETE_CUSTOM_MESSAGE = "deletecustommessage";
-    public static final String COMMAND_DELETE_CUSTOM_MESSAGE_DESC = "X";
-
-    public static final String COMMAND_LIST_CUSTOM_MESSAGES = "listcustommessages";
-    public static final String COMMAND_LIST_CUSTOM_MESSAGES_DESC = "X";
-
-    public static final String COMMAND_HELP = "help";
-    public static final String COMMAND_HELP_DESC = "X";
-
-    public static final String COMMAND_INSTALL = "install";
-    public static final String COMMAND_INSTALL_DESC = "X";
-
-    public static final String COMMAND_LANGUAGES = "languages";
-    public static final String COMMAND_LANGUAGES_DESC = "X";
-
-    public static final String COMMAND_TIMEZONES = "timezones";
-    public static final String COMMAND_TIMEZONES_DESC = "X";
-
-    public static final String COMMAND_TODAY = "today";
-    public static final String COMMAND_TODAY_DESC = "X";
-
-    public static final String COMMAND_UPCOMING = "upcoming";
-    public static final String COMMAND_UPCOMING_DESC = "X";
-
-    public static final String COMMAND_CREATE_REACTION_ROLE = "createreactionrole";
-    public static final String COMMAND_CREATE_REACTION_ROLE_DESC = "X";
-
-    public static final String COMMAND_WARN_TIME = "warntime";
-    public static final String COMMAND_WARN_TIME_DESC = "X";
 
     public static final String MESSAGE_ID_OPTION_NAME = "messageid";
     private static final OptionData REQUIRED_MESSAGE_ID_OPTION =
@@ -121,42 +69,22 @@ public class CommandsUtil {
     private static final OptionData REQUIRED_EMOTE_OPTION =
             new OptionData(OptionType.STRING, EMOTE_OPTION_NAME, "Enter here your emote", true);
 
-    public static final String COMMAND_LIST_REACTION_ROLES = "listreactionroles";
-    public static final String COMMAND_LIST_REACTION_ROLES_DESC = "X";
-
-    public static final String COMMAND_REMOVE_REACTION_ROLE = "removereactionrole";
-    public static final String COMMAND_REMOVE_REACTION_ROLE_DESC = "X";
-
-    public static final String COMMAND_ADMIN_ROLE = "adminrole";
-    public static final String COMMAND_ADMIN_ROLE_DESC = "X";
-
-    public static final String COMMAND_CONFIG = "config";
-    public static final String COMMAND_CONFIG_DESC = "X";
-
-    public static final String COMMAND_LANGUAGE = "language";
-    public static final String COMMAND_LANGUAGE_DESC = "X";
-
     public static final String LANGUAGE_OPTION_NAME = "language";
     private static final OptionData REQUIRED_LANGUAGE_OPTION =
             new OptionData(OptionType.STRING, LANGUAGE_OPTION_NAME, "Enter your language here.", true);
 
-    public static final String COMMAND_SERVER = "server";
-    public static final String COMMAND_SERVER_DESC = "X";
-
     public static final String SERVER_SETTING_OPTION_NAME = "serversetting";
     private static final OptionData REQUIRED_SERVER_SETTING_OPTION =
-            new OptionData(OptionType.STRING, SERVER_SETTING_OPTION_NAME, "Select your server setting here.");
+            new OptionData(OptionType.STRING, SERVER_SETTING_OPTION_NAME, "Select your server setting here.", true);
 
     public static final String SERVER_SETTING_VALUE_OPTION_NAME = "servervalue";
     private static final OptionData REQUIRED_SERVER_VALUE_OPTION =
-            new OptionData(OptionType.STRING, SERVER_SETTING_VALUE_OPTION_NAME, "Turn this setting on or off?");
-
-    public static final String COMMAND_TIMEZONE = "timezone";
-    private static final String COMMAND_TIMEZONE_DESC = "X";
+            new OptionData(OptionType.BOOLEAN, SERVER_SETTING_VALUE_OPTION_NAME, "Turn this setting on or off?", true);
 
     public static final String TIMEZONE_OPTION_NAME = "timezone";
     private static final OptionData REQUIRED_TIMEZONE_OPTION =
-            new OptionData(OptionType.STRING, TIMEZONE_OPTION_NAME, "Select here your matching GMT timezone. Use /timzones to see what timezone would match you.", true);
+            new OptionData(OptionType.STRING, TIMEZONE_OPTION_NAME, "Select here your matching GMT timezone. " +
+                    "Use /timzones to see what timezone would match you.", true);
 
     public static final String WARN_TIME_OPTION_NAME = "warntime";
     private static final OptionData REQUIRED_WARN_TIME_OPTION =
@@ -164,20 +92,119 @@ public class CommandsUtil {
 
     public static final String MESSAGE_VALUE_OPTION_NAME = "messagevalue";
     private static final OptionData REQUIRED_MESSAGE_VALUE_OPTION =
-            new OptionData(OptionType.BOOLEAN, MESSAGE_VALUE_OPTION_NAME, "Enable or disable your custom notification message", true);
+            new OptionData(OptionType.BOOLEAN, MESSAGE_VALUE_OPTION_NAME, "Enable or disable your custom " +
+                    "notification message", true);
+
+    // -> Commands & Command Descriptions
+
+    public static final String COMMAND_EVENT = "event";
+    private static final String COMMAND_EVENT_DESC;
+
+    public static final String COMMAND_INFO = "info";
+    private static final String COMMAND_INFO_DESC;
+
+    public static final String COMMAND_LIST_EVENTS = "listevents";
+    private static final String COMMAND_LIST_EVENTS_DESC;
+
+    public static final String COMMAND_MENTION_ROLE = "mentionrole";
+    private static final String COMMAND_MENTION_ROLE_DESC;
+
+    public static final String COMMAND_PRESET = "preset";
+    private static final String COMMAND_PRESET_DESC;
+
+    public static final String COMMAND_REGISTER = "register";
+    private static final String COMMAND_REGISTER_DESC;
+
+    public static final String COMMAND_UNREGISTER = "unregister";
+    private static final String COMMAND_UNREGISTER_DESC;
+
+    public static final String COMMAND_CREATE_CUSTOM_MESSAGE = "createcustommessage";
+    private static final String COMMAND_CREATE_CUSTOM_MESSAGE_DESC;
+
+    public static final String COMMAND_MESSAGE = "message";
+    private static final String COMMAND_MESSAGE_DESC;
+
+    public static final String COMMAND_CUSTOM_MESSAGE_INFO = "custommessageinfo";
+    private static final String COMMAND_CUSTOM_MESSAGE_INFO_DESC;
+
+    public static final String COMMAND_DELETE_CUSTOM_MESSAGE = "deletecustommessage";
+    private static final String COMMAND_DELETE_CUSTOM_MESSAGE_DESC;
+
+    public static final String COMMAND_HELP = "help";
+    private static final String COMMAND_HELP_DESC;
+
+    public static final String COMMAND_INSTALL = "install";
+    private static final String COMMAND_INSTALL_DESC;
+
+    public static final String COMMAND_LANGUAGES = "languages";
+    private static final String COMMAND_LANGUAGES_DESC;
+
+    public static final String COMMAND_LIST_CUSTOM_MESSAGES = "listcustommessages";
+    private static final String COMMAND_LIST_CUSTOM_MESSAGES_DESC;
+
+    public static final String COMMAND_TIMEZONES = "timezones";
+    private static final String COMMAND_TIMEZONES_DESC;
+
+    public static final String COMMAND_TODAY = "today";
+    private static final String COMMAND_TODAY_DESC;
+
+    public static final String COMMAND_UPCOMING = "upcoming";
+    private static final String COMMAND_UPCOMING_DESC;
+
+    public static final String COMMAND_CREATE_REACTION_ROLE = "createreactionrole";
+    private static final String COMMAND_CREATE_REACTION_ROLE_DESC;
+
+    public static final String COMMAND_WARN_TIME = "warntime";
+    private static final String COMMAND_WARN_TIME_DESC;
+
+    public static final String COMMAND_LIST_REACTION_ROLES = "listreactionrole";
+    private static final String COMMAND_LIST_REACTION_ROLES_DESC;
+
+    public static final String COMMAND_REMOVE_REACTION_ROLE = "removereactionrole";
+    private static final String COMMAND_REMOVE_REACTION_ROLE_DESC;
+
+    public static final String COMMAND_ADMIN_ROLE = "adminrole";
+    private static final String COMMAND_ADMIN_ROLE_DESC;
+
+    public static final String COMMAND_CONFIG = "config";
+    private static final String COMMAND_CONFIG_DESC;
+
+    public static final String COMMAND_LANGUAGE = "language";
+    private static final String COMMAND_LANGUAGE_DESC;
+
+    public static final String COMMAND_SERVER = "server";
+    private static final String COMMAND_SERVER_DESC;
+
+    public static final String COMMAND_TIMEZONE = "timezone";
+    private static final String COMMAND_TIMEZONE_DESC;
 
     static {
-        //Todo: add useful description
+        try (InputStream inputStream = CommandsUtil.class.getClassLoader().getResourceAsStream("commands.properties")) {
+            if (inputStream != null) {
+                commandsProperties.load(inputStream);
+                LOGGER.info("Loaded command.properties file.");
+            } else {
+                LOGGER.warn("Failed to load command.properties! Input stream for command.properties was null.");
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Failed to load command.properties!", e);
+            e.printStackTrace();
+        }
+
         for (GameEvent gameEvent : GameEvent.values()) {
             REQUIRED_EVENT_NAME_OPTION.addChoice(gameEvent.rawName, gameEvent.rawName);
         }
 
+        for (ServerSetting serverSetting : ServerSetting.values()) {
+            REQUIRED_SERVER_SETTING_OPTION.addChoice(serverSetting.rawName, serverSetting.rawName);
+        }
+
         for (Preset preset : Preset.values()) {
-            REQUIRED_PRESET_OPTION.addChoice(preset.name(), preset.getAsChoiceName);
+            REQUIRED_PRESET_OPTION.addChoice(preset.presetDescription, preset.getAsChoiceName);
         }
 
         for (Weekday weekday : Weekday.values()) {
-            CREATE_CUSTOM_MESSAGE_WEEKDAY_OPTION.addChoice(weekday.name(), weekday.rawName);
+            CREATE_CUSTOM_MESSAGE_WEEKDAY_OPTION.addChoice(weekday.name, weekday.rawName);
         }
 
         for (Language language : Language.values()) {
@@ -199,6 +226,38 @@ public class CommandsUtil {
             }
             REQUIRED_TIMEZONE_OPTION.addChoice(timezoneMessage, timezoneMessage);
         }
+
+        COMMAND_EVENT_DESC = commandsProperties.get(COMMAND_EVENT).toString();
+        COMMAND_INFO_DESC = commandsProperties.get(COMMAND_INFO).toString();
+        COMMAND_LIST_EVENTS_DESC = commandsProperties.get(COMMAND_LIST_EVENTS).toString();
+        COMMAND_MENTION_ROLE_DESC = commandsProperties.get(COMMAND_MENTION_ROLE).toString();
+        COMMAND_PRESET_DESC = commandsProperties.get(COMMAND_PRESET).toString();
+        COMMAND_REGISTER_DESC = commandsProperties.get(COMMAND_REGISTER).toString();
+        COMMAND_UNREGISTER_DESC = commandsProperties.get(COMMAND_UNREGISTER).toString();
+        COMMAND_CREATE_CUSTOM_MESSAGE_DESC = commandsProperties.get(COMMAND_CREATE_CUSTOM_MESSAGE).toString();
+        COMMAND_MESSAGE_DESC = commandsProperties.get(COMMAND_MESSAGE).toString();
+        COMMAND_CUSTOM_MESSAGE_INFO_DESC = commandsProperties.get(COMMAND_CUSTOM_MESSAGE_INFO).toString();
+        COMMAND_DELETE_CUSTOM_MESSAGE_DESC = commandsProperties.get(COMMAND_DELETE_CUSTOM_MESSAGE).toString();
+        COMMAND_LIST_CUSTOM_MESSAGES_DESC = commandsProperties.get(COMMAND_LIST_CUSTOM_MESSAGES).toString();
+        COMMAND_HELP_DESC = commandsProperties.get(COMMAND_HELP).toString();
+        COMMAND_INSTALL_DESC = commandsProperties.get(COMMAND_INSTALL).toString();
+        COMMAND_LANGUAGES_DESC = commandsProperties.get(COMMAND_LANGUAGES).toString();
+        COMMAND_TIMEZONES_DESC = commandsProperties.get(COMMAND_TIMEZONES).toString();
+        COMMAND_TODAY_DESC = commandsProperties.get(COMMAND_TODAY).toString();
+        COMMAND_UPCOMING_DESC = commandsProperties.get(COMMAND_UPCOMING).toString();
+        COMMAND_CREATE_REACTION_ROLE_DESC = commandsProperties.get(COMMAND_CREATE_REACTION_ROLE).toString();
+        COMMAND_WARN_TIME_DESC = commandsProperties.get(COMMAND_WARN_TIME).toString();
+        COMMAND_LIST_REACTION_ROLES_DESC = commandsProperties.get(COMMAND_LIST_REACTION_ROLES).toString();
+        COMMAND_REMOVE_REACTION_ROLE_DESC = commandsProperties.get(COMMAND_REMOVE_REACTION_ROLE).toString();
+        COMMAND_ADMIN_ROLE_DESC = commandsProperties.get(COMMAND_ADMIN_ROLE).toString();
+        COMMAND_CONFIG_DESC = commandsProperties.get(COMMAND_CONFIG).toString();
+        COMMAND_LANGUAGE_DESC = commandsProperties.get(COMMAND_LANGUAGE).toString();
+        COMMAND_SERVER_DESC = commandsProperties.get(COMMAND_SERVER).toString();
+        COMMAND_TIMEZONE_DESC = commandsProperties.get(COMMAND_TIMEZONE).toString();
+    }
+
+    public static Properties getCommandsProperties() {
+        return commandsProperties;
     }
 
     public static List<CommandData> getCommandDataList() {

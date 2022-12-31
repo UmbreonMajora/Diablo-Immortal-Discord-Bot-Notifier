@@ -11,7 +11,8 @@ public enum GameEvent {
     DEMON_GATES("demongates"),
     SHADOW_LOTTERY("shadowlottery"),
     HAUNTED_CARRIAGE("hauntedcarriage"),
-    WRATHBORNE_INVASION("wrathborneinvasion");
+    WRATHBORNE_INVASION("wrathborneinvasion"),
+    ON_SLAUGHT("onslaught");
 
     public final String rawName;
 

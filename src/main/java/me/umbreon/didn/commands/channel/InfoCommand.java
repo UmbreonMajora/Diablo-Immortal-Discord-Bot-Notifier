@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 /**
  * @author Umbreon Majora
  * This command show's a user all infos about a registered channel.
@@ -32,22 +34,29 @@ public class InfoCommand implements IClientCommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
-        TextChannel targetTextChannel = getTargetTextChannel(event);
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
-        String targetTextChannelID = targetTextChannel.getId();
         User user = event.getUser();
+        String executingUser = getFullUsernameWithDiscriminator(user);
+
+        TextChannel targetTextChannel = getTargetTextChannel(event);
+        String targetTextChannelName = targetTextChannel.getName();
+        String targetTextChannelID = targetTextChannel.getId();
+
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
         Language language = guildsCache.getGuildLanguage(guildID);
 
+        String guildName = event.getGuild().getName();
         if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
-            createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " tried to use /info on an unregistered channel.");
+            createLog(LOGGER, guildID, executingUser + " tried to use /info on an unregistered channel" +
+                    " in " + guildName + "(" + guildID + ")," +
+                    " Channel: " + targetTextChannelName + "(" + targetTextChannelID + ")");
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANNEL-NOT-REGISTERED"));
             return;
         }
 
-        createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " executed /info on " + targetTextChannelID);
+        createLog(LOGGER, guildID, executingUser + " executed /info in " + guildName + "(" + guildID + ")," +
+                " Channel: " + targetTextChannelName + "(" + targetTextChannelID + ")");
         String mentionRoleID = getMentionRoleID(guildID, targetTextChannelID);
-        Role mentionRole = event.getGuild().getRoleById(mentionRoleID);
-        replyEphemeralToUser(event, buildInfoEmbed(targetTextChannel, mentionRole, guildID));
+        replyEphemeralToUser(event, buildInfoEmbed(targetTextChannel, mentionRoleID, guildID));
     }
 
     private String getMentionRoleID(String guildID, String targetTextChannelID) {
@@ -59,7 +68,8 @@ public class InfoCommand implements IClientCommand {
     }
 
     //todo: loop with gameevents enum?
-    private MessageEmbed buildInfoEmbed(TextChannel textChannel, Role mentionedRole, String guildID) {
+    //TODO: FIX THIS STUFF WTF? so ugly
+    private MessageEmbed buildInfoEmbed(TextChannel textChannel, String mentionRoleID, String guildID) {
         String textChannelID = textChannel.getId();
         String textChannelName = textChannel.getName();
 
@@ -73,7 +83,13 @@ public class InfoCommand implements IClientCommand {
         embedBuilder.addField(LanguageController.getMessage(language, "TIMEZONE"), timezone, true);
         embedBuilder.addField(LanguageController.getMessage(language, "CURRENT-TIME"), TimeUtil.getTimeWithWeekday(timezone), true);
         embedBuilder.addField(LanguageController.getMessage(language, "TEXT-CHANNEL-ID"), "<#" + notificationChannel.getTextChannelID() + '>', false);
-        embedBuilder.addField(LanguageController.getMessage(language, "CHANNEL-MENTION-ROLE"), String.valueOf(mentionedRole), false);
+
+        if (mentionRoleID.equalsIgnoreCase("EVERYONE")) {
+            embedBuilder.addField(LanguageController.getMessage(language, "CHANNEL-MENTION-ROLE"), "null", false);
+        } else {
+            Role mentionRole = textChannel.getGuild().getRoleById(mentionRoleID);
+            embedBuilder.addField(LanguageController.getMessage(language, "CHANNEL-MENTION-ROLE"), String.valueOf(mentionRole), false);
+        }
 
         String yes = LanguageController.getMessage(language, "TEXT-YES");
         String no = LanguageController.getMessage(language, "TEXT-NO");
@@ -111,6 +127,8 @@ public class InfoCommand implements IClientCommand {
         String eventAncientArenaEnabled = notificationChannel.isAncientArenaMessageEnabled() ? yes : no;
         embedBuilder.addField(LanguageController.getMessage(language, "ANCIENT-ARENA-MESSAGES-ENABLED"), eventAncientArenaEnabled, true);
 
+        String eventOnSlaughtEnabled = notificationChannel.isOnSlaughtMessagesEnabled() ? yes : no;
+        embedBuilder.addField(LanguageController.getMessage(language, "ON-SLAUGHT-ENABLED"), eventOnSlaughtEnabled, true);
 
 /* embedded messages are disabled.
         String eventHauntedCarriageEmbedEnabled = notificationChannel.isHauntedCarriageMessageEmbedEnabled() ? yes : no;

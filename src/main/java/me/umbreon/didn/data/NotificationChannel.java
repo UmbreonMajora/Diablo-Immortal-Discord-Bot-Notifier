@@ -17,6 +17,7 @@ public class NotificationChannel {
     private boolean hauntedCarriageMessageEnabled;
     private boolean ancientNightmareMessageEnabled;
     private boolean wrathborneInvasionEnabled;
+    private boolean isOnSlaughtMessagesEnabled;
 
     private boolean demonGatesMessageEmbedEnabled;
     private boolean ancientArenaMessageEmbedEnabled;
@@ -35,6 +36,7 @@ public class NotificationChannel {
         this.hauntedCarriageMessageEnabled = true;
         this.ancientNightmareMessageEnabled = true;
         this.wrathborneInvasionEnabled = true;
+        this.isOnSlaughtMessagesEnabled = true;
 
         this.demonGatesMessageEmbedEnabled = false;
         this.ancientArenaMessageEmbedEnabled = false;
@@ -54,7 +56,7 @@ public class NotificationChannel {
                                boolean hauntedCarriageMessageEnabled, boolean ancientNightmareMessageEnabled,
                                boolean demonGatesMessageEmbedEnabled, boolean ancientArenaMessageEmbedEnabled,
                                boolean hauntedCarriageMessageEmbedEnabled, boolean ancientNightmareMessageEmbedEnabled,
-                               boolean wrathborneInvasionEnabled) {
+                               boolean wrathborneInvasionEnabled, boolean isOnSlaughtMessagesEnabled) {
         this.roleID = roleID;
         this.guildID = guildID;
         this.textChannelID = textChannelID;
@@ -73,6 +75,7 @@ public class NotificationChannel {
         this.hauntedCarriageMessageEmbedEnabled = hauntedCarriageMessageEmbedEnabled;
         this.ancientNightmareMessageEmbedEnabled = ancientNightmareMessageEmbedEnabled;
         this.wrathborneInvasionEnabled = wrathborneInvasionEnabled;
+        this.isOnSlaughtMessagesEnabled = isOnSlaughtMessagesEnabled;
     }
 
     public String getMentionRoleID() {
@@ -219,4 +222,11 @@ public class NotificationChannel {
         this.wrathborneInvasionEnabled = wrathborneInvasionEnabled;
     }
 
+    public boolean isOnSlaughtMessagesEnabled() {
+        return isOnSlaughtMessagesEnabled;
+    }
+
+    public void setOnSlaughtMessagesEnabled(boolean onSlaughtMessagesEnabled) {
+        isOnSlaughtMessagesEnabled = onSlaughtMessagesEnabled;
+    }
 }

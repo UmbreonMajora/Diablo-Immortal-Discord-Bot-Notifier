@@ -1,6 +1,6 @@
 package me.umbreon.didn.data;
 /*
- * Weekday is null, when it's everyday.
+ * Weekday is null, when it's every day.
  */
 public class EventGameData {
 

@@ -5,8 +5,6 @@ import me.umbreon.didn.cache.GameDataCache;
 import me.umbreon.didn.cache.GuildsCache;
 import me.umbreon.didn.database.DatabaseRequests;
 import me.umbreon.didn.database.MySQLDatabaseConnection;
-import me.umbreon.didn.database.SQLStatements;
-import me.umbreon.didn.enums.Preset;
 import me.umbreon.didn.events.*;
 import me.umbreon.didn.logger.FileLogger;
 import me.umbreon.didn.notifier.CustomMessagesNotifier;
@@ -19,6 +17,28 @@ import net.dv8tion.jda.api.JDABuilder;
 import java.sql.SQLException;
 
 public class DiabloImmortalDiscordNotifier {
+    /*
+     * TODOS:
+     * TheGreatMax — Today at 8:08 AM
+     * Perfection
+     * The other major thing that people was talking about is the possibility of implementing DST time zones as well.
+     * Or just a toggle switch for Daylight Savings Time on/off
+     * Right now i'm on a DST-7 server but its actually GMT-8 now.
+     *
+     * Yeah. I believe the easiest method is just a /config DaylightTime on/off and just make it adjust the time by an hour.
+     * other then that its gonna get complex as crap.
+     * meaning they turn it on during the winter and off during the summer.
+     */
+
+    /*
+     - Fixes:
+     - upcoming & today command no working
+     - embedded message where removed (re-add after all testing)
+     - languages not implemented.
+     - Suggestions:
+     - /editcustommessge
+     - multiple warn-time-messages for example: 5 minutes & 10 minutes.
+     */
 
     public static void main(String[] args) {
         GameDataCache gameDataCache = new GameDataCache();
@@ -80,6 +100,7 @@ public class DiabloImmortalDiscordNotifier {
         gameDataCache.setAncientNightmareDataSet(databaseRequests.getEventTimes("ancient_nightmare_times", false));
         gameDataCache.setAssemblyDataSet(databaseRequests.getEventTimes("assembly_times", false));
         gameDataCache.setWrathborneInvasionDataSet(databaseRequests.getEventTimes("wrathborne_invasion_times", true));
+        gameDataCache.setOnSlaughtDataSet(databaseRequests.getEventTimes("onslaught_times", false));
     }
 
 }

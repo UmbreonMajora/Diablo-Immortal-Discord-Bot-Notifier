@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
+
 /**
  * @author Umbreon Majora
  * Allow's user to register a text channel as notification channel.
@@ -32,7 +34,7 @@ public class RegisterCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
         TextChannel targetTextChannel = getTargetTextChannel(event);
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
         String targetTextChannelID = targetTextChannel.getId();
         User user = event.getUser();
         Language language = guildsCache.getGuildLanguage(guildID);
@@ -48,7 +50,7 @@ public class RegisterCommand implements IClientCommand {
         databaseRequests.createNotificationChannel(notificationChannel);
 
         createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " registered channel " + targetTextChannelID);
-        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CHANNEL-ALREADY-REGISTERED"), targetTextChannel.getAsMention()));
+        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CHANNEL-REGISTERED"), targetTextChannel.getAsMention()));
     }
 
     private boolean isChannelAlreadyRegistered(String guildID, String textChannelID) {

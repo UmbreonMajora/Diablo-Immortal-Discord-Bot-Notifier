@@ -4,6 +4,7 @@ public class StringUtil {
 
     public final static String EMPTY_STRING = "";
     public final static String NEW_LINE = "\n";
+    public final static String FORMATTED_MESSAGE = "```";
 
     public static String convertEmojiToUnicode(String emoji) {
         StringBuilder sb = new StringBuilder();
