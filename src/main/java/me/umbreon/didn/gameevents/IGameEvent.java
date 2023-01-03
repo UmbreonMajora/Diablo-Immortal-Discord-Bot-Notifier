@@ -21,6 +21,11 @@ public interface IGameEvent {
         for (EventGameData data : eventGameDataSet) {
             if (data.getWeekday() == null || data.getWeekday().equalsIgnoreCase(TimeUtil.getCurrentWeekday(timeZone))) {
                 String[] warnRange = data.getWarnRange().split("-");
+
+                System.out.println(">1 "+warnRange[0]);
+                System.out.println(">2 "+warnRange[1]);
+                System.out.println(">3 "+currentTimeAsString);
+                System.out.println(">4 "+TimeUtil.isTimeInBetween(currentTimeAsString, warnRange[0], warnRange[1]));
                 if (TimeUtil.isTimeInBetween(currentTimeAsString, warnRange[0], warnRange[1])) {
                     return warnRange[0];
                 }
@@ -39,7 +44,21 @@ public interface IGameEvent {
         } catch (ParseException e) {
             return EMPTY_STRING;
         }
-        return calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
+        String hours;
+        if (calendar.get(Calendar.HOUR_OF_DAY) < 10) {
+            hours = "0" + calendar.get(Calendar.HOUR_OF_DAY);
+        } else {
+            hours = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY));
+        }
+
+        String minutes;
+        if (calendar.get(Calendar.MINUTE) < 10) {
+            minutes = "0" + calendar.get(Calendar.MINUTE);
+        } else {
+            minutes = String.valueOf(calendar.get(Calendar.MINUTE));
+        }
+
+        return hours + ":" + minutes;
     }
 
     default boolean isEventStarting(Set<EventGameData> eventGameDataSet, String timeZone) {

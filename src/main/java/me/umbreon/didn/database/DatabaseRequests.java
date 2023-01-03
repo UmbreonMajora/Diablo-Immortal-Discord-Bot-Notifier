@@ -70,8 +70,10 @@ public class DatabaseRequests {
 
                     boolean isWarnMessagesEnabled = (resultSet.getInt("warn_messages_enabled") == 1);
                     boolean isEventMessagesEnabled = (resultSet.getInt("event_messages_enabled") == 1);
+                    boolean isDaylightTimeEnabled = (resultSet.getInt("daylight_time_enabled") == 1);
+                    boolean isPremiumServer = (resultSet.getInt("premium_server") == 1);
 
-                    ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime, isWarnMessagesEnabled, isEventMessagesEnabled);
+                    ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime, isWarnMessagesEnabled, isEventMessagesEnabled, isDaylightTimeEnabled, isPremiumServer);
                     clientGuildData.put(guildID, clientGuild);
                 }
             }
@@ -179,8 +181,10 @@ public class DatabaseRequests {
             preparedStatement.setString(3, clientGuild.getGuildTimeZone());
             preparedStatement.setBoolean(4, clientGuild.isWarnMessagesEnabled());
             preparedStatement.setBoolean(5, clientGuild.isEventMessageEnabled());
+            preparedStatement.setBoolean(6, clientGuild.isDaylightTimeEnabled());
+            preparedStatement.setBoolean(7, clientGuild.isPremiumServer());
             preparedStatement.executeUpdate();
-            LOGGER.info("Registered new guild with ID: " + clientGuild.getGuildID() + " in database!");
+            LOGGER.info("Registered new guild in database! GuildID: " + clientGuild.getGuildID());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -197,15 +201,27 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(4, clientGuild.isEventMessageEnabled());
             preparedStatement.setString(5, clientGuild.getGuildAdminRoleID());
             preparedStatement.setInt(6, clientGuild.getHeadUpTime());
-            preparedStatement.setString(7, clientGuild.getGuildID());
+            preparedStatement.setBoolean(7, clientGuild.isDaylightTimeEnabled());
+            preparedStatement.setBoolean(8, clientGuild.isPremiumServer());
+            preparedStatement.setString(9, clientGuild.getGuildID());
             preparedStatement.executeUpdate();
-            LOGGER.info("Updated Guild " + clientGuild.getGuildID());
+            LOGGER.info("Updated " + clientGuild.getGuildID() + " in database.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    // Todo: delete Guild is missing.
+    public void deleteGuildByGuildID(String guildID) {
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteGuildByGuildIdStatement())
+        ) {
+            preparedStatement.setString(1, guildID);
+            LOGGER.info("Deleted guild " + guildID + " from database.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     // Custom Notifications
 
@@ -276,6 +292,18 @@ public class DatabaseRequests {
             e.printStackTrace();
         }
         return nextAutoIncrementNumber + 1;
+    }
+
+    public void deleteMessagesByGuildID(String guildID) {
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteMessageByGuildIdStatement())
+        ) {
+            preparedStatement.setString(1, guildID);
+            LOGGER.info("Deleted messages of " + guildID + " from database.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // Notification Channel
@@ -353,6 +381,18 @@ public class DatabaseRequests {
         }
     }
 
+    public void deleteChannelsByGuildID(String guildID) {
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteChannelByGuildIdStatement())
+        ) {
+            preparedStatement.setString(1, guildID);
+            LOGGER.info("Deleted channels of " + guildID + " from database.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Reaction role
 
     public void createReactionRole(ReactionRole reactionRole) {
@@ -380,6 +420,18 @@ public class DatabaseRequests {
             preparedStatement.setString(1, messageID);
             preparedStatement.executeUpdate();
             LOGGER.info("Deleted Reaction role with ID " + messageID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteReactionRolesByGuildID(String guildID) {
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteReactionRolesByGuildIdStatement())
+        ) {
+            preparedStatement.setString(1, guildID);
+            LOGGER.info("Deleted reaction roles of " + guildID + " from database.");
         } catch (SQLException e) {
             e.printStackTrace();
         }

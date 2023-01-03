@@ -6,6 +6,7 @@ import me.umbreon.didn.data.EventGameData;
 import me.umbreon.didn.data.NotificationChannel;
 import me.umbreon.didn.enums.Language;
 import me.umbreon.didn.languages.LanguageController;
+import me.umbreon.didn.utils.ConfigUtil;
 import me.umbreon.didn.utils.TimeUtil;
 
 import java.util.Set;
@@ -25,16 +26,20 @@ public class WrathborneInvasionEvent implements IGameEvent {
     }
 
     public String appendWrathborneInvasionNotificationIfHappening(ClientGuild guild, NotificationChannel channel) {
-        Set<EventGameData> eventGameDataSet = gameDataCache.getBattlegroundDataSet();
+        if (!channel.isWrathborneInvasionEnabled()) {
+            return EMPTY_STRING;
+        }
+
+        Set<EventGameData> eventGameDataSet = gameDataCache.getWrathborneInvasionDataSet();
         String timeZone = guild.getGuildTimeZone();
         Language language = guild.getGuildLanguage();
 
         if (!isTimeInWarnRange(eventGameDataSet, timeZone).equals(EMPTY_STRING)) {
             String startTime = isTimeInWarnRange(eventGameDataSet, timeZone);
-            int warnTime = 15 - guild.getHeadUpTime();
+            int warnTime = ConfigUtil.getDefaultWarnTime() - guild.getHeadUpTime();
             String warnMessageTime = getWarnMessageTime(startTime, warnTime);
             if (TimeUtil.getTime(timeZone).equals(warnMessageTime) && isWarnMessageEnabled(guild, channel)) {
-                return String.format(LanguageController.getMessage(language, "EVENT-WRATHBORNE-INVASION-HEAD-UP"), warnTime) + NEW_LINE;
+                return String.format(LanguageController.getMessage(language, "EVENT-WRATHBORNE-INVASION-HEAD-UP"), guild.getHeadUpTime()) + NEW_LINE;
             }
         }
 

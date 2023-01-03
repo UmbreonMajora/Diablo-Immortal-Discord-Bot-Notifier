@@ -6,6 +6,7 @@ import me.umbreon.didn.data.EventGameData;
 import me.umbreon.didn.data.NotificationChannel;
 import me.umbreon.didn.enums.Language;
 import me.umbreon.didn.languages.LanguageController;
+import me.umbreon.didn.utils.ConfigUtil;
 import me.umbreon.didn.utils.TimeUtil;
 
 import java.util.Set;
@@ -25,16 +26,20 @@ public class ShadowLotteryEvent implements IGameEvent {
     }
 
     public String appendShadowLotteryNotificationIfHappening(ClientGuild guild, NotificationChannel channel) {
+        if (!channel.isShadowLotteryMessageEnabled()) {
+            return EMPTY_STRING;
+        }
+
         Set<EventGameData> eventGameDataSet = gameDataCache.getShadowLotteryDataSet();
         String timeZone = guild.getGuildTimeZone();
         Language language = guild.getGuildLanguage();
 
         if (!isTimeInWarnRange(eventGameDataSet, timeZone).equals(EMPTY_STRING)) {
             String startTime = isTimeInWarnRange(eventGameDataSet, timeZone);
-            int warnTime = 15 - guild.getHeadUpTime();
+            int warnTime = ConfigUtil.getDefaultWarnTime() - guild.getHeadUpTime();
             String warnMessageTime = getWarnMessageTime(startTime, warnTime);
             if (TimeUtil.getTime(timeZone).equals(warnMessageTime) && isWarnMessageEnabled(guild, channel)) {
-                return String.format(LanguageController.getMessage(language, "EVENT-SHADOW-LOTTERY-HEAD-UP"), warnTime) + NEW_LINE;
+                return String.format(LanguageController.getMessage(language, "EVENT-SHADOW-LOTTERY-HEAD-UP"), guild.getHeadUpTime()) + NEW_LINE;
             }
         }
 

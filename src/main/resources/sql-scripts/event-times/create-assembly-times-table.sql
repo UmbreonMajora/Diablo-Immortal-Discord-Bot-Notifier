@@ -1,7 +1,7 @@
 -- ASSEMBLY
 CREATE TABLE assembly_times
 (
-    warn_range CHAR(11) NOT NULL PRIMARY KEY,
+    warn_range CHAR(11) NOT NULL,
     warn_day   CHAR(10) NOT NULL
 );
 INSERT INTO assembly_times (warn_range, warn_day)

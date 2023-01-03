@@ -1,7 +1,6 @@
 package me.umbreon.didn.database;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
-import me.umbreon.didn.utils.FilesUtil;
 import me.umbreon.didn.logger.FileLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

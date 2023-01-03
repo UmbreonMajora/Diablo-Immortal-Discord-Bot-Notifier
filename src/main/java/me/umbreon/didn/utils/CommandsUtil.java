@@ -58,7 +58,7 @@ public class CommandsUtil {
             new OptionData(OptionType.STRING, MESSAGE_OPTION_NAME, "Enter here your message.", true);
 
     public static final String CUSTOM_MESSAGE_ID_OPTION_NAME = "custommessageid";
-    private static final OptionData CUSTOM_MESSAGE_ID_OPTION =
+    private static final OptionData REQUIRED_CUSTOM_MESSAGE_ID_OPTION =
             new OptionData(OptionType.INTEGER, CUSTOM_MESSAGE_ID_OPTION_NAME, "Enter your custom message ID here.", true);
 
     public static final String MESSAGE_ID_OPTION_NAME = "messageid";
@@ -95,6 +95,18 @@ public class CommandsUtil {
             new OptionData(OptionType.BOOLEAN, MESSAGE_VALUE_OPTION_NAME, "Enable or disable your custom " +
                     "notification message", true);
 
+    public static final String BOOLEAN_OPTION_NAME = "boolean";
+    private static final OptionData REQUIRED_BOOLEAN_OPTION =
+            new OptionData(OptionType.BOOLEAN, BOOLEAN_OPTION_NAME, "Enable or disable it.", true);
+
+    public static final String EDIT_MESSAGE_OPTION_NAME = "editmessage";
+    private static final OptionData REQUIRED_EDIT_MESSAGE_OPTION =
+            new OptionData(OptionType.STRING, EDIT_MESSAGE_OPTION_NAME, "What would you like to change?", true);
+
+    public static final String EDIT_MESSAGE_VALUE_OPTION_NAME = "editmessagevalue";
+    private static final OptionData REQUIRED_EDIT_MESSAGE_VALUE_OPTION =
+            new OptionData(OptionType.STRING, EDIT_MESSAGE_VALUE_OPTION_NAME, "Enter here your new value.", true);
+
     // -> Commands & Command Descriptions
 
     public static final String COMMAND_EVENT = "event";
@@ -118,13 +130,13 @@ public class CommandsUtil {
     public static final String COMMAND_UNREGISTER = "unregister";
     private static final String COMMAND_UNREGISTER_DESC;
 
-    public static final String COMMAND_CREATE_CUSTOM_MESSAGE = "createcustommessage";
-    private static final String COMMAND_CREATE_CUSTOM_MESSAGE_DESC;
+    public static final String COMMAND_CREATE_MESSAGE = "createmessage";
+    private static final String COMMAND_CREATE_MESSAGE_DESC;
 
     public static final String COMMAND_MESSAGE = "message";
     private static final String COMMAND_MESSAGE_DESC;
 
-    public static final String COMMAND_CUSTOM_MESSAGE_INFO = "custommessageinfo";
+    public static final String COMMAND_CUSTOM_MESSAGE_INFO = "messageinfo";
     private static final String COMMAND_CUSTOM_MESSAGE_INFO_DESC;
 
     public static final String COMMAND_DELETE_CUSTOM_MESSAGE = "deletecustommessage";
@@ -139,8 +151,8 @@ public class CommandsUtil {
     public static final String COMMAND_LANGUAGES = "languages";
     private static final String COMMAND_LANGUAGES_DESC;
 
-    public static final String COMMAND_LIST_CUSTOM_MESSAGES = "listcustommessages";
-    private static final String COMMAND_LIST_CUSTOM_MESSAGES_DESC;
+    public static final String COMMAND_LIST_MESSAGES = "listcustommessages";
+    private static final String COMMAND_LIST_MESSAGES_DESC;
 
     public static final String COMMAND_TIMEZONES = "timezones";
     private static final String COMMAND_TIMEZONES_DESC;
@@ -177,6 +189,12 @@ public class CommandsUtil {
 
     public static final String COMMAND_TIMEZONE = "timezone";
     private static final String COMMAND_TIMEZONE_DESC;
+
+    public static final String COMMAND_DAYLIGHTTIME = "daylighttime";
+    private static final String COMMAND_DAYLIGHTTIME_DESC;
+
+    public static final String COMMAND_EDIT_MESSAGE = "editmessage";
+    private static final String COMMAND_EDIT_MESSAGE_DESC;
 
     static {
         try (InputStream inputStream = CommandsUtil.class.getClassLoader().getResourceAsStream("commands.properties")) {
@@ -215,6 +233,10 @@ public class CommandsUtil {
             REQUIRED_WARN_TIME_OPTION.addChoice(String.valueOf(i), i);
         }
 
+        REQUIRED_EDIT_MESSAGE_OPTION.addChoice("time", "time");
+        REQUIRED_EDIT_MESSAGE_OPTION.addChoice("message", "message");
+        REQUIRED_EDIT_MESSAGE_OPTION.addChoice("weekday", "weekday");
+
         for (int i = 12; i > -12; i--) {
             String timezoneMessage;
             if (i > 0) {
@@ -234,11 +256,11 @@ public class CommandsUtil {
         COMMAND_PRESET_DESC = commandsProperties.get(COMMAND_PRESET).toString();
         COMMAND_REGISTER_DESC = commandsProperties.get(COMMAND_REGISTER).toString();
         COMMAND_UNREGISTER_DESC = commandsProperties.get(COMMAND_UNREGISTER).toString();
-        COMMAND_CREATE_CUSTOM_MESSAGE_DESC = commandsProperties.get(COMMAND_CREATE_CUSTOM_MESSAGE).toString();
+        COMMAND_CREATE_MESSAGE_DESC = commandsProperties.get(COMMAND_CREATE_MESSAGE).toString();
         COMMAND_MESSAGE_DESC = commandsProperties.get(COMMAND_MESSAGE).toString();
         COMMAND_CUSTOM_MESSAGE_INFO_DESC = commandsProperties.get(COMMAND_CUSTOM_MESSAGE_INFO).toString();
         COMMAND_DELETE_CUSTOM_MESSAGE_DESC = commandsProperties.get(COMMAND_DELETE_CUSTOM_MESSAGE).toString();
-        COMMAND_LIST_CUSTOM_MESSAGES_DESC = commandsProperties.get(COMMAND_LIST_CUSTOM_MESSAGES).toString();
+        COMMAND_LIST_MESSAGES_DESC = commandsProperties.get(COMMAND_LIST_MESSAGES).toString();
         COMMAND_HELP_DESC = commandsProperties.get(COMMAND_HELP).toString();
         COMMAND_INSTALL_DESC = commandsProperties.get(COMMAND_INSTALL).toString();
         COMMAND_LANGUAGES_DESC = commandsProperties.get(COMMAND_LANGUAGES).toString();
@@ -254,6 +276,8 @@ public class CommandsUtil {
         COMMAND_LANGUAGE_DESC = commandsProperties.get(COMMAND_LANGUAGE).toString();
         COMMAND_SERVER_DESC = commandsProperties.get(COMMAND_SERVER).toString();
         COMMAND_TIMEZONE_DESC = commandsProperties.get(COMMAND_TIMEZONE).toString();
+        COMMAND_DAYLIGHTTIME_DESC = commandsProperties.get(COMMAND_DAYLIGHTTIME).toString();
+        COMMAND_EDIT_MESSAGE_DESC = commandsProperties.get(COMMAND_EDIT_MESSAGE).toString();
     }
 
     public static Properties getCommandsProperties() {
@@ -283,22 +307,20 @@ public class CommandsUtil {
         // -> /unregister <CHANNEL>
         commandDataList.add(Commands.slash(COMMAND_UNREGISTER, COMMAND_UNREGISTER_DESC)
                 .addOptions(NOT_REQUIRED_CHANNEL_OPTION));
-
         // -> /createcustommessage <WEEKDAY> <TIME> <BOOL_REPEATING> <MESSAGE>
-        commandDataList.add(Commands.slash(COMMAND_CREATE_CUSTOM_MESSAGE, COMMAND_CREATE_CUSTOM_MESSAGE_DESC)
+        commandDataList.add(Commands.slash(COMMAND_CREATE_MESSAGE, COMMAND_CREATE_MESSAGE_DESC)
                 .addOptions(CREATE_CUSTOM_MESSAGE_WEEKDAY_OPTION, CREATE_CUSTOM_MESSAGE_TIME_OPTION, CREATE_CUSTOM_MESSAGE_REPEATING_OPTION, CREATE_CUSTOM_MESSAGE_MESSAGE_OPTION));
         // -> /custommessageinfo <ID>
         commandDataList.add(Commands.slash(COMMAND_CUSTOM_MESSAGE_INFO, COMMAND_CUSTOM_MESSAGE_INFO_DESC)
-                .addOptions(CUSTOM_MESSAGE_ID_OPTION));
+                .addOptions(REQUIRED_CUSTOM_MESSAGE_ID_OPTION));
         // -> /deletecustommessage <ID>
         commandDataList.add(Commands.slash(COMMAND_DELETE_CUSTOM_MESSAGE, COMMAND_DELETE_CUSTOM_MESSAGE_DESC)
-                .addOptions(CUSTOM_MESSAGE_ID_OPTION));
-
-        /* -> /editcustommessage <ID>
-        todo: fix this command*/
-
+                .addOptions(REQUIRED_CUSTOM_MESSAGE_ID_OPTION));
+        // -> /editcustommessage <ID>
+        commandDataList.add(Commands.slash(COMMAND_EDIT_MESSAGE, COMMAND_EDIT_MESSAGE_DESC)
+                .addOptions(REQUIRED_CUSTOM_MESSAGE_ID_OPTION, REQUIRED_EDIT_MESSAGE_OPTION, REQUIRED_EDIT_MESSAGE_VALUE_OPTION));
         // -> /listcustommessages
-        commandDataList.add(Commands.slash(COMMAND_LIST_CUSTOM_MESSAGES, COMMAND_LIST_CUSTOM_MESSAGES_DESC));
+        commandDataList.add(Commands.slash(COMMAND_LIST_MESSAGES, COMMAND_LIST_MESSAGES_DESC));
         // -> /help
         commandDataList.add(Commands.slash(COMMAND_HELP, COMMAND_HELP_DESC));
         // -> /install
@@ -311,7 +333,6 @@ public class CommandsUtil {
         commandDataList.add(Commands.slash(COMMAND_TODAY, COMMAND_TODAY_DESC));
         // -> /upcoming
         commandDataList.add(Commands.slash(COMMAND_UPCOMING, COMMAND_UPCOMING_DESC));
-
         // -> Command: /createreactionrole [Required: messageid] [Required: emote] [Required: role]
         commandDataList.add(Commands.slash(COMMAND_CREATE_REACTION_ROLE, COMMAND_CREATE_REACTION_ROLE_DESC)
                 .addOptions(REQUIRED_MESSAGE_ID_OPTION, REQUIRED_ROLE_OPTION, REQUIRED_EMOTE_OPTION));
@@ -320,7 +341,6 @@ public class CommandsUtil {
         // -> Command: /removereactionrole [Required: MessageID] [Required: Emoji]
         commandDataList.add(Commands.slash(COMMAND_REMOVE_REACTION_ROLE, COMMAND_REMOVE_REACTION_ROLE_DESC)
                 .addOptions(REQUIRED_MESSAGE_ID_OPTION, REQUIRED_EMOTE_OPTION));
-
         // -> Command: /adminrole [Required: role]
         commandDataList.add(Commands.slash(COMMAND_ADMIN_ROLE, COMMAND_ADMIN_ROLE_DESC)
                 .addOptions(REQUIRED_ROLE_OPTION));
@@ -335,13 +355,16 @@ public class CommandsUtil {
         // -> Command: /timezone [Required: timezone]
         commandDataList.add(Commands.slash(COMMAND_TIMEZONE, COMMAND_TIMEZONE_DESC)
                 .addOptions(REQUIRED_TIMEZONE_OPTION));
-
         // -> Command: /warntime [Required: warntime]
         commandDataList.add(Commands.slash(COMMAND_WARN_TIME, COMMAND_WARN_TIME_DESC)
                 .addOptions(REQUIRED_WARN_TIME_OPTION));
         // -> Commmand: /message [Required: messagevalue] [Required: MessageID]
         commandDataList.add(Commands.slash(COMMAND_MESSAGE, COMMAND_MESSAGE_DESC)
                 .addOptions(REQUIRED_MESSAGE_VALUE_OPTION, REQUIRED_MESSAGE_ID_OPTION));
+        // -> Command: /daylighttime [Required: boolean]
+        //commandDataList.add(Commands.slash(COMMAND_DAYLIGHTTIME, COMMAND_DAYLIGHTTIME_DESC)
+        //        .addOptions(REQUIRED_BOOLEAN_OPTION)); todo this command is not working properly?
+
         return commandDataList;
     }
 }

@@ -1,7 +1,7 @@
 -- BATTLEGROUND
 CREATE TABLE battleground_times
 (
-    warn_range CHAR(11) NOT NULL PRIMARY KEY
+    warn_range CHAR(11) NOT NULL
 );
 INSERT INTO battleground_times (warn_range)
 VALUES ('07:45-08:00');

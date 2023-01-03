@@ -1,7 +1,7 @@
 -- SHADOW LOTTERY
 CREATE TABLE shadow_lottery_times
 (
-    warn_range CHAR(11) NOT NULL PRIMARY KEY
+    warn_range CHAR(11) NOT NULL
 );
 INSERT INTO shadow_lottery_times (warn_range)
 VALUES ('11:45-12:00');

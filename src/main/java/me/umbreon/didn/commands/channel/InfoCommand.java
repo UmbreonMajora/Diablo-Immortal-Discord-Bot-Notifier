@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
+import static me.umbreon.didn.utils.StringUtil.FORMATTED_MESSAGE;
+import static me.umbreon.didn.utils.StringUtil.NEW_LINE;
+
 /**
  * @author Umbreon Majora
  * This command show's a user all infos about a registered channel.

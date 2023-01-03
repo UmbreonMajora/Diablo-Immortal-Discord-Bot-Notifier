@@ -1,5 +1,6 @@
 package me.umbreon.didn.events;
 
+import me.umbreon.didn.cache.GameDataCache;
 import me.umbreon.didn.cache.GuildsCache;
 import me.umbreon.didn.commands.channel.*;
 import me.umbreon.didn.commands.custom_notifications.*;
@@ -29,6 +30,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
 
+    // Channel commands
     private final EventCommand eventCommand;
     private final InfoCommand infoCommand;
     private final ListEventsCommand listEventsCommand;
@@ -37,32 +39,37 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final RegisterCommand registerCommand;
     private final UnregisterCommand unregisterCommand;
 
-    private final CreateCustomNotificationCommand createCustomNotificationCommand;
-    private final CustomMessageInfoCommand customMessageInfoCommand;
-    private final DeleteCustomMessageCommand deleteCustomMessageCommand;
-    private final ListCustomMessagesCommand listCustomMessagesCommand;
+    // Custom notification commands
+    private final CreateMessageCommand createMessageCommand;
+    private final MessageInfoCommand messageInfoCommand;
+    private final DeleteMessageCommand deleteMessageCommand;
+    private final ListMessagesCommand listMessagesCommand;
+    private final MessageCommand messageCommand;
+    private final EditMessageCommand editMessageCommand;
 
+    // Info commands
     private final HelpCommand helpCommand;
     private final InstructionsCommand instructionsCommand;
     private final LanguagesCommand languagesCommand;
     private final TimeZonesCommand timeZonesCommand;
-    //private final TodayCommand todayCommand;
-    //private final UpComingCommand upComingCommand;
+    private final TodayCommand todayCommand;
+    private final UpComingCommand upComingCommand;
 
+    // Reaction roles commands
     private final CreateReactionRoleCommand createReactionRoleCommand;
     private final RemoveReactionRoleCommand removeReactionRoleCommand;
     private final ListReactionRolesCommand listReactionRolesCommand;
 
+    // Server commands
     private final AdminRoleCommand adminRoleCommand;
     private final ConfigCommand configCommand;
     private final LanguageCommand languageCommand;
     private final ServerCommand serverCommand;
     private final TimeZoneCommand timeZoneCommand;
-
     private final WarnTimeCommand warnTimeCommand;
-    private final MessageCommand messageCommand;
+    private final DaylightTimeCommand daylightTimeCommand;
 
-    public SlashCommandInteraction(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
+    public SlashCommandInteraction(GuildsCache guildsCache, DatabaseRequests databaseRequests, GameDataCache gameDataCache) {
         this.guildsCache = guildsCache;
         this.databaseRequests = databaseRequests;
 
@@ -74,18 +81,18 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.registerCommand = new RegisterCommand(guildsCache, databaseRequests);
         this.unregisterCommand = new UnregisterCommand(guildsCache, databaseRequests);
 
-        this.createCustomNotificationCommand = new CreateCustomNotificationCommand(guildsCache, databaseRequests);
-        this.customMessageInfoCommand = new CustomMessageInfoCommand(guildsCache);
-        this.deleteCustomMessageCommand = new DeleteCustomMessageCommand(databaseRequests, guildsCache);
-        this.listCustomMessagesCommand = new ListCustomMessagesCommand(guildsCache, databaseRequests);
+        this.createMessageCommand = new CreateMessageCommand(guildsCache, databaseRequests);
+        this.messageInfoCommand = new MessageInfoCommand(guildsCache);
+        this.deleteMessageCommand = new DeleteMessageCommand(databaseRequests, guildsCache);
+        this.listMessagesCommand = new ListMessagesCommand(guildsCache);
+        this.editMessageCommand = new EditMessageCommand(databaseRequests, guildsCache);
 
         this.helpCommand = new HelpCommand();
         this.instructionsCommand = new InstructionsCommand();
         this.languagesCommand = new LanguagesCommand();
         this.timeZonesCommand = new TimeZonesCommand(guildsCache);
-        //todo: commands are no longer working with the new cache system.
-        //this.todayCommand = new TodayCommand(guildsCache, gameEventCache);
-        //this.upComingCommand = new UpComingCommand(guildsCache, gameEventCache);
+        this.todayCommand = new TodayCommand(guildsCache, gameDataCache);
+        this.upComingCommand = new UpComingCommand(guildsCache, gameDataCache);
 
         this.createReactionRoleCommand = new CreateReactionRoleCommand(databaseRequests, guildsCache);
         this.removeReactionRoleCommand = new RemoveReactionRoleCommand(guildsCache);
@@ -98,6 +105,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.timeZoneCommand = new TimeZoneCommand(guildsCache, databaseRequests);
         this.warnTimeCommand = new WarnTimeCommand(databaseRequests, guildsCache);
 
+        this.daylightTimeCommand = new DaylightTimeCommand(databaseRequests, guildsCache);
         this.messageCommand = new MessageCommand(databaseRequests, guildsCache);
     }
 
@@ -141,23 +149,23 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private void executeCommand(SlashCommandInteractionEvent event) {
         String command = event.getName().toLowerCase();
         switch (command) {
-            //case COMMAND_TODAY:
-            //    todayCommand.runCommand(event);
-            //    break;
-            //case COMMAND_UPCOMING:
-            //    upComingCommand.runCommand(event);
-            //    break;
-            case COMMAND_CREATE_CUSTOM_MESSAGE:
-                createCustomNotificationCommand.runCommand(event);
+            case COMMAND_TODAY:
+                todayCommand.runCommand(event);
+                break;
+            case COMMAND_UPCOMING:
+                upComingCommand.runCommand(event);
+                break;
+            case COMMAND_CREATE_MESSAGE:
+                createMessageCommand.runCommand(event);
                 break;
             case COMMAND_DELETE_CUSTOM_MESSAGE:
-                deleteCustomMessageCommand.runCommand(event);
+                deleteMessageCommand.runCommand(event);
                 break;
             case COMMAND_CUSTOM_MESSAGE_INFO:
-                customMessageInfoCommand.runCommand(event);
+                messageInfoCommand.runCommand(event);
                 break;
-            case COMMAND_LIST_CUSTOM_MESSAGES:
-                listCustomMessagesCommand.runCommand(event);
+            case COMMAND_LIST_MESSAGES:
+                listMessagesCommand.runCommand(event);
                 break;
             case COMMAND_REGISTER:
                 registerCommand.runCommand(event);
@@ -221,6 +229,12 @@ public class SlashCommandInteraction extends ListenerAdapter {
                 break;
             case COMMAND_MESSAGE:
                 messageCommand.runCommand(event);
+                break;
+            case COMMAND_EDIT_MESSAGE:
+                editMessageCommand.runCommand(event);
+                break;
+            case COMMAND_DAYLIGHTTIME:
+                daylightTimeCommand.runCommand(event);
                 break;
         }
     }

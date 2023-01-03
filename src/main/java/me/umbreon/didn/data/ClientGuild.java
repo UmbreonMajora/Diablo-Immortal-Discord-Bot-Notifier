@@ -20,12 +20,15 @@ public class ClientGuild {
     private List<ReactionRole> reactionRoles;
     private Map<Integer, CustomNotification> customNotifications;
     private Map<String, NotificationChannel> notificationChannels;
+    private boolean isDaylightTimeEnabled;
+    private boolean isPremiumServer;
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
                        int headUpTime, boolean isWarnMessagesEnabled, boolean isEventMessageEnabled,
                        List<ReactionRole> reactionRoles,
                        Map<Integer, CustomNotification> customNotifications,
-                       Map<String, NotificationChannel> notificationChannels) {
+                       Map<String, NotificationChannel> notificationChannels,
+                       boolean isDaylightTimeEnabled, boolean isPremiumServer) {
         this.guildID = guildID;
         this.guildLanguage = guildLanguage;
         this.guildTimeZone = guildTimeZone;
@@ -36,10 +39,12 @@ public class ClientGuild {
         this.reactionRoles = reactionRoles;
         this.customNotifications = customNotifications;
         this.notificationChannels = notificationChannels;
+        this.isDaylightTimeEnabled = isDaylightTimeEnabled;
+        this.isPremiumServer = isPremiumServer;
     }
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
-                       int headUpTime, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled) {
+                       int headUpTime, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled, boolean isDaylightTimeEnabled, boolean isPremiumServer) {
         this.guildID = guildID;
         this.guildLanguage = guildLanguage;
         this.guildTimeZone = guildTimeZone;
@@ -50,6 +55,8 @@ public class ClientGuild {
         this.reactionRoles = new ArrayList<>();
         this.customNotifications = new ConcurrentHashMap<>();
         this.notificationChannels = new ConcurrentHashMap<>();
+        this.isDaylightTimeEnabled = isDaylightTimeEnabled;
+        this.isPremiumServer = isPremiumServer;
     }
 
     public ClientGuild(String guildID) {
@@ -63,6 +70,8 @@ public class ClientGuild {
         this.reactionRoles = new ArrayList<>();
         this.customNotifications = new ConcurrentHashMap<>();
         this.notificationChannels = new ConcurrentHashMap<>();
+        this.isDaylightTimeEnabled = false;
+        this.isPremiumServer = false;
     }
 
     public String getGuildID() {
@@ -238,5 +247,25 @@ public class ClientGuild {
 
     public Collection<NotificationChannel> getAllNotificationChannels() {
         return notificationChannels.values();
+    }
+
+    public boolean isDaylightTimeEnabled() {
+        return isDaylightTimeEnabled;
+    }
+
+    public void setDaylightTimeEnabled(boolean daylightTimeEnabled) {
+        isDaylightTimeEnabled = daylightTimeEnabled;
+    }
+
+    public boolean isPremiumServer() {
+        return isPremiumServer;
+    }
+
+    public void setPremiumServer(boolean premiumServer) {
+        isPremiumServer = premiumServer;
+    }
+
+    public int getCustomNotificationSize() {
+        return customNotifications.size();
     }
 }

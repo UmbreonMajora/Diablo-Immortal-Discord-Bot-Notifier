@@ -14,34 +14,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.util.Objects;
 
 import static me.umbreon.didn.utils.CommandsUtil.CUSTOM_MESSAGE_ID_OPTION_NAME;
 
 /**
  * @author Umbreon Majora
  * Allow's user to see all information about a custom notification.
- * /custommessageinfo [Required: custommessageid]
+ * /messageinfo [Required: custommessageid]
  */
-public class CustomMessageInfoCommand implements IClientCommand {
+public class MessageInfoCommand implements IClientCommand {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(MessageInfoCommand.class);
 
     private final GuildsCache guildsCache;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(CustomMessageInfoCommand.class);
-
-    public CustomMessageInfoCommand(GuildsCache guildsCache) {
+    public MessageInfoCommand(GuildsCache guildsCache) {
         this.guildsCache = guildsCache;
     }
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
-        User user = event.getUser();
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
         Language language = guildsCache.getGuildLanguage(guildID);
+        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
 
         int customMessageID = getCustomMessageID(event);
         if (customMessageID == -1) {
-            createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " tried to use /custommessageinfo " +
-                    "but it failed because id was null.");
+            createLog(LOGGER, guildID, executingUser + " to get info about a custom notification but the id was invalid.");
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INFO-CUSTOM-MESSAGE-FAILED-ID-NULL"));
             return;
         }
@@ -58,6 +58,7 @@ public class CustomMessageInfoCommand implements IClientCommand {
         CustomNotification customNotification = guildsCache.getClientGuildByID(guildID).getCustomNotificationByID(customMessageID);
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setColor(Color.ORANGE);
+        embedBuilder.setTitle(LanguageController.getMessage(Language.ENGLISH, "TEXT-YOUR-CUSTOM-NOTIFICATIONS"));
         String textChannelMention = "<#" + customNotification.getChannelID() + ">";
         String time = customNotification.getWeekday() + " " + customNotification.getTime();
         embedBuilder.addField("TextChannel:", textChannelMention, true);

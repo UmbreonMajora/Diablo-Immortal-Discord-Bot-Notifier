@@ -19,43 +19,42 @@ import static me.umbreon.didn.utils.CommandsUtil.CUSTOM_MESSAGE_ID_OPTION_NAME;
 /**
  * @author Umbreon Majora
  * Allow's user to delete their custom notification by the given id.
- * Command: /deletecustommessage [Required: custommessageid]
+ * Command: /deletemessage [Required: custommessageid]
  */
-public class DeleteCustomMessageCommand implements IClientCommand {
+public class DeleteMessageCommand implements IClientCommand {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(DeleteMessageCommand.class);
 
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(DeleteCustomMessageCommand.class);
-
-    public DeleteCustomMessageCommand(DatabaseRequests databaseRequests, GuildsCache guildsCache) {
+    public DeleteMessageCommand(DatabaseRequests databaseRequests, GuildsCache guildsCache) {
         this.databaseRequests = databaseRequests;
         this.guildsCache = guildsCache;
     }
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
-        User user = event.getUser();
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
         Language language = guildsCache.getGuildLanguage(guildID);
+        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
 
         int customMessageID = getCustomMessageID(event);
         if (customMessageID == -1) {
-            createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " tried to use /custommessageinfo " +
-                    "but it failed because id was null.");
+            createLog(LOGGER, guildID, executingUser + " tried to delete a custom notification but it failed because the id was invalid.");
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INFO-CUSTOM-MESSAGE-FAILED-ID-NULL"));
             return;
         }
 
         if (!isCustomMessageGuildIdCurrentGuildId(guildID, customMessageID)) {
-            createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " tried to delete a custom notification which wasn't theirs.");
+            createLog(LOGGER, guildID, executingUser + " tried to delete a custom notification which wasn't theirs.");
             replyEphemeralToUser(event, LanguageController.getMessage(language, "DELETE-CUSTOM-MESSAGE-FAILED-NOT-PERMITTED"));
             return;
         }
 
         databaseRequests.deleteCustomNotificationByID(customMessageID);
         guildsCache.getClientGuildByID(guildID).deleteCustomNotificationByID(customMessageID);
-        createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " deleted custom notification with id " + customMessageID);
+        createLog(LOGGER, guildID, executingUser + " deleted custom notification with id " + customMessageID);
         replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "DELETED-CUSTOM-MESSAGE"), customMessageID));
     }
 

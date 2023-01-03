@@ -62,12 +62,13 @@ public class DiabloImmortalDiscordNotifier {
             jda = JDABuilder.createDefault(ConfigUtil.getClientToken())
 
                     .addEventListeners(new ChannelDelete(databaseRequests, guildsCache))
-                    .addEventListeners(new GuildJoin())
+                    .addEventListeners(new GuildJoin(databaseRequests, guildsCache))
                     .addEventListeners(new GuildReady())
                     .addEventListeners(new MessageDelete(databaseRequests, guildsCache))
                     .addEventListeners(new MessageReactionAdd(guildsCache, databaseRequests))
                     .addEventListeners(new MessageReactionRemove(guildsCache))
-                    .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests))
+                    .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache))
+                    .addEventListeners(new GuildLeave(databaseRequests, guildsCache))
 
                     .build().awaitReady();
         } catch (InterruptedException e) {
