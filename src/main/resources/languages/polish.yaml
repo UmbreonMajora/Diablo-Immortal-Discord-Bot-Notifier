@@ -110,3 +110,29 @@ EVENT-VAULT-HEAD-UP: "The doors of the treasury open in %s minutes."
 INVALID-ID: "Invalid ID. Possibly mistyped?"
 CM-NOT-EXISTS: "This custom notification does not exist."
 CM-ENABLED-DISABLED: "Custom Notification with ID %s is now %s"
+
+ON-SLAUGHT-ENABLED: "Onslaught messages enabled:"
+
+ON-SLAUGHT: "Onslaught"
+
+
+EVENT-ON-SLAUGHT: "Onslaught is starting now!"
+EVENT-ON-SLAUGHT-WARN: "Onslaught event is starting in %s minutes."
+
+
+# daylight command
+DAYLIGHT-TIME-ALREADY-ENABLED: "Daylight saving time is already enabled."
+DAYLIGHT-TIME-ALREADY-DISABLED: "Daylight saving time is already disabled."
+DAYLIGHT-TIME-NOW-ENABLED: "Daylight saving time is now enabled."
+DAYLIGHT-TIME-NOW-DISABLED: "Daylight saving time is now disabled."
+
+# create message command
+MESSAGE-MAX-REACHED: "You have reached the maximum number of custom notifications."
+
+# edit message command
+EDIT-MESSAGE-FAILED: "Failed to edit your custom notification."
+MESSAGE-EDITED-TIME: "Your custom notification was edited. Time was changed to %s."
+MESSAGE-EDITED-WEEKDAY: "Your custom notification was edited. Weekday was changed to %s."
+MESSAGE-EDITED-MESSAGE: "Your custom notification was edited. Message was changed to %s."
+WEEKDAY-INVALID: "The weekday is invalid."
+TIME-INVALID: "The time is invalid."
