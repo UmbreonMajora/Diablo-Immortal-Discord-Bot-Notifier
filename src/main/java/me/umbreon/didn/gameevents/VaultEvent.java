@@ -34,7 +34,7 @@ public class VaultEvent implements IGameEvent {
 
         Set<EventGameData> eventGameDataSet = gameDataCache.getVaultGameDataSet();
         eventGameDataSet.clear();
-        eventGameDataSet.add(new EventGameData("21:00-21:15", null, "21:15"));
+        eventGameDataSet.add(new EventGameData("23:20-23:35", null, "23:35"));
         String timeZone = guild.getGuildTimeZone();
         Language language = guild.getGuildLanguage();
 

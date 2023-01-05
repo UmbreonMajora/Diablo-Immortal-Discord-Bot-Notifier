@@ -43,7 +43,12 @@ public class ConfigCommand implements IClientCommand {
     private String buildServerInfoMessage(String guildID, Member member, Guild guild) {
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
         Language language = guildsCache.getGuildLanguage(guildID);
-        String guildOwnerName = Objects.requireNonNull(guild.getOwner()).getEffectiveName();
+        String guildOwnerName;
+        try {
+            guildOwnerName = Objects.requireNonNull(guild.getOwner()).getEffectiveName();
+        } catch (NullPointerException e) {
+            guildOwnerName = "?";
+        }
 
         StringBuilder serverConfigMessageBuilder = new StringBuilder();
         serverConfigMessageBuilder.append(FORMATTED_MESSAGE).append(NEW_LINE)

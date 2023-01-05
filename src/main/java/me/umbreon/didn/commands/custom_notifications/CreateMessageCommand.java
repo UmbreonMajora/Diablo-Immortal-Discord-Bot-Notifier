@@ -38,6 +38,9 @@ public class CreateMessageCommand implements IClientCommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
+        replyEphemeralToUser(event, "This command is temporary disabled.");
+        if (true) return;
+
         String guildID = Objects.requireNonNull(event.getGuild()).getId();
         Language language = guildsCache.getGuildLanguage(guildID);
         String executingUser = getFullUsernameWithDiscriminator(event.getUser());
@@ -86,9 +89,13 @@ public class CreateMessageCommand implements IClientCommand {
         String targetTextChannelID = getTargetTextChannel(event).getId();
         boolean repeating = getRepeating(event);
         int nextAutoIncrementNumber = databaseRequests.getGetCustomMessageNextAutoIncrementValue();
+
+        guildsCache.getAllGuilds().clear();
+
+
         CustomNotification customNotification = new CustomNotification(targetTextChannelID, guildID, message, weekday.rawName, time, repeating, true);
         databaseRequests.createCustomNotification(customNotification);
-        customNotification.setCustomMessageID(nextAutoIncrementNumber);
+
         guildsCache.getClientGuildByID(guildID).addCustomNotification(customNotification);
         createLog(logger, guildID, executingUser + " created a new message on " + guildID + " with id " + nextAutoIncrementNumber);
         replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CREATED-CUSTOM-MESSAGE"), nextAutoIncrementNumber));

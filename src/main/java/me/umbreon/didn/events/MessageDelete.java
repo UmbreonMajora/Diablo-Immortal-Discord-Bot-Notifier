@@ -19,9 +19,10 @@ public class MessageDelete extends ListenerAdapter implements IClientEvent {
 
     @Override
     public void onMessageDelete(@NotNull MessageDeleteEvent event) {
-        if (!isChannelTypeTextChannelType(event.getChannel())) {
+        if (isChannelTypeNotTextChannel(event.getChannel())) {
             return;
         }
+
         String messageID = event.getMessageId();
         String guildID = event.getGuild().getId();
 

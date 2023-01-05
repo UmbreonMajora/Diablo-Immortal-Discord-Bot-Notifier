@@ -2,7 +2,6 @@ package me.umbreon.didn.events;
 
 import me.umbreon.didn.cache.GuildsCache;
 import me.umbreon.didn.data.ReactionRole;
-import me.umbreon.didn.database.DatabaseRequests;
 import me.umbreon.didn.enums.Language;
 import me.umbreon.didn.languages.LanguageController;
 import net.dv8tion.jda.api.entities.Role;
@@ -26,7 +25,7 @@ public class MessageReactionRemove extends ListenerAdapter implements IClientEve
 
     @Override
     public void onMessageReactionRemove(MessageReactionRemoveEvent event) {
-        if (!isChannelTypeTextChannelType(event.getChannel())) {
+        if (isChannelTypeNotTextChannel(event.getChannel())) {
             return;
         }
 

@@ -217,6 +217,7 @@ public class DatabaseRequests {
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteGuildByGuildIdStatement())
         ) {
             preparedStatement.setString(1, guildID);
+            preparedStatement.executeUpdate();
             LOGGER.info("Deleted guild " + guildID + " from database.");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -300,6 +301,7 @@ public class DatabaseRequests {
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteMessageByGuildIdStatement())
         ) {
             preparedStatement.setString(1, guildID);
+            preparedStatement.executeUpdate();
             LOGGER.info("Deleted messages of " + guildID + " from database.");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -387,6 +389,7 @@ public class DatabaseRequests {
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteChannelByGuildIdStatement())
         ) {
             preparedStatement.setString(1, guildID);
+            preparedStatement.executeUpdate();
             LOGGER.info("Deleted channels of " + guildID + " from database.");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -431,6 +434,7 @@ public class DatabaseRequests {
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteReactionRolesByGuildIdStatement())
         ) {
             preparedStatement.setString(1, guildID);
+            preparedStatement.executeUpdate();
             LOGGER.info("Deleted reaction roles of " + guildID + " from database.");
         } catch (SQLException e) {
             e.printStackTrace();

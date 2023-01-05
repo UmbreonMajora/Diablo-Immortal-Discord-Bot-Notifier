@@ -13,15 +13,9 @@ public class ConfigUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
 
-    private static int DEFAULT_WARN_TIME;
-    private static String CLIENT_TOKEN;
-    private static int CUSTOM_NOTIFICATION_MAX;
-
-    private static String DATABASE_HOST;
-    private static String DATABASE;
-    private static String DATABASE_USER;
-    private static String DATABASE_PASSWORD;
-    private static String DATABASE_PORT;
+    private static final int DEFAULT_WARN_TIME;
+    private static final String CLIENT_TOKEN;
+    private static final int CUSTOM_NOTIFICATION_MAX;
 
     static {
         Properties clientProperties = new Properties();
@@ -42,11 +36,6 @@ public class ConfigUtil {
         DEFAULT_WARN_TIME = Integer.parseInt(clientProperties.getProperty("DEFAULT-WARN-TIME"));
         CUSTOM_NOTIFICATION_MAX = Integer.parseInt(clientProperties.getProperty("CUSTOM-NOTIFICATION-MAX"));
         CLIENT_TOKEN = clientProperties.getProperty("TOKEN");
-        DATABASE_HOST = clientProperties.getProperty("HOST");
-        DATABASE = clientProperties.getProperty("DATABASE");
-        DATABASE_USER = clientProperties.getProperty("USERNAME");
-        DATABASE_PASSWORD = clientProperties.getProperty("PASSWORD");
-        DATABASE_PORT = clientProperties.getProperty("PORT");
     }
 
     public static int getDefaultWarnTime() {

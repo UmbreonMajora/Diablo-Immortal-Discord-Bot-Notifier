@@ -31,9 +31,9 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final DatabaseRequests databaseRequests;
 
     // Channel commands
-    private final EventCommand eventCommand;
+    private final NotificationCommand notificationCommand;
     private final InfoCommand infoCommand;
-    private final ListEventsCommand listEventsCommand;
+    private final ListNotificationsCommand listNotificationsCommand;
     private final MentionRoleCommand mentionRoleCommand;
     private final PresetCommand presetCommand;
     private final RegisterCommand registerCommand;
@@ -73,9 +73,9 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.guildsCache = guildsCache;
         this.databaseRequests = databaseRequests;
 
-        this.eventCommand = new EventCommand(guildsCache, databaseRequests);
+        this.notificationCommand = new NotificationCommand(guildsCache, databaseRequests);
         this.infoCommand = new InfoCommand(guildsCache);
-        this.listEventsCommand = new ListEventsCommand();
+        this.listNotificationsCommand = new ListNotificationsCommand();
         this.mentionRoleCommand = new MentionRoleCommand(guildsCache, databaseRequests);
         this.presetCommand = new PresetCommand(guildsCache, databaseRequests);
         this.registerCommand = new RegisterCommand(guildsCache, databaseRequests);
@@ -188,11 +188,11 @@ public class SlashCommandInteraction extends ListenerAdapter {
             case COMMAND_TIMEZONES:
                 timeZonesCommand.runCommand(event);
                 break;
-            case COMMAND_EVENT:
-                eventCommand.runCommand(event);
+            case COMMAND_NOTIFICATION:
+                notificationCommand.runCommand(event);
                 break;
-            case COMMAND_LIST_EVENTS:
-                listEventsCommand.runCommand(event);
+            case COMMAND_LIST_NOTIFICATIONS:
+                listNotificationsCommand.runCommand(event);
                 break;
             case COMMAND_TIMEZONE:
                 timeZoneCommand.runCommand(event);

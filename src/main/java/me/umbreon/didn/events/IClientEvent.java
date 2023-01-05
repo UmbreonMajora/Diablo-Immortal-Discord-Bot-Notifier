@@ -12,9 +12,8 @@ import org.slf4j.Logger;
 
 public interface IClientEvent {
 
-    default boolean isChannelTypeTextChannelType(Channel channel) {
-        ChannelType channelType = channel.getType();
-        return channelType.getId() == 0;
+    default boolean isChannelTypeNotTextChannel(Channel channel) {
+        return channel.getType().getId() != 0;
     }
 
     default boolean isUserBot(User user) {

@@ -29,7 +29,7 @@ public class MessageReactionAdd extends ListenerAdapter implements IClientEvent 
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
-        if (!isChannelTypeTextChannelType(event.getChannel())) {
+        if (isChannelTypeNotTextChannel(event.getChannel())) {
             return;
         }
 
@@ -79,6 +79,10 @@ public class MessageReactionAdd extends ListenerAdapter implements IClientEvent 
     }
 
     private boolean doReactionRoleExists(String messageID, String emojiCode, String guildID) {
-        return guildsCache.getClientGuildByID(guildID).doReactionRoleExist(messageID, emojiCode);
+        try {
+            return guildsCache.getClientGuildByID(guildID).doReactionRoleExist(messageID, emojiCode);
+        } catch (NullPointerException e) {
+            return false;
+        }
     }
 }

@@ -21,11 +21,6 @@ public interface IGameEvent {
         for (EventGameData data : eventGameDataSet) {
             if (data.getWeekday() == null || data.getWeekday().equalsIgnoreCase(TimeUtil.getCurrentWeekday(timeZone))) {
                 String[] warnRange = data.getWarnRange().split("-");
-
-                System.out.println(">1 "+warnRange[0]);
-                System.out.println(">2 "+warnRange[1]);
-                System.out.println(">3 "+currentTimeAsString);
-                System.out.println(">4 "+TimeUtil.isTimeInBetween(currentTimeAsString, warnRange[0], warnRange[1]));
                 if (TimeUtil.isTimeInBetween(currentTimeAsString, warnRange[0], warnRange[1])) {
                     return warnRange[0];
                 }

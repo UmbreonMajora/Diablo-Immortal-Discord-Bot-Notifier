@@ -109,14 +109,14 @@ public class CommandsUtil {
 
     // -> Commands & Command Descriptions
 
-    public static final String COMMAND_EVENT = "event";
-    private static final String COMMAND_EVENT_DESC;
+    public static final String COMMAND_NOTIFICATION = "notification";
+    private static final String COMMAND_NOTIFICATION_DESC;
 
     public static final String COMMAND_INFO = "info";
     private static final String COMMAND_INFO_DESC;
 
-    public static final String COMMAND_LIST_EVENTS = "listevents";
-    private static final String COMMAND_LIST_EVENTS_DESC;
+    public static final String COMMAND_LIST_NOTIFICATIONS = "listnotifications";
+    private static final String COMMAND_LIST_NOTIFICATIONS_DESC;
 
     public static final String COMMAND_MENTION_ROLE = "mentionrole";
     private static final String COMMAND_MENTION_ROLE_DESC;
@@ -249,9 +249,9 @@ public class CommandsUtil {
             REQUIRED_TIMEZONE_OPTION.addChoice(timezoneMessage, timezoneMessage);
         }
 
-        COMMAND_EVENT_DESC = commandsProperties.get(COMMAND_EVENT).toString();
+        COMMAND_NOTIFICATION_DESC = commandsProperties.get(COMMAND_NOTIFICATION).toString();
         COMMAND_INFO_DESC = commandsProperties.get(COMMAND_INFO).toString();
-        COMMAND_LIST_EVENTS_DESC = commandsProperties.get(COMMAND_LIST_EVENTS).toString();
+        COMMAND_LIST_NOTIFICATIONS_DESC = commandsProperties.get(COMMAND_LIST_NOTIFICATIONS).toString();
         COMMAND_MENTION_ROLE_DESC = commandsProperties.get(COMMAND_MENTION_ROLE).toString();
         COMMAND_PRESET_DESC = commandsProperties.get(COMMAND_PRESET).toString();
         COMMAND_REGISTER_DESC = commandsProperties.get(COMMAND_REGISTER).toString();
@@ -288,13 +288,13 @@ public class CommandsUtil {
         List<CommandData> commandDataList = new ArrayList<>();
 
         // -> /event <GAME_EVENT> <ON/OFF>
-        commandDataList.add(Commands.slash(COMMAND_EVENT, COMMAND_EVENT_DESC)
+        commandDataList.add(Commands.slash(COMMAND_NOTIFICATION, COMMAND_NOTIFICATION_DESC)
                 .addOptions(REQUIRED_EVENT_NAME_OPTION, REQUIRED_EVENT_VALUE_OPTION));
         // -> /info <CHANNEL>
         commandDataList.add(Commands.slash(COMMAND_INFO, COMMAND_INFO_DESC)
                 .addOptions(NOT_REQUIRED_CHANNEL_OPTION));
         // -> /listevents
-        commandDataList.add(Commands.slash(COMMAND_LIST_EVENTS, COMMAND_LIST_EVENTS_DESC));
+        commandDataList.add(Commands.slash(COMMAND_LIST_NOTIFICATIONS, COMMAND_LIST_NOTIFICATIONS_DESC));
         // -> /mentionrole <ROLE> <CHANNEL>
         commandDataList.add(Commands.slash(COMMAND_MENTION_ROLE, COMMAND_MENTION_ROLE_DESC)
                 .addOptions(REQUIRED_ROLE_OPTION, NOT_REQUIRED_CHANNEL_OPTION));

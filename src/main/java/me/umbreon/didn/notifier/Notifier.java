@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +56,11 @@ public class Notifier {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
+
+                boolean x = false;
                 for (ClientGuild clientGuild : guildsCache.getAllGuilds().values()) {
 
                     if (clientGuild.getNotificationChannelCount() == 0) {
-                        LOGGER.info(clientGuild.getGuildID() + " has no notification channels.");
                         continue;
                     }
 
@@ -90,7 +92,14 @@ public class Notifier {
                         }
 
                         addMessageMention(notificationMessage, channel, textChannel.getGuild());
-                        textChannel.sendMessage(notificationMessage.toString()).queue();
+
+                        try {
+                            textChannel.sendMessage(notificationMessage.toString()).queue();
+                        } catch (InsufficientPermissionException e) {
+                            LOGGER.info("Failed to send notification.");
+                            continue;
+                        }
+
                         LOGGER.info("Sended notification message to " + channel.getTextChannelID());
                     }
                 }
@@ -105,25 +114,29 @@ public class Notifier {
             return; // add no mention role if null.
         }
 
-        switch (mentionID) {
-            case "HERE":
-                sb.append(NEW_LINE).append("@here");
-                break;
-            case "EVERYONE":
-                sb.append(NEW_LINE).append("@everyone");
-                break;
-            default:
-                if (guild.getRoleById(mentionID) != null) {
-                    Role mentionRole = guild.getRoleById(mentionID);
-                    sb.append(NEW_LINE).append(Objects.requireNonNull(mentionRole).getAsMention());
-                } else {
-                    sb.append(NEW_LINE).append("Failed to append mention role. Please re-set your mention role.");
-                    String guildID = guild.getId();
-                    String guildName = guild.getName();
-                    String textChannelID = channel.getTextChannelID();
-                    FileLogger.createGuildFileLog(guildID, "Failed to append mention role for guild " +
-                            guildName + "(" + guildID + ") in " + textChannelID);
-                }
+        try {
+            switch (mentionID.toUpperCase()) {
+                case "HERE":
+                    sb.append(NEW_LINE).append("@here");
+                    break;
+                case "EVERYONE":
+                    sb.append(NEW_LINE).append("@everyone");
+                    break;
+                default:
+                    if (guild.getRoleById(mentionID) != null) {
+                        Role mentionRole = guild.getRoleById(mentionID);
+                        sb.append(NEW_LINE).append(Objects.requireNonNull(mentionRole).getAsMention());
+                    } else {
+                        sb.append(NEW_LINE).append("Failed to append mention role. Please re-set your mention role.");
+                        String guildID = guild.getId();
+                        String guildName = guild.getName();
+                        String textChannelID = channel.getTextChannelID();
+                        FileLogger.createGuildFileLog(guildID, "Failed to append mention role for guild " +
+                                guildName + "(" + guildID + ") in " + textChannelID);
+                    }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
