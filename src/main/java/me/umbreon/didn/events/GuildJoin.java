@@ -3,7 +3,6 @@ package me.umbreon.didn.events;
 import me.umbreon.didn.cache.GuildsCache;
 import me.umbreon.didn.data.ClientGuild;
 import me.umbreon.didn.database.DatabaseRequests;
-import me.umbreon.didn.logger.FileLogger;
 import me.umbreon.didn.utils.CommandsUtil;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -32,7 +31,6 @@ public class GuildJoin extends ListenerAdapter {
             guildsCache.addGuild(clientGuild);
             databaseRequests.createGuild(clientGuild);
             logger.info("Joined new guild. Registering " + guildID);
-            FileLogger.createClientFileLog("Joined new guild. Registering " + guildID);
         }
 
         event.getGuild().updateCommands().addCommands(CommandsUtil.getCommandDataList()).queue();

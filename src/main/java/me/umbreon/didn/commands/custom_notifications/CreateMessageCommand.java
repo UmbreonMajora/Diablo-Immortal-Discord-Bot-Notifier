@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 import static me.umbreon.didn.utils.CommandsUtil.*;
@@ -38,9 +39,6 @@ public class CreateMessageCommand implements IClientCommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
-        replyEphemeralToUser(event, "This command is temporary disabled.");
-        if (true) return;
-
         String guildID = Objects.requireNonNull(event.getGuild()).getId();
         Language language = guildsCache.getGuildLanguage(guildID);
         String executingUser = getFullUsernameWithDiscriminator(event.getUser());
@@ -48,57 +46,59 @@ public class CreateMessageCommand implements IClientCommand {
         String weekdayRawName = getWeekday(event);
         if (weekdayRawName == null) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-NULL"));
-            createLog(logger, guildID, executingUser + " tried to create a message on " + guildID + " but the weekday was null.");
+            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the weekday was null.");
             return;
         }
 
         Weekday weekday = Weekday.findWeekdayByRawName(weekdayRawName);
         if (weekday == null) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-INVALID"));
-            createLog(logger, guildID, executingUser + " tried to create a message on " + guildID + " but the weekday was invalid.");
+            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the weekday was invalid.");
             return;
         }
 
         String time = getTime(event);
         if (time == null) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-TIME-NULL"));
-            createLog(logger, guildID, executingUser + " tried to create a message on " + guildID + " but the time was null.");
+            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the time was null.");
             return;
         }
 
-        if (!StringUtil.isStringInTimePattern(time)) {
+        if (StringUtil.isStringNotInTimePattern(time)) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-TIME-INVALID"));
-            createLog(logger, guildID, executingUser + " tried to create a message on " + guildID + " but the time was invalid.");
+            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the time was invalid.");
             return;
         }
 
         String message = getMessage(event);
         if (message == null) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-MESSAGE-NULL"));
-            createLog(logger, guildID, executingUser + " tried to create a message on " + guildID + " but the time was invalid.");
+            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the time was invalid.");
             return;
         }
 
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
         if (clientGuild.getCustomNotificationSize() >= ConfigUtil.getCustomNotificationMax() && !clientGuild.isPremiumServer()) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "MESSAGE-MAX-REACHED"));
-            createLog(logger, guildID, executingUser + " tried to create a message on " + guildID + " but the max was reached.");
+            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the max was reached.");
             return;
         }
 
         String targetTextChannelID = getTargetTextChannel(event).getId();
         boolean repeating = getRepeating(event);
-        int nextAutoIncrementNumber = databaseRequests.getGetCustomMessageNextAutoIncrementValue();
-
-        guildsCache.getAllGuilds().clear();
-
+        // int nextAutoIncrementNumber = databaseRequests.getGetCustomMessageNextAutoIncrementValue();
 
         CustomNotification customNotification = new CustomNotification(targetTextChannelID, guildID, message, weekday.rawName, time, repeating, true);
         databaseRequests.createCustomNotification(customNotification);
 
-        guildsCache.getClientGuildByID(guildID).addCustomNotification(customNotification);
-        createLog(logger, guildID, executingUser + " created a new message on " + guildID + " with id " + nextAutoIncrementNumber);
-        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CREATED-CUSTOM-MESSAGE"), nextAutoIncrementNumber));
+        try {
+            guildsCache.setGuilds(databaseRequests.loadDataFromDatabaseToCache());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        createLog(logger, executingUser + " created a new message on " + guildID + " with id " + "?");
+        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CREATED-CUSTOM-MESSAGE"), "?"));
     }
 
     private String getWeekday(SlashCommandInteractionEvent event) {

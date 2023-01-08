@@ -1,11 +1,13 @@
 package me.umbreon.didn;
 
+import me.umbreon.didn.cache.ErrorCache;
 import me.umbreon.didn.cache.GameDataCache;
 import me.umbreon.didn.cache.GuildsCache;
+import me.umbreon.didn.data.ClientGuild;
+import me.umbreon.didn.data.NotificationChannel;
 import me.umbreon.didn.database.DatabaseRequests;
 import me.umbreon.didn.database.MySQLDatabaseConnection;
 import me.umbreon.didn.events.*;
-import me.umbreon.didn.logger.FileLogger;
 import me.umbreon.didn.notifier.CustomMessagesNotifier;
 import me.umbreon.didn.notifier.InformationNotifier;
 import me.umbreon.didn.notifier.Notifier;
@@ -27,7 +29,6 @@ public class DiabloImmortalDiscordNotifier {
             guildsCache.setGuilds(databaseRequests.loadDataFromDatabaseToCache());
         } catch (SQLException e) {
             e.printStackTrace();
-            FileLogger.createClientFileLog("Failed to run. Loading cache failed.");
             System.exit(0);
             return;
         }
@@ -40,25 +41,23 @@ public class DiabloImmortalDiscordNotifier {
 
                     .addEventListeners(new ChannelDelete(databaseRequests, guildsCache))
                     .addEventListeners(new GuildJoin(databaseRequests, guildsCache))
-                    // .addEventListeners(new GuildReady())
-                    .addEventListeners(new MessageDelete(databaseRequests, guildsCache))
-                    .addEventListeners(new MessageReactionAdd(guildsCache, databaseRequests))
-                    .addEventListeners(new MessageReactionRemove(guildsCache))
                     .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache))
                     .addEventListeners(new GuildLeave(databaseRequests, guildsCache))
 
                     .build().awaitReady();
+
+            jda.addEventListener(new GuildReady());
         } catch (InterruptedException e) {
-            FileLogger.createClientFileLog("Failed to run. Building JDA failed.");
             System.exit(0);
             return;
         }
 
+        createShowcaseChannels(guildsCache);
         runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
     }
 
     private static void runScheduler(GameDataCache gameDataCache, GuildsCache guildsCache, DatabaseRequests databaseRequests, JDA jda) {
-        Notifier notifier = new Notifier(guildsCache, gameDataCache);
+        Notifier notifier = new Notifier(guildsCache, gameDataCache, new ErrorCache(databaseRequests));
         notifier.runNotificationScheduler(jda);
 
         CustomMessagesNotifier customMessagesNotifier = new CustomMessagesNotifier(databaseRequests, guildsCache);
@@ -79,6 +78,22 @@ public class DiabloImmortalDiscordNotifier {
         gameDataCache.setAssemblyDataSet(databaseRequests.getEventTimes("assembly_times", false));
         gameDataCache.setWrathborneInvasionDataSet(databaseRequests.getEventTimes("wrathborne_invasion_times", true));
         gameDataCache.setOnSlaughtDataSet(databaseRequests.getEventTimes("onslaught_times", false));
+    }
+
+    private static void createShowcaseChannels(GuildsCache guildsCache) {
+        ClientGuild gmt0Guild = new ClientGuild("0");
+        gmt0Guild.setHeadUpTime(10);
+        NotificationChannel gmt0Channel = new NotificationChannel("1061561889739522058", "0");
+        gmt0Channel.setRoleID(null);
+        gmt0Guild.addNewNotificationChannel(gmt0Channel);
+        guildsCache.addGuild(gmt0Guild);
+
+        ClientGuild gmt1Guild = new ClientGuild("0");
+        gmt1Guild.setHeadUpTime(10);
+        NotificationChannel gmt1Channel = new NotificationChannel("1061561926804574258", "0");
+        gmt1Channel.setRoleID(null);
+        gmt1Guild.addNewNotificationChannel(gmt1Channel);
+        guildsCache.addGuild(gmt1Guild);
     }
 
 }

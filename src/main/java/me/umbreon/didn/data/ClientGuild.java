@@ -2,9 +2,7 @@ package me.umbreon.didn.data;
 
 import me.umbreon.didn.enums.Language;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,7 +15,6 @@ public class ClientGuild {
     private int headUpTime;
     private boolean isWarnMessagesEnabled;
     private boolean isEventMessageEnabled;
-    private List<ReactionRole> reactionRoles;
     private Map<Integer, CustomNotification> customNotifications;
     private Map<String, NotificationChannel> notificationChannels;
     private boolean isDaylightTimeEnabled;
@@ -25,7 +22,6 @@ public class ClientGuild {
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
                        int headUpTime, boolean isWarnMessagesEnabled, boolean isEventMessageEnabled,
-                       List<ReactionRole> reactionRoles,
                        Map<Integer, CustomNotification> customNotifications,
                        Map<String, NotificationChannel> notificationChannels,
                        boolean isDaylightTimeEnabled, boolean isPremiumServer) {
@@ -36,7 +32,6 @@ public class ClientGuild {
         this.headUpTime = headUpTime;
         this.isWarnMessagesEnabled = isWarnMessagesEnabled;
         this.isEventMessageEnabled = isEventMessageEnabled;
-        this.reactionRoles = reactionRoles;
         this.customNotifications = customNotifications;
         this.notificationChannels = notificationChannels;
         this.isDaylightTimeEnabled = isDaylightTimeEnabled;
@@ -52,7 +47,6 @@ public class ClientGuild {
         this.headUpTime = headUpTime;
         this.isWarnMessagesEnabled = isEventMessageEnabled;
         this.isEventMessageEnabled = isWarnMessagesEnabled;
-        this.reactionRoles = new ArrayList<>();
         this.customNotifications = new ConcurrentHashMap<>();
         this.notificationChannels = new ConcurrentHashMap<>();
         this.isDaylightTimeEnabled = isDaylightTimeEnabled;
@@ -67,7 +61,6 @@ public class ClientGuild {
         this.headUpTime = 15;
         this.isWarnMessagesEnabled = true;
         this.isEventMessageEnabled = true;
-        this.reactionRoles = new ArrayList<>();
         this.customNotifications = new ConcurrentHashMap<>();
         this.notificationChannels = new ConcurrentHashMap<>();
         this.isDaylightTimeEnabled = false;
@@ -118,28 +111,8 @@ public class ClientGuild {
         isEventMessageEnabled = eventMessageEnabled;
     }
 
-    public List<ReactionRole> getReactionRoles() {
-        return reactionRoles;
-    }
-
-    public void setReactionRoles(List<ReactionRole> reactionRoles) {
-        this.reactionRoles = reactionRoles;
-    }
-
     public Map<Integer, CustomNotification> getCustomNotifications() {
         return customNotifications;
-    }
-
-    public void setCustomNotifications(Map<Integer, CustomNotification> customNotifications) {
-        this.customNotifications = customNotifications;
-    }
-
-    public Map<String, NotificationChannel> getNotificationChannels() {
-        return notificationChannels;
-    }
-
-    public void setNotificationChannels(Map<String, NotificationChannel> notificationChannels) {
-        this.notificationChannels = notificationChannels;
     }
 
     public boolean isChannelRegistered(String textChannelID) {
@@ -150,52 +123,12 @@ public class ClientGuild {
         return notificationChannels.get(textChannelID);
     }
 
-    public void replaceNotificationChannel(NotificationChannel notificationChannel) {
-        notificationChannels.replace(notificationChannel.getTextChannelID(), notificationChannel);
-    }
-
     public void addNewNotificationChannel(NotificationChannel notificationChannel) {
         notificationChannels.put(notificationChannel.getTextChannelID(), notificationChannel);
     }
 
     public void deleteNotificationChannelByID(String textChannelID) {
         notificationChannels.remove(textChannelID);
-    }
-
-    public int getReactionRolesAmount(String messageID) {
-        int count = 0;
-        for (ReactionRole reactionRole : reactionRoles) {
-            if (reactionRole.getMessageID().equals(messageID)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public void addReactionRole(ReactionRole reactionRole) {
-        reactionRoles.add(reactionRole);
-    }
-
-    public ReactionRole getReactionRoleByMessageIDAndEmojiID(String messageID, String emojiCode) {
-        for (ReactionRole reactionRole : reactionRoles) {
-            if (reactionRole.getMessageID().equals(messageID)) {
-                if (reactionRole.getReactionID().equals(emojiCode)) {
-                    return reactionRole;
-                }
-            }
-        }
-        return null;
-    }
-
-    public void removeReactionRoleByMessageIDAndEmojiID(final String messageID, final String codifiedEmote) {
-        for (ReactionRole reactionRole : reactionRoles) {
-            String tmpListMessageID = reactionRole.getMessageID();
-            String tmpListCodifiedEmote = reactionRole.getReactionID();
-            if (tmpListMessageID.equalsIgnoreCase(messageID) && tmpListCodifiedEmote.equalsIgnoreCase(codifiedEmote)) {
-                reactionRoles.remove(reactionRole);
-                break;
-            }
-        }
     }
 
     public void addCustomNotification(CustomNotification customNotification) {
@@ -212,25 +145,6 @@ public class ClientGuild {
 
     public boolean doNotificationChannelExist(String textChannelID) {
         return notificationChannels.containsKey(textChannelID);
-    }
-
-    public boolean doReactionRoleExist(String messageID) {
-        return reactionRoles.stream()
-                .filter(reactionRole -> reactionRole.getMessageID().equals(messageID))
-                .findFirst()
-                .orElse(null) != null;
-    }
-
-    public boolean doReactionRoleExist(String messageID, String emojiCode) {
-        return reactionRoles.stream()
-                .filter(reactionRole -> reactionRole.getMessageID().equals(messageID))
-                .filter(reactionRole -> reactionRole.getReactionID().equals(emojiCode))
-                .findFirst()
-                .orElse(null) != null;
-    }
-
-    public void deleteReactionRoleByMessageID(String messageID) {
-        reactionRoles.removeIf(reactionRole -> reactionRole.getMessageID().equals(messageID));
     }
 
     public int getHeadUpTime() {

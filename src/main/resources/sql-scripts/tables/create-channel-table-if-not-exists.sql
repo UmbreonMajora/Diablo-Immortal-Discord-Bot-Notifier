@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS channel_notification
 (
     textChannelID           VARCHAR(20)          NOT NULL PRIMARY KEY,
     guildID                 VARCHAR(20)          NOT NULL,
-    roleID                  VARCHAR(20)          NOT NULL DEFAULT 'EVERYONE',
+    roleID          VARCHAR(20)          NOT NULL DEFAULT 'EVERYONE',
     message                 TINYINT(1) DEFAULT 1 NOT NULL,
     headUp                  TINYINT(1) DEFAULT 1 NOT NULL,
     ancientarena            TINYINT(1) DEFAULT 1 NOT NULL,

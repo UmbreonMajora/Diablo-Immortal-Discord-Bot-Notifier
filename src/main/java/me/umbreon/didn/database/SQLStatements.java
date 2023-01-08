@@ -27,13 +27,12 @@ public class SQLStatements {
     private static final String UPDATE_CHANNEL_STATEMENT;
     private static final String DELETE_CHANNEL_BY_GUILD_ID_STATEMENT;
 
-    private static final String GET_ALL_REACTION_ROLES_STATEMENT;
-    private static final String CREATE_REACTION_ROLE_STATEMENT;
-    private static final String DELETE_REACTION_ROLE_BY_MESSAGE_ID_STATEMENT;
-    private static final String DELETE_REACTION_ROLES_BY_GUILD_ID_STATEMENT;
-    //TODO: UPDATE_STATEMENTS?
-
     private static final String GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE;
+
+    private static final String CREATE_CHANNEL_TABLE_STATEMENT;
+    private static final String CREATE_MESSAGES_TABLE_STATEMENT;
+    private static final String CREATE_GUILDS_TABLE_STATEMENT;
+    private static final String CREATE_REACTION_ROLES_STATEMENT;
 
     static {
 
@@ -54,12 +53,12 @@ public class SQLStatements {
         UPDATE_CHANNEL_STATEMENT = loadResourceToString(DEFAULT_PATH + "update-channel.sql");
         DELETE_CHANNEL_BY_GUILD_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-channels-by-guildid.sql");
 
-        GET_ALL_REACTION_ROLES_STATEMENT = loadResourceToString(DEFAULT_PATH + "get-all-reaction-roles.sql");
-        CREATE_REACTION_ROLE_STATEMENT = loadResourceToString(DEFAULT_PATH + "create-reaction-role.sql");
-        DELETE_REACTION_ROLE_BY_MESSAGE_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-reaction-role-by-message-id.sql");
-        DELETE_REACTION_ROLES_BY_GUILD_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-reaction-roles-by-guildid.sql");
-
         GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE = loadResourceToString(DEFAULT_PATH + "get-custom-message-next-auto-increment-value.sql");
+
+        CREATE_CHANNEL_TABLE_STATEMENT = null;// loadResourceToString(DEFAULT_PATH + "/tables/create-channel-table-if-not-exists.sql");
+        CREATE_MESSAGES_TABLE_STATEMENT = null;//loadResourceToString(DEFAULT_PATH + "/tables/create-custom-messages-table-if-not-exists.sql");
+        CREATE_GUILDS_TABLE_STATEMENT = null;//loadResourceToString(DEFAULT_PATH + "/tables/create-guilds-table-if-not-exists.sql");
+        CREATE_REACTION_ROLES_STATEMENT = null;//loadResourceToString(DEFAULT_PATH + "/tables/create-reaction-roles-table-if-not-exists.sql");
     }
 
     private static String loadResourceToString(String path) {
@@ -144,30 +143,26 @@ public class SQLStatements {
     }
 
     /*
-     * Reaction Roles Statements Getter
-     */
-
-    public static String getGetAllReactionRolesStatement() {
-        return GET_ALL_REACTION_ROLES_STATEMENT;
-    }
-
-    public static String getCreateReactionRoleStatement() {
-        return CREATE_REACTION_ROLE_STATEMENT;
-    }
-
-    public static String getDeleteReactionRoleByMessageIdStatement() {
-        return DELETE_REACTION_ROLE_BY_MESSAGE_ID_STATEMENT;
-    }
-
-    public static String getDeleteReactionRolesByGuildIdStatement() {
-        return DELETE_REACTION_ROLES_BY_GUILD_ID_STATEMENT;
-    }
-
-    /*
      *
      */
 
     public static String getGetCustomMessageNextAutoIncrementValue() {
         return GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE;
+    }
+
+    public static String getCreateChannelTableStatement() {
+        return CREATE_CHANNEL_TABLE_STATEMENT;
+    }
+
+    public static String getCreateGuildsTableStatement() {
+        return CREATE_GUILDS_TABLE_STATEMENT;
+    }
+
+    public static String getCreateMessagesTableStatement() {
+        return CREATE_MESSAGES_TABLE_STATEMENT;
+    }
+
+    public static String getCreateReactionRolesStatement() {
+        return CREATE_REACTION_ROLES_STATEMENT;
     }
 }

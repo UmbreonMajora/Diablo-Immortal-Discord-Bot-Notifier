@@ -1,6 +1,6 @@
 package me.umbreon.didn.commands;
 
-import me.umbreon.didn.logger.FileLogger;
+import lombok.extern.slf4j.Slf4j;
 import me.umbreon.didn.utils.CommandsUtil;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -11,10 +11,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
 public interface IClientCommand {
 
     void runCommand(SlashCommandInteractionEvent event);
@@ -41,13 +39,8 @@ public interface IClientCommand {
         }
     }
 
-    default void createLog(Logger LOGGER, String guildID, String message) {
+    default void createLog(Logger LOGGER, String message) {
         LOGGER.info(message);
-        FileLogger.createClientFileLog(message);
-
-        if (guildID != null) {
-            FileLogger.createGuildFileLog(guildID, message);
-        }
     }
 
     default boolean isUserPermitted(Member member, String guildAdminRoleID) {

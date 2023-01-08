@@ -1,41 +1,47 @@
 package me.umbreon.didn.utils;
 
-import me.umbreon.didn.commands.server.LanguageCommand;
-import me.umbreon.didn.logger.FileLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 public class ConfigUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
 
+    private static final Properties CLIENT_PROPERTIES = new Properties();
+
     private static final int DEFAULT_WARN_TIME;
     private static final String CLIENT_TOKEN;
     private static final int CUSTOM_NOTIFICATION_MAX;
 
-    static {
-        Properties clientProperties = new Properties();
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream stream = loader.getResourceAsStream("client.properties");
+    private static final String DATABASE_HOST;
+    private static final String DATABASE_DATABASE;
+    private static final String DATABASE_USERNAME;
+    private static final String DATABASE_PASSWORD;
+    private static final int DATABASE_PORT;
 
+    static {
         try {
-            clientProperties.load(stream);
+            CLIENT_PROPERTIES.load(new FileInputStream(System.getProperty("user.dir") + "/client.properties"));
             LOGGER.info("Loaded client.properties file.");
-            FileLogger.createClientFileLog("Loaded client.properties file.");
         } catch (IOException e) {
-            LOGGER.warn("Failed to load client.properties file! Shutting down...");
-            FileLogger.createClientFileLog("Failed to load client.properties file! Shutting down...");
             e.printStackTrace();
+            LOGGER.warn("Failed to load client.properties file! Shutting down...");
             System.exit(0);
         }
 
-        DEFAULT_WARN_TIME = Integer.parseInt(clientProperties.getProperty("DEFAULT-WARN-TIME"));
-        CUSTOM_NOTIFICATION_MAX = Integer.parseInt(clientProperties.getProperty("CUSTOM-NOTIFICATION-MAX"));
-        CLIENT_TOKEN = clientProperties.getProperty("TOKEN");
+        DEFAULT_WARN_TIME = Integer.parseInt(CLIENT_PROPERTIES.getProperty("DEFAULT-WARN-TIME"));
+        CUSTOM_NOTIFICATION_MAX = Integer.parseInt(CLIENT_PROPERTIES.getProperty("CUSTOM-NOTIFICATION-MAX"));
+        CLIENT_TOKEN = CLIENT_PROPERTIES.getProperty("TOKEN");
+
+        DATABASE_HOST = CLIENT_PROPERTIES.getProperty("DATABASE_HOST");
+        DATABASE_DATABASE = CLIENT_PROPERTIES.getProperty("DATABASE_DATABASE");
+        DATABASE_USERNAME = CLIENT_PROPERTIES.getProperty("DATABASE_USERNAME");
+        DATABASE_PASSWORD = CLIENT_PROPERTIES.getProperty("DATABASE_PASSWORD");
+        DATABASE_PORT = Integer.parseInt(CLIENT_PROPERTIES.getProperty("DATABASE_PORT"));
     }
 
     public static int getDefaultWarnTime() {
@@ -48,5 +54,25 @@ public class ConfigUtil {
 
     public static int getCustomNotificationMax() {
         return CUSTOM_NOTIFICATION_MAX;
+    }
+
+    public static String getDatabaseHost() {
+        return DATABASE_HOST;
+    }
+
+    public static String getDatabaseDatabase() {
+        return DATABASE_DATABASE;
+    }
+
+    public static String getDatabaseUsername() {
+        return DATABASE_USERNAME;
+    }
+
+    public static String getDatabasePassword() {
+        return DATABASE_PASSWORD;
+    }
+
+    public static int getDatabasePort() {
+        return DATABASE_PORT;
     }
 }

@@ -5,17 +5,17 @@ import me.umbreon.didn.cache.GuildsCache;
 import me.umbreon.didn.commands.channel.*;
 import me.umbreon.didn.commands.custom_notifications.*;
 import me.umbreon.didn.commands.info.*;
-import me.umbreon.didn.commands.reaction_roles.CreateReactionRoleCommand;
-import me.umbreon.didn.commands.reaction_roles.ListReactionRolesCommand;
-import me.umbreon.didn.commands.reaction_roles.RemoveReactionRoleCommand;
 import me.umbreon.didn.commands.server.*;
 import me.umbreon.didn.data.ClientGuild;
 import me.umbreon.didn.database.DatabaseRequests;
-import me.umbreon.didn.logger.FileLogger;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,11 +55,6 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final TodayCommand todayCommand;
     private final UpComingCommand upComingCommand;
 
-    // Reaction roles commands
-    private final CreateReactionRoleCommand createReactionRoleCommand;
-    private final RemoveReactionRoleCommand removeReactionRoleCommand;
-    private final ListReactionRolesCommand listReactionRolesCommand;
-
     // Server commands
     private final AdminRoleCommand adminRoleCommand;
     private final ConfigCommand configCommand;
@@ -94,10 +89,6 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.todayCommand = new TodayCommand(guildsCache, gameDataCache);
         this.upComingCommand = new UpComingCommand(guildsCache, gameDataCache);
 
-        this.createReactionRoleCommand = new CreateReactionRoleCommand(databaseRequests, guildsCache);
-        this.removeReactionRoleCommand = new RemoveReactionRoleCommand(guildsCache);
-        this.listReactionRolesCommand = new ListReactionRolesCommand(guildsCache);
-
         this.adminRoleCommand = new AdminRoleCommand(guildsCache, databaseRequests);
         this.configCommand = new ConfigCommand(guildsCache);
         this.languageCommand = new LanguageCommand(guildsCache, databaseRequests);
@@ -110,19 +101,17 @@ public class SlashCommandInteraction extends ListenerAdapter {
     }
 
     @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         Member member = event.getMember();
         Guild guild = event.getGuild();
         String fullUsername = event.getUser().getName() + "#" + event.getUser().getDiscriminator();
         if (isEventInPrivatChat(guild, member)) {
             LOGGER.info(fullUsername + " executed a command in privat chat.");
-            FileLogger.createClientFileLog(fullUsername + " executed a command in privat chat.");
             return;
         }
 
         if (!isChannelTypeTextChannelType(event.getChannelType())) {
             LOGGER.info(fullUsername + " executed a command in a non text channel.");
-            FileLogger.createClientFileLog(fullUsername + " executed a command in a non text channel.");
             return;
         }
 
@@ -130,16 +119,13 @@ public class SlashCommandInteraction extends ListenerAdapter {
 
         if (!guildsCache.isGuildRegistered(guildID)) {
             LOGGER.info(guild + " is not registered. Registering...");
-            FileLogger.createClientFileLog(guild + " is not registered. Registering...");
             ClientGuild clientGuild = new ClientGuild(guildID);
             guildsCache.addGuild(clientGuild);
             databaseRequests.createGuild(clientGuild);
         }
 
         String guildAdminRoleID = guildsCache.getGuildAdminRoleID(guildID);
-        if (!isUserPermitted(member, guildAdminRoleID)) {
-            return;
-        }
+        if (!isUserPermitted(member, guildAdminRoleID)) return;
 
         event.deferReply().queue();
 
@@ -206,12 +192,6 @@ public class SlashCommandInteraction extends ListenerAdapter {
             case COMMAND_CONFIG:
                 configCommand.runCommand(event);
                 break;
-            case COMMAND_CREATE_REACTION_ROLE:
-                createReactionRoleCommand.runCommand(event);
-                break;
-            case COMMAND_REMOVE_REACTION_ROLE:
-                removeReactionRoleCommand.runCommand(event);
-                break;
             case COMMAND_ADMIN_ROLE:
                 adminRoleCommand.runCommand(event);
                 break;
@@ -220,9 +200,6 @@ public class SlashCommandInteraction extends ListenerAdapter {
                 break;
             case COMMAND_PRESET:
                 presetCommand.runCommand(event);
-                break;
-            case COMMAND_LIST_REACTION_ROLES:
-                listReactionRolesCommand.runCommand(event);
                 break;
             case COMMAND_WARN_TIME:
                 warnTimeCommand.runCommand(event);
@@ -249,7 +226,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
     }
 
     private boolean isUserPermitted(Member member, String guildAdminRoleID) {
-        if (isServerOwner(member)) {
+        if (isServerOwner(member) || isAdmin(member)) {
             return true;
         }
 
@@ -263,6 +240,10 @@ public class SlashCommandInteraction extends ListenerAdapter {
 
     private boolean isServerOwner(final Member member) {
         return member.isOwner();
+    }
+
+    private boolean isAdmin(Member member) {
+        return member.hasPermission(Permission.ADMINISTRATOR);
     }
 
     private boolean doMemberHasDefaultAdminRole(List<Role> roles) {

@@ -14,5 +14,4 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 /.idea/
 /gradle/wrapper/
-/src/main/resources/database.properties
-/src/main/resources/client.properties
+/client.properties

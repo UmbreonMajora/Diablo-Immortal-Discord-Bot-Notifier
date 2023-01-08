@@ -65,10 +65,6 @@ public class CommandsUtil {
     private static final OptionData REQUIRED_MESSAGE_ID_OPTION =
             new OptionData(OptionType.STRING, MESSAGE_ID_OPTION_NAME, "Enter here your message ID.", true);
 
-    public static final String EMOTE_OPTION_NAME = "emote";
-    private static final OptionData REQUIRED_EMOTE_OPTION =
-            new OptionData(OptionType.STRING, EMOTE_OPTION_NAME, "Enter here your emote", true);
-
     public static final String LANGUAGE_OPTION_NAME = "language";
     private static final OptionData REQUIRED_LANGUAGE_OPTION =
             new OptionData(OptionType.STRING, LANGUAGE_OPTION_NAME, "Enter your language here.", true);
@@ -163,17 +159,8 @@ public class CommandsUtil {
     public static final String COMMAND_UPCOMING = "upcoming";
     private static final String COMMAND_UPCOMING_DESC;
 
-    public static final String COMMAND_CREATE_REACTION_ROLE = "createreactionrole";
-    private static final String COMMAND_CREATE_REACTION_ROLE_DESC;
-
     public static final String COMMAND_WARN_TIME = "warntime";
     private static final String COMMAND_WARN_TIME_DESC;
-
-    public static final String COMMAND_LIST_REACTION_ROLES = "listreactionrole";
-    private static final String COMMAND_LIST_REACTION_ROLES_DESC;
-
-    public static final String COMMAND_REMOVE_REACTION_ROLE = "removereactionrole";
-    private static final String COMMAND_REMOVE_REACTION_ROLE_DESC;
 
     public static final String COMMAND_ADMIN_ROLE = "adminrole";
     private static final String COMMAND_ADMIN_ROLE_DESC;
@@ -267,10 +254,7 @@ public class CommandsUtil {
         COMMAND_TIMEZONES_DESC = commandsProperties.get(COMMAND_TIMEZONES).toString();
         COMMAND_TODAY_DESC = commandsProperties.get(COMMAND_TODAY).toString();
         COMMAND_UPCOMING_DESC = commandsProperties.get(COMMAND_UPCOMING).toString();
-        COMMAND_CREATE_REACTION_ROLE_DESC = commandsProperties.get(COMMAND_CREATE_REACTION_ROLE).toString();
         COMMAND_WARN_TIME_DESC = commandsProperties.get(COMMAND_WARN_TIME).toString();
-        COMMAND_LIST_REACTION_ROLES_DESC = commandsProperties.get(COMMAND_LIST_REACTION_ROLES).toString();
-        COMMAND_REMOVE_REACTION_ROLE_DESC = commandsProperties.get(COMMAND_REMOVE_REACTION_ROLE).toString();
         COMMAND_ADMIN_ROLE_DESC = commandsProperties.get(COMMAND_ADMIN_ROLE).toString();
         COMMAND_CONFIG_DESC = commandsProperties.get(COMMAND_CONFIG).toString();
         COMMAND_LANGUAGE_DESC = commandsProperties.get(COMMAND_LANGUAGE).toString();
@@ -333,14 +317,6 @@ public class CommandsUtil {
         commandDataList.add(Commands.slash(COMMAND_TODAY, COMMAND_TODAY_DESC));
         // -> /upcoming
         commandDataList.add(Commands.slash(COMMAND_UPCOMING, COMMAND_UPCOMING_DESC));
-        // -> Command: /createreactionrole [Required: messageid] [Required: emote] [Required: role]
-        commandDataList.add(Commands.slash(COMMAND_CREATE_REACTION_ROLE, COMMAND_CREATE_REACTION_ROLE_DESC)
-                .addOptions(REQUIRED_MESSAGE_ID_OPTION, REQUIRED_ROLE_OPTION, REQUIRED_EMOTE_OPTION));
-        // -> Command: /listreactionroles
-        commandDataList.add(Commands.slash(COMMAND_LIST_REACTION_ROLES, COMMAND_LIST_REACTION_ROLES_DESC));
-        // -> Command: /removereactionrole [Required: MessageID] [Required: Emoji]
-        commandDataList.add(Commands.slash(COMMAND_REMOVE_REACTION_ROLE, COMMAND_REMOVE_REACTION_ROLE_DESC)
-                .addOptions(REQUIRED_MESSAGE_ID_OPTION, REQUIRED_EMOTE_OPTION));
         // -> Command: /adminrole [Required: role]
         commandDataList.add(Commands.slash(COMMAND_ADMIN_ROLE, COMMAND_ADMIN_ROLE_DESC)
                 .addOptions(REQUIRED_ROLE_OPTION));

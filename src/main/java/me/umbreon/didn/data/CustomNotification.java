@@ -1,5 +1,10 @@
 package me.umbreon.didn.data;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class CustomNotification {
 
     private final String channelID;
@@ -34,63 +39,4 @@ public class CustomNotification {
         this.enabled = enabled;
     }
 
-    public String getChannelID() {
-        return channelID;
-    }
-
-    public String getGuildID() {
-        return guildID;
-    }
-
-    public void setGuildID(String guildID) {
-        this.guildID = guildID;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getWeekday() {
-        return weekday;
-    }
-
-    public void setWeekday(String weekday) {
-        this.weekday = weekday;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public int getCustomMessageID() {
-        return customMessageID;
-    }
-
-    public void setCustomMessageID(int customMessageID) {
-        this.customMessageID = customMessageID;
-    }
-
-    public boolean isRepeating() {
-        return isRepeating;
-    }
-
-    public void setRepeating(boolean repeating) {
-        this.isRepeating = repeating;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 }

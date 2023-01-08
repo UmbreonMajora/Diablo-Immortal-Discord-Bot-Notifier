@@ -1,15 +1,12 @@
 package me.umbreon.didn.database;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
-import me.umbreon.didn.logger.FileLogger;
+import me.umbreon.didn.utils.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class MySQLDatabaseConnection implements IDatabaseConnection {
 
@@ -23,21 +20,11 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
 
     @Override
     public boolean createConnection() {
-        Properties prop = new Properties();
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        InputStream stream = loader.getResourceAsStream("database.properties");
-
-        try {
-            prop.load(stream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String host = prop.getProperty("host");
-        String database = prop.getProperty("database");
-        String username = prop.getProperty("username");
-        String password = prop.getProperty("password");
-        int port = Integer.parseInt(prop.getProperty("port"));
+        String host = ConfigUtil.getDatabaseHost();
+        String database = ConfigUtil.getDatabaseDatabase();
+        String username = ConfigUtil.getDatabaseUsername();
+        String password = ConfigUtil.getDatabasePassword();
+        int port = ConfigUtil.getDatabasePort();
 
         dataSource = new MysqlDataSource();
         dataSource.setServerName(host);
@@ -48,17 +35,14 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
         dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?verifyServerCertificate=false&useSSL=true");
 
         try (Connection connection = dataSource.getConnection()) {
-            /* Todo: implement start up scripts
-            String startSqlFilesPath = "run";
-            for (String sqlFile : FilesUtil.getResourceFiles(startSqlFilesPath, getClass())) {
-                connection.prepareStatement(FilesUtil.loadResourceToString(startSqlFilesPath + "/" + sqlFile))
-                        .executeUpdate();
-            }
-             */
-            connection.prepareStatement("SELECT 1;").executeQuery();
+            connection.prepareStatement("SELECT 1;").executeUpdate();
+            //connection.prepareStatement(SQLStatements.getCreateReactionRolesStatement());
+            //connection.prepareStatement(SQLStatements.getCreateMessagesTableStatement());
+            //connection.prepareStatement(SQLStatements.getCreateGuildsTableStatement());
+            //connection.prepareStatement(SQLStatements.getCreateChannelTableStatement());
         } catch (SQLException e) {
-            FileLogger.createClientFileErrorLog(e.getMessage(), e);
             LOGGER.error(e.getMessage(), e);
+            e.printStackTrace();
             return false;
         }
         return true;
@@ -70,7 +54,6 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
             try {
                 dataSource.getConnection().close();
             } catch (SQLException e) {
-                FileLogger.createClientFileErrorLog(e.getMessage(), e);
                 LOGGER.error(e.getMessage(), e);
             }
         }
@@ -81,7 +64,6 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
-            FileLogger.createClientFileErrorLog(e.getMessage(), e);
             LOGGER.error(e.getMessage(), e);
             return null;
         }

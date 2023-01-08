@@ -1,9 +1,9 @@
 package me.umbreon.didn.enums;
 
 public enum Language {
-    ENGLISH("English", "ENG", "languages/english.yaml"),
-    GERMAN("German", "GER", "languages/french.yaml"),
-    FRENCH("French", "FRA", "languages/german.yaml"),
+    ENGLISH("English", "ENG", "languages/english.yml"),
+    GERMAN("German", "GER", "languages/german.yaml"),
+    FRENCH("French", "FRA", "languages/french.yaml"),
     INDONESIA("Indonesia", "IND", "languages/indonesia.yaml"),
     ITALIAN("Italian", "ITA", "languages/italian.yaml"),
     POLISH("Polish", "POL", "languages/polish.yaml"),
@@ -20,15 +20,6 @@ public enum Language {
         this.rawName = rawName;
         this.shortName = shortName;
         this.path = path;
-    }
-
-    public static Language findLanguageByRawName(String rawName) {
-        for (Language language : Language.values()) {
-            if (language.rawName.equalsIgnoreCase(rawName)) {
-                return language;
-            }
-        }
-        return null;
     }
 
     public static Language findLanguageByShortName(String shortName) {

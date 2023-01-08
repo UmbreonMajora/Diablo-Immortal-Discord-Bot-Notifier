@@ -9,7 +9,6 @@ import me.umbreon.didn.languages.LanguageController;
 import me.umbreon.didn.utils.ConfigUtil;
 import me.umbreon.didn.utils.TimeUtil;
 
-import java.sql.Time;
 import java.util.Set;
 
 import static me.umbreon.didn.utils.StringUtil.EMPTY_STRING;
@@ -33,8 +32,6 @@ public class VaultEvent implements IGameEvent {
         }
 
         Set<EventGameData> eventGameDataSet = gameDataCache.getVaultGameDataSet();
-        eventGameDataSet.clear();
-        eventGameDataSet.add(new EventGameData("23:20-23:35", null, "23:35"));
         String timeZone = guild.getGuildTimeZone();
         Language language = guild.getGuildLanguage();
 

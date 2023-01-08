@@ -1,5 +1,6 @@
 package me.umbreon.didn.commands.channel;
 
+import lombok.extern.slf4j.Slf4j;
 import me.umbreon.didn.cache.GuildsCache;
 import me.umbreon.didn.commands.IClientCommand;
 import me.umbreon.didn.data.NotificationChannel;
@@ -10,8 +11,6 @@ import me.umbreon.didn.languages.LanguageController;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -23,9 +22,8 @@ import static me.umbreon.didn.utils.CommandsUtil.EVENT_VALUE_OPTION_NAME;
  * Allow's user to specify which event notification a channel should get.
  * Command: /notification [Required: event] [Required: eventvalue]
  */
+@Slf4j
 public class NotificationCommand implements IClientCommand {
-
-    private final Logger logger = LoggerFactory.getLogger(NotificationCommand.class);
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
@@ -37,40 +35,37 @@ public class NotificationCommand implements IClientCommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
+        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
+
         String guildID = Objects.requireNonNull(event.getGuild()).getId();
         String guildName = event.getGuild().getName();
-
-        Language language = guildsCache.getGuildLanguage(guildID);
-        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
 
         TextChannel targetTextChannel = getTargetTextChannel(event);
         String targetTextChannelID = targetTextChannel.getId();
         String targetTextChannelName = targetTextChannel.getName();
 
+        Language language = guildsCache.getGuildLanguage(guildID);
+
         if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
-            createLog(logger, guildID, executingUser + " tried to use /notification in " + guildName + "(" +
-                    guildID + ") on " + targetTextChannelName + "(" + targetTextChannelID + ") but this channel is not " +
-                    "registered.");
+            log.info("{} executed /info in an unregistered channel. Guild: {}({}), Channel: {}({})",
+                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANNEL-NOT-REGISTERED"));
             return;
         }
 
         String selectedEvent = getSelectedEvent(event);
         GameEvent gameEvent = GameEvent.findGameEventByRawName(selectedEvent);
-
         if (gameEvent == null) {
-            createLog(logger, guildID, executingUser + " tried to use /notification in " + guildName + "(" +
-                    guildID + ") on " + targetTextChannelName + "(" + targetTextChannelID + ") but the gameevent " +
-                    "was invalid.");
+            log.info("{} executed /notification with invalid gameevent. Guild: {}({}), Channel: {}({})",
+                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INVALID-EVENT"));
             return;
         }
 
         boolean eventValue = getEventValue(event);
         updateNotificationChannel(gameEvent, eventValue, guildID, targetTextChannelID);
-        createLog(logger, guildID, executingUser + " used /notification in " + guildName + "(" +
-                guildID + ") on " + targetTextChannelName + "(" + targetTextChannelID + ") and changed the event " +
-                "value of " + gameEvent.rawName + " to " + eventValue);
+        log.info("{} executed /notification. Changed {} to {}. Guild: {}({}), Channel: {}({})",
+                executingUser, gameEvent.rawName, eventValue, guildName, guildID, targetTextChannelName, targetTextChannelID);
         String replyMessage = getReplyMessage(gameEvent, eventValue, language);
         replyEphemeralToUser(event, replyMessage);
     }

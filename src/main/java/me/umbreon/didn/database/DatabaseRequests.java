@@ -1,6 +1,9 @@
 package me.umbreon.didn.database;
 
-import me.umbreon.didn.data.*;
+import me.umbreon.didn.data.ClientGuild;
+import me.umbreon.didn.data.CustomNotification;
+import me.umbreon.didn.data.EventGameData;
+import me.umbreon.didn.data.NotificationChannel;
 import me.umbreon.didn.enums.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,28 +142,6 @@ public class DatabaseRequests {
                         clientGuildData.get(guildID).addNewNotificationChannel(notificationChannel);
                     } else {
                         LOGGER.error("Failed to add notification channel with channel id " + textChannelID + " to " + guildID + ".");
-                    }
-                }
-            }
-        }
-
-        try (
-                Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getGetAllReactionRolesStatement())
-        ) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    String messageID = resultSet.getString("messageID");
-                    String guildID = resultSet.getString("guildID");
-                    String roleID = resultSet.getString("roleID");
-                    String emojiCode = resultSet.getString("emojiCode");
-                    String emojiType = resultSet.getString("emojiType");
-                    ReactionRole reactionRole = new ReactionRole(messageID, guildID, emojiCode, emojiType, roleID);
-
-                    if (clientGuildData.containsKey(guildID)) {
-                        clientGuildData.get(guildID).addReactionRole(reactionRole);
-                    } else {
-                        LOGGER.error("Failed to add reaction role with message id " + messageID + " to " + guildID + ".");
                     }
                 }
             }
@@ -391,51 +372,6 @@ public class DatabaseRequests {
             preparedStatement.setString(1, guildID);
             preparedStatement.executeUpdate();
             LOGGER.info("Deleted channels of " + guildID + " from database.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Reaction role
-
-    public void createReactionRole(ReactionRole reactionRole) {
-        try (
-                Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getCreateReactionRoleStatement())
-        ) {
-            preparedStatement.setString(1, reactionRole.getMessageID());
-            preparedStatement.setString(2, reactionRole.getGuildID());
-            preparedStatement.setString(3, reactionRole.getReactionID());
-            preparedStatement.setString(4, reactionRole.getReactionType());
-            preparedStatement.setString(5, reactionRole.getRoleID());
-            preparedStatement.executeUpdate();
-            LOGGER.info("Created new reaction role on " + reactionRole.getGuildID());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteReactionRoleByMessageID(String messageID) {
-        try (
-                Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteReactionRoleByMessageIdStatement())
-        ) {
-            preparedStatement.setString(1, messageID);
-            preparedStatement.executeUpdate();
-            LOGGER.info("Deleted Reaction role with ID " + messageID);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteReactionRolesByGuildID(String guildID) {
-        try (
-                Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteReactionRolesByGuildIdStatement())
-        ) {
-            preparedStatement.setString(1, guildID);
-            preparedStatement.executeUpdate();
-            LOGGER.info("Deleted reaction roles of " + guildID + " from database.");
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,6 @@
 package me.umbreon.didn.commands.channel;
 
+import lombok.extern.slf4j.Slf4j;
 import me.umbreon.didn.cache.GuildsCache;
 import me.umbreon.didn.commands.IClientCommand;
 import me.umbreon.didn.data.NotificationChannel;
@@ -7,12 +8,11 @@ import me.umbreon.didn.database.DatabaseRequests;
 import me.umbreon.didn.enums.Language;
 import me.umbreon.didn.languages.LanguageController;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 import static me.umbreon.didn.utils.CommandsUtil.ROLE_OPTION_NAME;
 
@@ -21,9 +21,8 @@ import static me.umbreon.didn.utils.CommandsUtil.ROLE_OPTION_NAME;
  * Allow's user to remove or change the mention role.
  * Command: /mentionrole [Not required: role] [Not required: targetchannel]
  */
+@Slf4j
 public class MentionRoleCommand implements IClientCommand {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(MentionRoleCommand.class);
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
@@ -35,24 +34,29 @@ public class MentionRoleCommand implements IClientCommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event) {
+        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
+
+        String guildID = Objects.requireNonNull(event.getGuild()).getId();
+        String guildName = event.getGuild().getName();
+
         TextChannel targetTextChannel = getTargetTextChannel(event);
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
+        String targetTextChannelName = targetTextChannel.getName();
         String targetTextChannelID = targetTextChannel.getId();
-        User user = event.getUser();
+
         Language language = guildsCache.getGuildLanguage(guildID);
 
         if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
-            createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " tried to use /mentionrole on an unregistered channel.");
+            log.info("{} executed /mentionrole in an unregistered channel. Guild: {}({}), Channel: {}({})",
+                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANNEL-NOT-REGISTERED"));
             return;
         }
 
         Role mentionRole = getMentionRole(event);
-        createLog(LOGGER, guildID, getFullUsernameWithDiscriminator(user) + " changed the mention role of " + targetTextChannelID +
-                ", the new value is " + (mentionRole != null ? mentionRole.getName() : null));
+        log.info("{} executed /mentionrole. Changed the mention role to {}. Guild: {}({}), Channel: {}({})",
+                executingUser, (mentionRole != null ? mentionRole.getId() : null), guildName, guildID, targetTextChannelName, targetTextChannelID);
 
         updateChannel(guildID, targetTextChannelID, mentionRole);
-
         if (mentionRole == null) {
             replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "MENTION-ROLE-DISABLED"), targetTextChannel.getAsMention()));
         } else {
