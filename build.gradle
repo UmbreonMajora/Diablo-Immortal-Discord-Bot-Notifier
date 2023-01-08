@@ -5,7 +5,7 @@ plugins {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'me.umbreon.didn.DiabloImmortalDiscordNotifier'
+                'Main-Class': 'net.purplegoose.didnb.DiabloImmortalDiscordNotifier'
         )
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -14,8 +14,8 @@ jar {
     }
 }
 
-group 'me.umbreon.didn'
-version '1.1.0'
+group 'net.purplegoose.didnb'
+version '1.0.0-alpha1'
 
 repositories {
     mavenCentral()
