@@ -1,10 +1,9 @@
 package net.purplegoose.didnb.database;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.utils.ConfigUtil;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,10 +15,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class MySQLDatabaseConnection implements IDatabaseConnection {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(MySQLDatabaseConnection.class);
-    private static final String STARTUP_SCRIPT_FOLDER = "start";
+    private static final String STARTUP_SCRIPT_FOLDER = "start-up";
     private MysqlDataSource dataSource;
 
     public MySQLDatabaseConnection() {
@@ -43,15 +41,15 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
         dataSource.setUrl("jdbc:mysql://" + host + ":" + port + "/" + database + "?verifyServerCertificate=false&useSSL=true");
 
         try (Connection connection = dataSource.getConnection()) {
-            LOGGER.info("Executing start up scripts...");
+            log.info("Executing start up scripts...");
             for (String scriptName : loadStartUpScripts()) {
                 String statement = loadResourceToString(STARTUP_SCRIPT_FOLDER + "/" + scriptName);
-                connection.prepareStatement(statement).executeQuery();
-                LOGGER.info("> executed {}.", scriptName);
+                connection.prepareStatement(statement).executeUpdate();
+                log.info("> executed {}.", scriptName);
             }
-            LOGGER.info("Done executing start up scripts!");
+            log.info("Done executing start up scripts!");
         } catch (SQLException e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return false;
         }
         return true;
@@ -63,7 +61,7 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
             try {
                 dataSource.getConnection().close();
             } catch (SQLException e) {
-                LOGGER.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -73,13 +71,13 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return null;
         }
     }
 
     private List<String> loadStartUpScripts() {
-        LOGGER.info("Loading scripts for start up...");
+        log.info("Loading scripts for start up...");
         List<String> filenames = new ArrayList<>();
 
         try (InputStream in = getResourceAsStream();
@@ -87,13 +85,13 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
             String resource;
 
             while ((resource = br.readLine()) != null) {
-                LOGGER.info("> Added {} to start up scripts.", resource);
+                log.info("> Added {} to start up scripts.", resource);
                 filenames.add(resource);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        LOGGER.info("Loaded {} start up scripts!", filenames.size());
+        log.info("Loaded {} start up scripts!", filenames.size());
         return filenames;
     }
 

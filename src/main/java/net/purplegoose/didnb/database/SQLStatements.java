@@ -29,11 +29,6 @@ public class SQLStatements {
 
     private static final String GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE;
 
-    private static final String CREATE_CHANNEL_TABLE_STATEMENT;
-    private static final String CREATE_MESSAGES_TABLE_STATEMENT;
-    private static final String CREATE_GUILDS_TABLE_STATEMENT;
-    private static final String CREATE_REACTION_ROLES_STATEMENT;
-
     static {
 
         GET_ALL_GUILDS_STATEMENT = loadResourceToString(DEFAULT_PATH + "get-all-guilds.sql");
@@ -54,11 +49,6 @@ public class SQLStatements {
         DELETE_CHANNEL_BY_GUILD_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-channels-by-guildid.sql");
 
         GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE = loadResourceToString(DEFAULT_PATH + "get-custom-message-next-auto-increment-value.sql");
-
-        CREATE_CHANNEL_TABLE_STATEMENT = null;// loadResourceToString(DEFAULT_PATH + "/tables/create-channel-table-if-not-exists.sql");
-        CREATE_MESSAGES_TABLE_STATEMENT = null;//loadResourceToString(DEFAULT_PATH + "/tables/create-custom-messages-table-if-not-exists.sql");
-        CREATE_GUILDS_TABLE_STATEMENT = null;//loadResourceToString(DEFAULT_PATH + "/tables/create-guilds-table-if-not-exists.sql");
-        CREATE_REACTION_ROLES_STATEMENT = null;//loadResourceToString(DEFAULT_PATH + "/tables/create-reaction-roles-table-if-not-exists.sql");
     }
 
     private static String loadResourceToString(String path) {
@@ -148,21 +138,5 @@ public class SQLStatements {
 
     public static String getGetCustomMessageNextAutoIncrementValue() {
         return GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE;
-    }
-
-    public static String getCreateChannelTableStatement() {
-        return CREATE_CHANNEL_TABLE_STATEMENT;
-    }
-
-    public static String getCreateGuildsTableStatement() {
-        return CREATE_GUILDS_TABLE_STATEMENT;
-    }
-
-    public static String getCreateMessagesTableStatement() {
-        return CREATE_MESSAGES_TABLE_STATEMENT;
-    }
-
-    public static String getCreateReactionRolesStatement() {
-        return CREATE_REACTION_ROLES_STATEMENT;
     }
 }

@@ -12,6 +12,10 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+
+    from('src/main/java') {
+        include 'config/**/*.sql'
+    }
 }
 
 group 'net.purplegoose.didnb'

@@ -15,8 +15,6 @@ import java.util.TimerTask;
 
 public class CustomMessagesNotifier {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(CustomMessagesNotifier.class);
-
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
 
@@ -72,11 +70,12 @@ public class CustomMessagesNotifier {
     }
 
     private boolean isFullTimeValid(String timezone, String fullTime) {
-        String time = TimeUtil.getTimeWithWeekday(timezone);
-        return time.equalsIgnoreCase(fullTime);
+        String time = TimeUtil.getTimeWithWeekday(timezone).toLowerCase();
+        return time.equalsIgnoreCase(fullTime.toLowerCase());
     }
 
     private boolean isTimeValid(String timezone, String time) {
+        System.out.println("time :" + time);
         String timeOnly = TimeUtil.getTime(timezone);
         return time.equalsIgnoreCase(timeOnly);
     }

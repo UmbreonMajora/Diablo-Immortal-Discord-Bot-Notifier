@@ -43,16 +43,14 @@ public class DiabloImmortalDiscordNotifier {
                     .addEventListeners(new GuildJoin(databaseRequests, guildsCache))
                     .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache))
                     .addEventListeners(new GuildLeave(databaseRequests, guildsCache))
-
+                    .addEventListeners(new GuildReady())
                     .build().awaitReady();
 
-            jda.addEventListener(new GuildReady());
         } catch (InterruptedException e) {
             System.exit(0);
             return;
         }
 
-        createShowcaseChannels(guildsCache);
         runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
     }
 
@@ -78,22 +76,6 @@ public class DiabloImmortalDiscordNotifier {
         gameDataCache.setAssemblyDataSet(databaseRequests.getEventTimes("assembly_times", false));
         gameDataCache.setWrathborneInvasionDataSet(databaseRequests.getEventTimes("wrathborne_invasion_times", true));
         gameDataCache.setOnSlaughtDataSet(databaseRequests.getEventTimes("onslaught_times", false));
-    }
-
-    private static void createShowcaseChannels(GuildsCache guildsCache) {
-        ClientGuild gmt0Guild = new ClientGuild("0");
-        gmt0Guild.setHeadUpTime(10);
-        NotificationChannel gmt0Channel = new NotificationChannel("1061561889739522058", "0");
-        gmt0Channel.setRoleID(null);
-        gmt0Guild.addNewNotificationChannel(gmt0Channel);
-        guildsCache.addGuild(gmt0Guild);
-
-        ClientGuild gmt1Guild = new ClientGuild("0");
-        gmt1Guild.setHeadUpTime(10);
-        NotificationChannel gmt1Channel = new NotificationChannel("1061561926804574258", "0");
-        gmt1Channel.setRoleID(null);
-        gmt1Guild.addNewNotificationChannel(gmt1Channel);
-        guildsCache.addGuild(gmt1Guild);
     }
 
 }

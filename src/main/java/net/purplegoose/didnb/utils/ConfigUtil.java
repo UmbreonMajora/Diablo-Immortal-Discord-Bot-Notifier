@@ -1,15 +1,14 @@
 package net.purplegoose.didnb.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-
+@Slf4j
 public class ConfigUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtil.class);
 
     private static final Properties CLIENT_PROPERTIES = new Properties();
 
@@ -26,10 +25,10 @@ public class ConfigUtil {
     static {
         try {
             CLIENT_PROPERTIES.load(new FileInputStream(System.getProperty("user.dir") + "/client.properties"));
-            LOGGER.info("Loaded client.properties file.");
+            log.info("Loaded client.properties file.");
         } catch (IOException e) {
             e.printStackTrace();
-            LOGGER.warn("Failed to load client.properties file! Shutting down...");
+            log.warn("Failed to load client.properties file! Shutting down...");
             System.exit(0);
         }
 
