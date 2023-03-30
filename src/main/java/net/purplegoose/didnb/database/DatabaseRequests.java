@@ -181,7 +181,7 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(3, clientGuild.isWarnMessagesEnabled());
             preparedStatement.setBoolean(4, clientGuild.isEventMessageEnabled());
             preparedStatement.setString(5, clientGuild.getGuildAdminRoleID());
-            preparedStatement.setInt(6, clientGuild.getHeadUpTime());
+            preparedStatement.setInt(6, clientGuild.getWarnTimeInMinutes());
             preparedStatement.setBoolean(7, clientGuild.isDaylightTimeEnabled());
             preparedStatement.setBoolean(8, clientGuild.isPremiumServer());
             preparedStatement.setString(9, clientGuild.getGuildID());

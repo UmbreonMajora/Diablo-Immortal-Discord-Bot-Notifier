@@ -17,6 +17,7 @@ import java.util.List;
 
 @Slf4j
 public class MySQLDatabaseConnection implements IDatabaseConnection {
+
     private static final String STARTUP_SCRIPT_FOLDER = "start-up";
     private MysqlDataSource dataSource;
 
@@ -80,13 +81,15 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
         log.info("Loading scripts for start up...");
         List<String> filenames = new ArrayList<>();
 
-        try (InputStream in = getResourceAsStream();
-             BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-            String resource;
+        try (InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream(STARTUP_SCRIPT_FOLDER)) {
+            assert in != null;
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+                String resource;
 
-            while ((resource = br.readLine()) != null) {
-                log.info("> Added {} to start up scripts.", resource);
-                filenames.add(resource);
+                while ((resource = br.readLine()) != null) {
+                    log.info("> Added {} to start up scripts.", resource);
+                    filenames.add(resource);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -95,18 +98,8 @@ public class MySQLDatabaseConnection implements IDatabaseConnection {
         return filenames;
     }
 
-    private InputStream getResourceAsStream() {
-        InputStream in = getContextClassLoader().getResourceAsStream(STARTUP_SCRIPT_FOLDER);
-        return in == null ? MySQLDatabaseConnection.class.getResourceAsStream(STARTUP_SCRIPT_FOLDER) : in;
-    }
-
-    private ClassLoader getContextClassLoader() {
-        return Thread.currentThread().getContextClassLoader();
-    }
-
     private String loadResourceToString(String path) {
-        InputStream stream = Thread.currentThread()
-                .getContextClassLoader()
+        InputStream stream = ClassLoader.getSystemClassLoader()
                 .getResourceAsStream(path);
         try {
             return IOUtils.toString(stream, StandardCharsets.UTF_8);

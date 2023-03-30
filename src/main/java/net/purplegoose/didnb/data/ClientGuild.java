@@ -12,7 +12,7 @@ public class ClientGuild {
     private Language guildLanguage;
     private String guildTimeZone;
     private String guildAdminRoleID;
-    private int headUpTime;
+    private int warnTimeInMinutes;
     private boolean isWarnMessagesEnabled;
     private boolean isEventMessageEnabled;
     private Map<Integer, CustomNotification> customNotifications;
@@ -21,7 +21,7 @@ public class ClientGuild {
     private boolean isPremiumServer;
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
-                       int headUpTime, boolean isWarnMessagesEnabled, boolean isEventMessageEnabled,
+                       int warnTimeInMinutes, boolean isWarnMessagesEnabled, boolean isEventMessageEnabled,
                        Map<Integer, CustomNotification> customNotifications,
                        Map<String, NotificationChannel> notificationChannels,
                        boolean isDaylightTimeEnabled, boolean isPremiumServer) {
@@ -29,7 +29,7 @@ public class ClientGuild {
         this.guildLanguage = guildLanguage;
         this.guildTimeZone = guildTimeZone;
         this.guildAdminRoleID = guildAdminRoleID;
-        this.headUpTime = headUpTime;
+        this.warnTimeInMinutes = warnTimeInMinutes;
         this.isWarnMessagesEnabled = isWarnMessagesEnabled;
         this.isEventMessageEnabled = isEventMessageEnabled;
         this.customNotifications = customNotifications;
@@ -39,12 +39,12 @@ public class ClientGuild {
     }
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
-                       int headUpTime, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled, boolean isDaylightTimeEnabled, boolean isPremiumServer) {
+                       int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled, boolean isDaylightTimeEnabled, boolean isPremiumServer) {
         this.guildID = guildID;
         this.guildLanguage = guildLanguage;
         this.guildTimeZone = guildTimeZone;
         this.guildAdminRoleID = guildAdminRoleID;
-        this.headUpTime = headUpTime;
+        this.warnTimeInMinutes = warnTimeInMinutes;
         this.isWarnMessagesEnabled = isEventMessageEnabled;
         this.isEventMessageEnabled = isWarnMessagesEnabled;
         this.customNotifications = new ConcurrentHashMap<>();
@@ -58,7 +58,7 @@ public class ClientGuild {
         this.guildLanguage = Language.ENGLISH;
         this.guildTimeZone = "GMT";
         this.guildAdminRoleID = null;
-        this.headUpTime = 15;
+        this.warnTimeInMinutes = 15;
         this.isWarnMessagesEnabled = true;
         this.isEventMessageEnabled = true;
         this.customNotifications = new ConcurrentHashMap<>();
@@ -147,12 +147,12 @@ public class ClientGuild {
         return notificationChannels.containsKey(textChannelID);
     }
 
-    public int getHeadUpTime() {
-        return headUpTime;
+    public int getWarnTimeInMinutes() {
+        return warnTimeInMinutes;
     }
 
-    public void setHeadUpTime(int headUpTime) {
-        this.headUpTime = headUpTime;
+    public void setWarnTimeInMinutes(int warnTimeInMinutes) {
+        this.warnTimeInMinutes = warnTimeInMinutes;
     }
 
     public int getNotificationChannelCount() {

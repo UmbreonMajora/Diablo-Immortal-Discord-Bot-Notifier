@@ -37,10 +37,10 @@ public class VaultEvent implements IGameEvent {
 
         if (!isTimeInWarnRange(eventGameDataSet, timeZone).equals(EMPTY_STRING)) {
             String startTime = isTimeInWarnRange(eventGameDataSet, timeZone);
-            int warnTime = ConfigUtil.getDefaultWarnTime() - guild.getHeadUpTime();
+            int warnTime = ConfigUtil.getDefaultWarnTime() - guild.getWarnTimeInMinutes();
             String warnMessageTime = getWarnMessageTime(startTime, warnTime);
             if (TimeUtil.getTime(timeZone).equals(warnMessageTime) && isWarnMessageEnabled(guild, channel)) {
-                return String.format(LanguageController.getMessage(language, "EVENT-VAULT-HEAD-UP"), guild.getHeadUpTime()) + NEW_LINE;
+                return String.format(LanguageController.getMessage(language, "EVENT-VAULT-HEAD-UP"), guild.getWarnTimeInMinutes()) + NEW_LINE;
             }
         }
 

@@ -5,6 +5,7 @@ public class StringUtil {
     public final static String EMPTY_STRING = "";
     public final static String NEW_LINE = "\n";
     public final static String FORMATTED_MESSAGE = "```";
+    public final static String FAILED_MESSAGE = "FAILED!";
 
     public static boolean isStringSingleDashWithDigits(String string) {
         return string.matches("-[0-9]+");

@@ -1,5 +1,8 @@
 package net.purplegoose.didnb.utils;
 
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.purplegoose.didnb.enums.*;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -343,4 +346,42 @@ public class CommandsUtil {
 
         return commandDataList;
     }
+
+    public static boolean isUserPermitted(Member member, String guildAdminRoleID) {
+        if (isServerOwner(member) || isAdmin(member)) {
+            return true;
+        }
+
+        List<Role> roles = member.getRoles();
+        if (guildAdminRoleID == null) {
+            return doMemberHasDefaultAdminRole(roles);
+        }
+
+        return doMemberHasCustomAdminRole(roles, guildAdminRoleID);
+    }
+
+    private static boolean isServerOwner(final Member member) {
+        return member.isOwner();
+    }
+
+    private static boolean isAdmin(Member member) {
+        return member.hasPermission(Permission.ADMINISTRATOR);
+    }
+
+    private static boolean doMemberHasDefaultAdminRole(List<Role> roles) {
+        Role tempRole = roles.stream()
+                .filter(role -> role.getName().equalsIgnoreCase("Bot Admin"))
+                .findFirst()
+                .orElse(null);
+        return tempRole != null;
+    }
+
+    private static boolean doMemberHasCustomAdminRole(List<Role> roles, String guildAdminRoleID) {
+        Role tempRole = roles.stream()
+                .filter(role -> role.getId().equals(guildAdminRoleID))
+                .findFirst()
+                .orElse(null);
+        return tempRole != null;
+    }
+
 }

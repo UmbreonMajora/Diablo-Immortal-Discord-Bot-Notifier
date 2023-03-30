@@ -33,7 +33,7 @@ public class WarnTimeCommand  implements IClientCommand {
         }
 
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
-        clientGuild.setHeadUpTime(warntime);
+        clientGuild.setWarnTimeInMinutes(warntime);
         databaseRequests.updateGuild(clientGuild);
         replyEphemeralToUser(event, "Warn time changed to " + warntime);
     }

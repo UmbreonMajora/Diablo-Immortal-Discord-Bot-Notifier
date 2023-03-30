@@ -75,7 +75,6 @@ public class CustomMessagesNotifier {
     }
 
     private boolean isTimeValid(String timezone, String time) {
-        System.out.println("time :" + time);
         String timeOnly = TimeUtil.getTime(timezone);
         return time.equalsIgnoreCase(timeOnly);
     }

@@ -225,41 +225,4 @@ public class SlashCommandInteraction extends ListenerAdapter {
         return guild == null || member == null;
     }
 
-    private boolean isUserPermitted(Member member, String guildAdminRoleID) {
-        if (isServerOwner(member) || isAdmin(member)) {
-            return true;
-        }
-
-        List<Role> roles = member.getRoles();
-        if (guildAdminRoleID == null) {
-            return doMemberHasDefaultAdminRole(roles);
-        }
-
-        return doMemberHasCustomAdminRole(roles, guildAdminRoleID);
-    }
-
-    private boolean isServerOwner(final Member member) {
-        return member.isOwner();
-    }
-
-    private boolean isAdmin(Member member) {
-        return member.hasPermission(Permission.ADMINISTRATOR);
-    }
-
-    private boolean doMemberHasDefaultAdminRole(List<Role> roles) {
-        Role tempRole = roles.stream()
-                .filter(role -> role.getName().equalsIgnoreCase("Bot Admin"))
-                .findFirst()
-                .orElse(null);
-        return tempRole != null;
-    }
-
-    private boolean doMemberHasCustomAdminRole(List<Role> roles, String guildAdminRoleID) {
-        Role tempRole = roles.stream()
-                .filter(role -> role.getId().equals(guildAdminRoleID))
-                .findFirst()
-                .orElse(null);
-        return tempRole != null;
-    }
-
 }
