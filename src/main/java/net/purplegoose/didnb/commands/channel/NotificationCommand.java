@@ -88,7 +88,7 @@ public class NotificationCommand implements IClientCommand {
                 notificationChannel.setVaultMessageEnabled(gameEventValue);
                 break;
             case HEAD_UP:
-                notificationChannel.setEventHeadUpEnabled(gameEventValue);
+                notificationChannel.setEventWarnMessage(gameEventValue);
                 break;
             case MESSAGE:
                 notificationChannel.setEventMessageEnabled(gameEventValue);

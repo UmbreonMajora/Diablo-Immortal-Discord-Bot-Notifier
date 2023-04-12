@@ -300,7 +300,7 @@ public class DatabaseRequests {
             preparedStatement.setString(2, notificationChannel.getGuildID());
             preparedStatement.setString(3, notificationChannel.getMentionRoleID());
             preparedStatement.setBoolean(4, notificationChannel.isEventMessageEnabled());
-            preparedStatement.setBoolean(5, notificationChannel.isWarnMessagesEnabled());
+            preparedStatement.setBoolean(5, notificationChannel.isEventWarnMessage());
             preparedStatement.setBoolean(6, notificationChannel.isAncientArenaMessageEnabled());
             preparedStatement.setBoolean(7, notificationChannel.isAncientNightmareMessageEnabled());
             preparedStatement.setBoolean(8, notificationChannel.isAssemblyMessageEnabled());
@@ -329,7 +329,7 @@ public class DatabaseRequests {
         ) {
             preparedStatement.setString(1, notificationChannel.getMentionRoleID());
             preparedStatement.setBoolean(2, notificationChannel.isEventMessageEnabled());
-            preparedStatement.setBoolean(3, notificationChannel.isWarnMessagesEnabled());
+            preparedStatement.setBoolean(3, notificationChannel.isEventWarnMessage());
             preparedStatement.setBoolean(4, notificationChannel.isAncientArenaMessageEnabled());
             preparedStatement.setBoolean(5, notificationChannel.isAncientNightmareMessageEnabled());
             preparedStatement.setBoolean(6, notificationChannel.isAssemblyMessageEnabled());

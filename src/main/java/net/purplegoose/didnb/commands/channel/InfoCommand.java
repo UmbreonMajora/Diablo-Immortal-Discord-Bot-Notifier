@@ -86,7 +86,7 @@ public class InfoCommand implements IClientCommand {
 
     private MessageEmbed.Field getGeneralField(NotificationChannel channel) {
         String context = "Event Messages Enabled: " + (channel.isEventMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Warn Messages Enabled: " + (channel.isWarnMessagesEnabled() ? "Enabled" : "Disabled");
+                "Warn Messages Enabled: " + (channel.isEventWarnMessage() ? "Enabled" : "Disabled");
         return new MessageEmbed.Field("General", context, false);
     }
 

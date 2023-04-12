@@ -1,5 +1,9 @@
 package net.purplegoose.didnb.utils;
 
+import net.purplegoose.didnb.cache.GuildsCache;
+
+import java.util.Random;
+
 public class StringUtil {
 
     public final static String EMPTY_STRING = "";
@@ -22,4 +26,5 @@ public class StringUtil {
     public static boolean isStringOnlyContainingNumbers(String string) {
         return string.matches("[0-9]+");
     }
+
 }

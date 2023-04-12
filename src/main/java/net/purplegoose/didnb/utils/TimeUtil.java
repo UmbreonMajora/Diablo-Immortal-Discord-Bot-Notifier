@@ -15,14 +15,6 @@ public class TimeUtil {
         // all static methods.
     }
 
-    public static String getCurrentDate() {
-        return new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-    }
-
-    public static String getCurrentTime() {
-        return new SimpleDateFormat("HH:mm:ss.SSS").format(new Date());
-    }
-
     public static String getTimeWithWeekday(String timeZone) {
         ZonedDateTime dateTime = Instant.now().atZone(ZoneId.of(timeZone, ZoneId.SHORT_IDS));
         return dateTime.format(DateTimeFormatter.ofPattern("EEEE HH:mm"));

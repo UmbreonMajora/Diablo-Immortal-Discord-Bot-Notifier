@@ -66,7 +66,7 @@ public class MentionRoleCommand implements IClientCommand {
 
     private void updateChannel(String guildID, String targetTextChannelID, Role mentionRole) {
         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID).getNotificationChannel(targetTextChannelID);
-        notificationChannel.setRoleID(mentionRole != null ? mentionRole.getId() : null);
+        notificationChannel.setMentionRoleID(mentionRole != null ? mentionRole.getId() : null);
         databaseRequests.updateNotificationChannel(notificationChannel);
     }
 

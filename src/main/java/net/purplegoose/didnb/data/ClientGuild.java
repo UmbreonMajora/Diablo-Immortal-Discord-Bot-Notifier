@@ -1,5 +1,7 @@
 package net.purplegoose.didnb.data;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.purplegoose.didnb.enums.Language;
 
 import java.util.Collection;
@@ -8,17 +10,34 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientGuild {
 
+    @Getter
     private final String guildID;
+    @Getter
+    @Setter
     private Language guildLanguage;
+    @Getter
+    @Setter
     private String guildTimeZone;
+    @Getter
+    @Setter
     private String guildAdminRoleID;
+    @Getter
+    @Setter
     private int warnTimeInMinutes;
+    @Getter
+    @Setter
     private boolean isWarnMessagesEnabled;
+    @Getter
+    @Setter
     private boolean isEventMessageEnabled;
-    private Map<Integer, CustomNotification> customNotifications;
-    private Map<String, NotificationChannel> notificationChannels;
+    @Getter
+    @Setter
     private boolean isDaylightTimeEnabled;
+    @Getter
+    @Setter
     private boolean isPremiumServer;
+    private final Map<Integer, CustomNotification> customNotifications;
+    private final Map<String, NotificationChannel> notificationChannels;
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isWarnMessagesEnabled, boolean isEventMessageEnabled,
@@ -39,7 +58,8 @@ public class ClientGuild {
     }
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
-                       int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled, boolean isDaylightTimeEnabled, boolean isPremiumServer) {
+                       int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled,
+                       boolean isDaylightTimeEnabled, boolean isPremiumServer) {
         this.guildID = guildID;
         this.guildLanguage = guildLanguage;
         this.guildTimeZone = guildTimeZone;
@@ -65,50 +85,6 @@ public class ClientGuild {
         this.notificationChannels = new ConcurrentHashMap<>();
         this.isDaylightTimeEnabled = false;
         this.isPremiumServer = false;
-    }
-
-    public String getGuildID() {
-        return guildID;
-    }
-
-    public Language getGuildLanguage() {
-        return guildLanguage;
-    }
-
-    public void setGuildLanguage(Language guildLanguage) {
-        this.guildLanguage = guildLanguage;
-    }
-
-    public String getGuildTimeZone() {
-        return guildTimeZone;
-    }
-
-    public void setGuildTimeZone(String guildTimeZone) {
-        this.guildTimeZone = guildTimeZone;
-    }
-
-    public String getGuildAdminRoleID() {
-        return guildAdminRoleID;
-    }
-
-    public void setGuildAdminRoleID(String guildAdminRoleID) {
-        this.guildAdminRoleID = guildAdminRoleID;
-    }
-
-    public boolean isWarnMessagesEnabled() {
-        return isWarnMessagesEnabled;
-    }
-
-    public void setWarnMessagesEnabled(boolean warnMessagesEnabled) {
-        isWarnMessagesEnabled = warnMessagesEnabled;
-    }
-
-    public boolean isEventMessageEnabled() {
-        return isEventMessageEnabled;
-    }
-
-    public void setEventMessageEnabled(boolean eventMessageEnabled) {
-        isEventMessageEnabled = eventMessageEnabled;
     }
 
     public Map<Integer, CustomNotification> getCustomNotifications() {
@@ -147,14 +123,6 @@ public class ClientGuild {
         return notificationChannels.containsKey(textChannelID);
     }
 
-    public int getWarnTimeInMinutes() {
-        return warnTimeInMinutes;
-    }
-
-    public void setWarnTimeInMinutes(int warnTimeInMinutes) {
-        this.warnTimeInMinutes = warnTimeInMinutes;
-    }
-
     public int getNotificationChannelCount() {
         return notificationChannels.size();
     }
@@ -163,23 +131,8 @@ public class ClientGuild {
         return notificationChannels.values();
     }
 
-    public boolean isDaylightTimeEnabled() {
-        return isDaylightTimeEnabled;
-    }
-
-    public void setDaylightTimeEnabled(boolean daylightTimeEnabled) {
-        isDaylightTimeEnabled = daylightTimeEnabled;
-    }
-
-    public boolean isPremiumServer() {
-        return isPremiumServer;
-    }
-
-    public void setPremiumServer(boolean premiumServer) {
-        isPremiumServer = premiumServer;
-    }
-
     public int getCustomNotificationSize() {
         return customNotifications.size();
     }
+
 }

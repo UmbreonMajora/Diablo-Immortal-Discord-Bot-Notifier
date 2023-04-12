@@ -41,4 +41,5 @@ public class GuildsCache {
     public void setGuilds(Map<String, ClientGuild> guilds) {
         this.guilds = guilds;
     }
+
 }

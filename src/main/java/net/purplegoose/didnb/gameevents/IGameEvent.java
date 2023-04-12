@@ -70,7 +70,7 @@ public interface IGameEvent {
     }
 
     default boolean isWarnMessageEnabled(ClientGuild clientGuild, NotificationChannel notificationChannel) {
-        return clientGuild.isWarnMessagesEnabled() && notificationChannel.isWarnMessagesEnabled();
+        return clientGuild.isWarnMessagesEnabled() && notificationChannel.isEventWarnMessage();
     }
 
     default boolean isEventMessageEnabled(ClientGuild clientGuild, NotificationChannel notificationChannel) {
