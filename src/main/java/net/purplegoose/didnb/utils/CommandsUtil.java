@@ -39,6 +39,8 @@ public class CommandsUtil {
     public static final String ROLE_OPTION_NAME = "role";
     private static final OptionData REQUIRED_ROLE_OPTION =
             new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "Enter here your role", true);
+    private static final OptionData NOT_REQUIRED_ROLE_OPTION =
+            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "Enter here your role", false);
 
     public static final String PRESET_OPTION_NAME = "preset";
     private static final OptionData REQUIRED_PRESET_OPTION =
@@ -322,7 +324,7 @@ public class CommandsUtil {
         commandDataList.add(Commands.slash(COMMAND_UPCOMING, COMMAND_UPCOMING_DESC));
         // -> Command: /adminrole [Required: role]
         commandDataList.add(Commands.slash(COMMAND_ADMIN_ROLE, COMMAND_ADMIN_ROLE_DESC)
-                .addOptions(REQUIRED_ROLE_OPTION));
+                .addOptions(NOT_REQUIRED_ROLE_OPTION));
         // -> Command: /config
         commandDataList.add(Commands.slash(COMMAND_CONFIG, COMMAND_CONFIG_DESC));
         // -> Command: /language [Required: language]

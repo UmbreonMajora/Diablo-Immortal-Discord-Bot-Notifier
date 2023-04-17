@@ -3,6 +3,7 @@ package net.purplegoose.didnb.commands.channel;
 import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.Language;
@@ -40,11 +41,8 @@ public class PresetCommand implements IClientCommand {
     }
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
-
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
-        String guildName = event.getGuild().getName();
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
 
         TextChannel targetTextChannel = getTargetTextChannel(event);
         String targetTextChannelID = targetTextChannel.getId();
@@ -53,17 +51,16 @@ public class PresetCommand implements IClientCommand {
         Language language = guildsCache.getGuildLanguage(guildID);
 
         if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
-            log.info("{} executed /preset in an unregistered channel. Guild: {}({}), Channel: {}({})",
-                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
+            log.error("{} used /preset. Error: Channel not registered. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANNEL-NOT-REGISTERED"));
             return;
         }
 
         String preset = getPreset(event);
-
-        if (preset == null) {
-            log.info("{} executed /preset. It failed because the preset was null. Guild: {}({}), Channel: {}({})",
-                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
+        if (!isPresetValid(preset)) {
+            log.error("{} used /preset. Error: Preset null. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "PRESET-OPTION-NULL"));
             return;
         }
@@ -71,29 +68,31 @@ public class PresetCommand implements IClientCommand {
         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID).getNotificationChannel(targetTextChannelID);
         Preset selectedPreset = Preset.findPresetByChoiceName(preset);
 
-        if (selectedPreset == null) {
-            log.info("{} executed /preset. It failed because the preset was null. Guild: {}({}), Channel: {}({})",
-                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
-            replyEphemeralToUser(event, LanguageController.getMessage(language, "PRESET-OPTION-NULL"));
-            return;
-        }
-
         switch (updateChannel(selectedPreset, notificationChannel)) {
             case RETURN_LIST:
+                log.info("{} used /preset. Output: List. Guild: {}({}). Channel: {}({})",
+                        logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
                 replyEphemeralToUser(event, presetInfoMessage);
                 return;
             case RETURN_INVALID:
-                replyEphemeralToUser(event, LanguageController.getMessage(language, "PRESET-OPTION-INVALID"));
-                log.info("{} executed /preset. It failed because the preset was invalid. Guild: {}({}), Channel: {}({})",
-                        executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
+                log.error("{} used /preset. Error: Preset invalid. Guild: {}({}). Channel: {}({})",
+                        logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
                 return;
             case RETURN_SUCCESS:
                 String rawPresetString = preset.replace("preset", "");
-                log.info("{} executed /preset. Applied preset {}. Guild: {}({}), Channel: {}({})",
-                        executingUser, rawPresetString, guildName, guildID, targetTextChannelName, targetTextChannelID);
-                replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "APPLIED-PRESET-TO-CHANNEL"), rawPresetString, targetTextChannel.getAsMention()));
+                log.error("{} used /preset. Applied preset {}. Guild: {}({}). Channel: {}({})",
+                        logInfo.getExecutor(), rawPresetString, logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
+                String response = String.format(LanguageController.getMessage(language, "APPLIED-PRESET-TO-CHANNEL"), rawPresetString, targetTextChannel.getAsMention());
+                replyEphemeralToUser(event, response);
         }
 
+    }
+
+    private boolean isPresetValid(String preset) {
+        if (preset == null) {
+            return false;
+        }
+        return Preset.findPresetByChoiceName(preset) != null;
     }
 
     private int updateChannel(Preset selectedPreset, NotificationChannel notificationChannel) {

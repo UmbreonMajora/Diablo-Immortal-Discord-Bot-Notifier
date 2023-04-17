@@ -1,7 +1,10 @@
 package net.purplegoose.didnb.commands.info;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.TimeUtil;
@@ -13,21 +16,23 @@ import java.awt.*;
 
 /**
  * @author Umbreon Majora
+ * <p>
  * Show's the user a list with GMT-11 to GMT+12 timezones & it's current time in 24hrs format.
+ * <p>
  * Command: /timezones
  */
+@Slf4j
+@AllArgsConstructor
 public class TimeZonesCommand implements IClientCommand {
 
     private final GuildsCache guildsCache;
 
-    public TimeZonesCommand(GuildsCache guildsCache) {
-        this.guildsCache = guildsCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
         Language language = guildsCache.getGuildLanguage(guildID);
+        log.info("{} used /timezones. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(), logInfo.getChannelID());
         replyEphemeralToUser(event, buildTimeZonesEmbed(language));
     }
 

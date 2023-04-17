@@ -1,15 +1,16 @@
 package net.purplegoose.didnb.commands.info;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.EventGameData;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.TimeUtil;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -18,29 +19,26 @@ import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
 
 /**
  * @author Umbreon Majora
+ * <p>
  * Send's the user a message with upcoming events.
+ * <p>
  * Command: /upcoming
  */
+@Slf4j
+@AllArgsConstructor
 public class UpComingCommand implements IClientCommand {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(UpComingCommand.class);
 
     private final GuildsCache guildsCache;
     private final GameDataCache gameDataCache;
 
-    public UpComingCommand(GuildsCache guildsCache, GameDataCache gameDataCache) {
-        this.guildsCache = guildsCache;
-        this.gameDataCache = gameDataCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
         String timeZone = guildsCache.getGuildTimeZone(guildID);
         Language language = guildsCache.getGuildLanguage(guildID);
 
-        LOGGER.info(getFullUsernameWithDiscriminator(event.getUser()) + " used " + event.getCommandString() + " on " +
-                event.getChannel().getId() + " at " + event.getGuild().getId());
+        log.info("{} used /upcoming. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(), logInfo.getChannelID());
 
         replyEphemeralToUser(event, buildTodayEventMessage(timeZone, language));
     }
@@ -64,7 +62,6 @@ public class UpComingCommand implements IClientCommand {
 
     private List<String> getTodayUpComingEvents(String timeZone, Set<EventGameData> eventList) {
         List<String> result = new ArrayList<>();
-
         String weekday = TimeUtil.getCurrentWeekday(timeZone);
 
         for (EventGameData eventGameData : eventList) {

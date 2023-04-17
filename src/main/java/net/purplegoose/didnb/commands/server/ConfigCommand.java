@@ -1,5 +1,6 @@
 package net.purplegoose.didnb.commands.server;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -7,6 +8,7 @@ import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.purplegoose.didnb.data.LoggingInformation;
 import org.jetbrains.annotations.Nullable;
 
 import static net.purplegoose.didnb.utils.StringUtil.*;
@@ -19,28 +21,19 @@ import static net.purplegoose.didnb.utils.StringUtil.*;
  * @Command: /config
  */
 @Slf4j
+@AllArgsConstructor
 public class ConfigCommand implements IClientCommand {
 
     private final GuildsCache guildsCache;
 
-    public ConfigCommand(GuildsCache guildsCache) {
-        this.guildsCache = guildsCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         Guild guild = event.getGuild();
         Member member = event.getMember();
-        User user = member.getUser();
+        User user = event.getUser();
 
-        String guildID = guild.getId();
-        String guildName = guild.getName();
-
-        String channelID = event.getChannel().getId();
-        String channelName = event.getChannel().getName();
-
-        log.info("{} used /config. Guild: {}({}) Channel: {}({})",
-                getFullUsernameWithDiscriminator(user), guildName, guildID, channelName, channelID);
+        log.info("{} used /config. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
 
         replyEphemeralToUser(event, buildConfigEmbed(guild, member, user));
     }

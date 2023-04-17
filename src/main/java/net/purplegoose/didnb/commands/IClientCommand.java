@@ -1,5 +1,6 @@
 package net.purplegoose.didnb.commands;
 
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.utils.CommandsUtil;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -15,6 +16,8 @@ import java.util.List;
 public interface IClientCommand {
 
     void runCommand(SlashCommandInteractionEvent event);
+
+    void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo);
 
     default String getFullUsernameWithDiscriminator(User user) {
         return user.getName() + "#" + user.getDiscriminator();

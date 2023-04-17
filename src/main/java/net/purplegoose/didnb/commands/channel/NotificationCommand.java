@@ -1,8 +1,10 @@
 package net.purplegoose.didnb.commands.channel;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.GameEvent;
@@ -23,22 +25,15 @@ import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_VALUE_OPTION_NAME;
  * Command: /notification [Required: event] [Required: eventvalue]
  */
 @Slf4j
+@AllArgsConstructor
 public class NotificationCommand implements IClientCommand {
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
 
-    public NotificationCommand(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
-        this.guildsCache = guildsCache;
-        this.databaseRequests = databaseRequests;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
-
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
-        String guildName = event.getGuild().getName();
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
 
         TextChannel targetTextChannel = getTargetTextChannel(event);
         String targetTextChannelID = targetTextChannel.getId();
@@ -47,8 +42,8 @@ public class NotificationCommand implements IClientCommand {
         Language language = guildsCache.getGuildLanguage(guildID);
 
         if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
-            log.info("{} executed /info in an unregistered channel. Guild: {}({}), Channel: {}({})",
-                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
+            log.error("{} used /notification. Error: Channel not registered. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANNEL-NOT-REGISTERED"));
             return;
         }
@@ -56,16 +51,17 @@ public class NotificationCommand implements IClientCommand {
         String selectedEvent = getSelectedEvent(event);
         GameEvent gameEvent = GameEvent.findGameEventByRawName(selectedEvent);
         if (gameEvent == null) {
-            log.info("{} executed /notification with invalid gameevent. Guild: {}({}), Channel: {}({})",
-                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
+            log.error("{} used /notification. Error: GameEvent invalid. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INVALID-EVENT"));
             return;
         }
 
         boolean eventValue = getEventValue(event);
         updateNotificationChannel(gameEvent, eventValue, guildID, targetTextChannelID);
-        log.info("{} executed /notification. Changed {} to {}. Guild: {}({}), Channel: {}({})",
-                executingUser, gameEvent.rawName, eventValue, guildName, guildID, targetTextChannelName, targetTextChannelID);
+        log.error("{} used /notification. {} is now {}. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), gameEvent.rawName, eventValue, logInfo.getGuildName(), guildID,
+                targetTextChannelName, targetTextChannelID);
         String replyMessage = getReplyMessage(gameEvent, eventValue, language);
         replyEphemeralToUser(event, replyMessage);
     }

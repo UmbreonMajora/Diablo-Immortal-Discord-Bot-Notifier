@@ -1,8 +1,11 @@
 package net.purplegoose.didnb.commands.server;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -11,31 +14,48 @@ import static net.purplegoose.didnb.utils.CommandsUtil.WARN_TIME_OPTION_NAME;
 
 /**
  * @author Umbreon Majora
- * Allow's the user to change their time of the warn message
- * Command: /warntime [Required: warntime]
+ * <p>
+ * @Description: Allow's the user to change their time of the warn message
+ * <p>
+ * @Command: /warntime [Required: warntime]
  */
-public class WarnTimeCommand  implements IClientCommand {
+@Slf4j
+@AllArgsConstructor
+public class WarnTimeCommand implements IClientCommand {
+
+    private final int INVALID_NEW_WARNTIME = -1;
 
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
 
-    public WarnTimeCommand(DatabaseRequests databaseRequests, GuildsCache guildsCache) {
-        this.databaseRequests = databaseRequests;
-        this.guildsCache = guildsCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = event.getGuild().getId();//Can't be null since it's caught in SlashCommandInteraction.java
-        int warntime = getWarnTime(event);
-        if (warntime == -1) {
-            return; //invalid
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
+        int newWarnTime = getWarnTime(event);
+
+        if (newWarnTime == INVALID_NEW_WARNTIME) {
+            log.error("{} used /warntime. Error: Time was not in the given range. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(),
+                    logInfo.getChannelID());
+            //todo: new error message for invalid new warntime
+            replyEphemeralToUser(event, "Invalid new warntime.");
+            return;
         }
 
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
+        int oldWarnTime = clientGuild.getWarnTimeInMinutes();
+        updateWarnTime(clientGuild, newWarnTime);
+
+        log.info("{} used /warntime. Old warn time: {}. New warn time: {}. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), oldWarnTime, newWarnTime, logInfo.getGuildName(), guildID, logInfo.getChannelName(),
+                logInfo.getChannelID());
+        //todo: update message for new warntime
+        replyEphemeralToUser(event, "Warn time changed to " + newWarnTime);
+    }
+
+    private void updateWarnTime(ClientGuild clientGuild, int warntime) {
         clientGuild.setWarnTimeInMinutes(warntime);
         databaseRequests.updateGuild(clientGuild);
-        replyEphemeralToUser(event, "Warn time changed to " + warntime);
     }
 
     private int getWarnTime(SlashCommandInteractionEvent event) {
@@ -43,11 +63,11 @@ public class WarnTimeCommand  implements IClientCommand {
         if (warnTimeOption != null) {
             int warntime = warnTimeOption.getAsInt();
             if (warntime < 0 || warntime > 15) {
-                return -1;
+                return INVALID_NEW_WARNTIME;
             } else {
                 return warntime;
             }
         }
-        return -1;
+        return INVALID_NEW_WARNTIME;
     }
 }

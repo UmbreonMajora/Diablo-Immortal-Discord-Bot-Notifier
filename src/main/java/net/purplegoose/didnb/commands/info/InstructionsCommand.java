@@ -1,19 +1,26 @@
 package net.purplegoose.didnb.commands.info;
 
+import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.purplegoose.didnb.data.LoggingInformation;
 
 import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
 
 /**
  * @author Umbreon Majora
+ * <p>
  * Show's use an instruction on how to install the bot.
+ * <p>
  * Command: /instructions
  */
+@Slf4j
 public class InstructionsCommand implements IClientCommand {
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        log.info("{} used /instructions. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
         replyEphemeralToUser(event, buildInstallationMessage());
     }
 
