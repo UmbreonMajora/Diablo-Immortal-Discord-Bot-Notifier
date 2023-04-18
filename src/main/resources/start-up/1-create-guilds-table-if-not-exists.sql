@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS guilds
     admin_role_id          CHAR(20),
     warn_time              TINYINT(15) DEFAULT 15    NOT NULL,
     daylight_time_enabled  TINYINT(1)  DEFAULT 0     NOT NULL,
-    premium_server         TINYINT(1)  DEFAULT 0     NOT NULL
+    premium_server         TINYINT(1)  DEFAULT 0     NOT NULL,
+    auto_delete            TINYINT(1)  DEFAULT 0     NOT NULL
 );

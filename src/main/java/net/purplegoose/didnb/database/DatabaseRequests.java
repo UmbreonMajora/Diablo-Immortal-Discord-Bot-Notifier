@@ -1,12 +1,12 @@
 package net.purplegoose.didnb.database;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.CustomNotification;
 import net.purplegoose.didnb.data.EventGameData;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.enums.Language;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,15 +17,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+@AllArgsConstructor
+@Slf4j
 public class DatabaseRequests {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(DatabaseRequests.class);
-
     private final IDatabaseConnection databaseConnection;
-
-    public DatabaseRequests(IDatabaseConnection databaseConnection) {
-        this.databaseConnection = databaseConnection;
-    }
 
     public Set<EventGameData> getEventTimes(String table, boolean everyDay) {
         Set<EventGameData> listEventTimeTables = new HashSet<>();
@@ -42,11 +38,9 @@ public class DatabaseRequests {
                     EventGameData eventGameData = new EventGameData(warnRange, weekday, eventStartTime);
                     listEventTimeTables.add(eventGameData);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         return listEventTimeTables;
     }
@@ -94,13 +88,13 @@ public class DatabaseRequests {
                     String day = resultSet.getString("day");
                     String time = resultSet.getString("time");
                     boolean repeat = (resultSet.getInt("message_repeat") == 1);
-                    int id = resultSet.getInt("message_id");
+                    String id = resultSet.getString("message_id");
                     boolean enabled = (resultSet.getInt("message_enabled") == 1);
-                    CustomNotification customNotification = new CustomNotification(channelID, guildID, message, day, time, id, repeat, enabled);
+                    CustomNotification cn = new CustomNotification(channelID, guildID, message, day, time, id, repeat, enabled);
                     if (clientGuildData.containsKey(guildID)) {
-                        clientGuildData.get(guildID).addCustomNotification(customNotification);
+                        clientGuildData.get(guildID).addCustomNotification(cn);
                     } else {
-                        LOGGER.error("Failed to add custom message with id " + id + " to " + guildID + ".");
+                        log.error("Failed to add custom message with id " + id + " to " + guildID + ".");
                     }
                 }
             }
@@ -141,7 +135,7 @@ public class DatabaseRequests {
                     if (clientGuildData.containsKey(guildID)) {
                         clientGuildData.get(guildID).addNewNotificationChannel(notificationChannel);
                     } else {
-                        LOGGER.error("Failed to add notification channel with channel id " + textChannelID + " to " + guildID + ".");
+                        log.error("Failed to add notification channel with channel id " + textChannelID + " to " + guildID + ".");
                     }
                 }
             }
@@ -165,9 +159,9 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(6, clientGuild.isDaylightTimeEnabled());
             preparedStatement.setBoolean(7, clientGuild.isPremiumServer());
             preparedStatement.executeUpdate();
-            LOGGER.info("Registered new guild in database! GuildID: " + clientGuild.getGuildID());
+            log.info("Registered new guild in database! GuildID: " + clientGuild.getGuildID());
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -186,9 +180,9 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(8, clientGuild.isPremiumServer());
             preparedStatement.setString(9, clientGuild.getGuildID());
             preparedStatement.executeUpdate();
-            LOGGER.info("Updated " + clientGuild.getGuildID() + " in database.");
+            log.info("Updated " + clientGuild.getGuildID() + " in database.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -199,9 +193,9 @@ public class DatabaseRequests {
         ) {
             preparedStatement.setString(1, guildID);
             preparedStatement.executeUpdate();
-            LOGGER.info("Deleted guild " + guildID + " from database.");
+            log.info("Deleted guild " + guildID + " from database.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -218,10 +212,11 @@ public class DatabaseRequests {
             preparedStatement.setString(4, customNotification.getWeekday());
             preparedStatement.setString(5, customNotification.getTime());
             preparedStatement.setBoolean(6, customNotification.isRepeating());
+            preparedStatement.setString(7, customNotification.getCustomMessageID());
             preparedStatement.executeUpdate();
-            LOGGER.info("Created Custom Notification for guild " + customNotification.getGuildID());
+            log.info("Created Custom Notification for guild " + customNotification.getGuildID());
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -237,43 +232,23 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(5, customNotification.isEnabled());
             preparedStatement.setString(6, customNotification.getChannelID());
             preparedStatement.executeUpdate();
-            LOGGER.info("Updated Custom Notification for guild " + customNotification.getGuildID());
+            log.info("Updated Custom Notification for guild " + customNotification.getGuildID());
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
-
     }
 
-    public void deleteCustomNotificationByID(int customMessageID) {
+    public void deleteCustomNotificationByID(String customMessageID) {
         try (
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteCustomMessageByIdStatement())
         ) {
-            preparedStatement.setInt(1, customMessageID);
+            preparedStatement.setString(1, customMessageID);
             preparedStatement.executeUpdate();
-            LOGGER.info("Deleted Custom Notification with ID " + customMessageID);
+            log.info("Deleted Custom Notification with ID " + customMessageID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
-    }
-
-    public int getGetCustomMessageNextAutoIncrementValue() {
-        int nextAutoIncrementNumber = 0;
-        try (
-                Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getGetCustomMessageNextAutoIncrementValue())
-        ) {
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    nextAutoIncrementNumber = resultSet.getInt("AUTO_INCREMENT");
-                } else {
-                    throw new SQLException("Failed to get next auto increment number for custom messages");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return nextAutoIncrementNumber + 1;
     }
 
     public void deleteMessagesByGuildID(String guildID) {
@@ -283,9 +258,9 @@ public class DatabaseRequests {
         ) {
             preparedStatement.setString(1, guildID);
             preparedStatement.executeUpdate();
-            LOGGER.info("Deleted messages of " + guildID + " from database.");
+            log.info("Deleted messages of " + guildID + " from database.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -315,10 +290,10 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(17, notificationChannel.isAncientNightmareMessageEmbedEnabled());
             preparedStatement.setBoolean(18, notificationChannel.isWrathborneInvasionEnabled());
             preparedStatement.executeUpdate();
-            LOGGER.info("Created Notification Channel on guild " + notificationChannel.getGuildID() + " with " +
+            log.info("Created Notification Channel on guild " + notificationChannel.getGuildID() + " with " +
                     "channel id " + notificationChannel.getTextChannelID());
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -344,10 +319,10 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(15, notificationChannel.isWrathborneInvasionEnabled());
             preparedStatement.setString(16, notificationChannel.getTextChannelID());
             preparedStatement.executeUpdate();
-            LOGGER.info("Updated Notification Channel on guild " + notificationChannel.getGuildID() + " with channel id " +
+            log.info("Updated Notification Channel on guild " + notificationChannel.getGuildID() + " with channel id " +
                     notificationChannel.getTextChannelID());
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -358,9 +333,9 @@ public class DatabaseRequests {
         ) {
             preparedStatement.setString(1, textChannelID);
             preparedStatement.executeUpdate();
-            LOGGER.info("Deleted Notification Channel with ID " + textChannelID);
+            log.info("Deleted Notification Channel with ID " + textChannelID);
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -371,9 +346,9 @@ public class DatabaseRequests {
         ) {
             preparedStatement.setString(1, guildID);
             preparedStatement.executeUpdate();
-            LOGGER.info("Deleted channels of " + guildID + " from database.");
+            log.info("Deleted channels of " + guildID + " from database.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 

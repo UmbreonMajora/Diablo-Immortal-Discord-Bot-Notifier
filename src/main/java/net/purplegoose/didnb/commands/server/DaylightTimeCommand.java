@@ -1,16 +1,17 @@
 package net.purplegoose.didnb.commands.server;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.StringUtil;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -19,20 +20,15 @@ import java.util.Objects;
  * Allow's users to toggle daylight time.
  * Command: /daylightime off/on
  */
+@Slf4j
+@AllArgsConstructor
 public class DaylightTimeCommand implements IClientCommand {
-
-    private final Logger logger = LoggerFactory.getLogger(DaylightTimeCommand.class);
 
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
 
-    public DaylightTimeCommand(DatabaseRequests databaseRequests, GuildsCache guildsCache) {
-        this.databaseRequests = databaseRequests;
-        this.guildsCache = guildsCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = Objects.requireNonNull(event.getGuild()).getId();
         Language language = guildsCache.getGuildLanguage(guildID);
         String executingUser = getFullUsernameWithDiscriminator(event.getUser());
@@ -41,15 +37,15 @@ public class DaylightTimeCommand implements IClientCommand {
 
         if (clientGuild.isDaylightTimeEnabled() && commandValue) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "DAYLIGHT-TIME-ALREADY-ENABLED"));
-            createLog(logger, executingUser + " tried to enable daylight saving time for " + guildID +
-                    " but it was already enabled.");
+            //createLog(logger, executingUser + " tried to enable daylight saving time for " + guildID +
+            //        " but it was already enabled.");
             return;
         }
 
         if (!clientGuild.isDaylightTimeEnabled() && !commandValue) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "DAYLIGHT-TIME-ALREADY-DISABLED"));
-            createLog(logger, executingUser + " tried to enable daylight saving time for " + guildID +
-                    " but it was already disabled.");
+            //createLog(logger, executingUser + " tried to enable daylight saving time for " + guildID +
+            //        " but it was already disabled.");
             return;
         }
 
@@ -82,10 +78,10 @@ public class DaylightTimeCommand implements IClientCommand {
         databaseRequests.updateGuild(clientGuild);
         if (commandValue) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "DAYLIGHT-TIME-NOW-ENABLED"));
-            createLog(logger, executingUser + " enabled daylight saving time for " + guildID);
+            //createLog(logger, executingUser + " enabled daylight saving time for " + guildID);
         } else {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "DAYLIGHT-TIME-NOW-DISABLED"));
-            createLog(logger, executingUser + " disabled daylight saving time for " + guildID);
+            //createLog(logger, executingUser + " disabled daylight saving time for " + guildID);
         }
 
     }

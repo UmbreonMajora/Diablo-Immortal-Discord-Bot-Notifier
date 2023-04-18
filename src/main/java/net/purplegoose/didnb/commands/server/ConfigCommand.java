@@ -4,14 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.purplegoose.didnb.data.LoggingInformation;
-import org.jetbrains.annotations.Nullable;
 
-import static net.purplegoose.didnb.utils.StringUtil.*;
+import static net.purplegoose.didnb.utils.StringUtil.FAILED_MESSAGE;
 
 /**
  * @author Umbreon Majora

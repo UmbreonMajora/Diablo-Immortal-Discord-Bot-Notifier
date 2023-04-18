@@ -1,12 +1,6 @@
 package net.purplegoose.didnb.notifier;
 
-import net.purplegoose.didnb.cache.ErrorCache;
-import net.purplegoose.didnb.cache.GameDataCache;
-import net.purplegoose.didnb.cache.GuildsCache;
-import net.purplegoose.didnb.data.ClientGuild;
-import net.purplegoose.didnb.data.NotificationChannel;
-import net.purplegoose.didnb.gameevents.*;
-import net.purplegoose.didnb.utils.TimeUtil;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -14,17 +8,20 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.purplegoose.didnb.cache.ErrorCache;
+import net.purplegoose.didnb.cache.GameDataCache;
+import net.purplegoose.didnb.cache.GuildsCache;
+import net.purplegoose.didnb.data.ClientGuild;
+import net.purplegoose.didnb.data.NotificationChannel;
+import net.purplegoose.didnb.gameevents.*;
+import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
-
+@Slf4j
 public class Notifier {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(Notifier.class);
 
     private final GuildsCache guildsCache;
     private final ErrorCache errorCache;
@@ -87,9 +84,9 @@ public class Notifier {
                         }
 
                         if (textChannel == null) {
-                            String log = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
+                            String logMsg = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
                                     "guild " + channel.getGuildID() + ", but it failed because the channel was null!";
-                            LOGGER.warn(log);
+                            log.error(logMsg);
                             errorCache.addChannelError(channel);
                             continue;
                         }
@@ -111,11 +108,11 @@ public class Notifier {
                                     });
                                 }
                             }
-                            LOGGER.info("Failed to send notification.");
+                            log.info("Failed to send notification.");
                             continue;
                         }
 
-                        LOGGER.info("Sended notification message to " + channel.getTextChannelID());
+                        log.info("Sended notification message to " + channel.getTextChannelID());
                     }
                 }
             }
@@ -145,7 +142,7 @@ public class Notifier {
                     String guildID = guild.getId();
                     String guildName = guild.getName();
                     String textChannelID = channel.getTextChannelID();
-                    LOGGER.info("Failed to append mention role for guild " +
+                    log.info("Failed to append mention role for guild " +
                             guildName + "(" + guildID + ") in " + textChannelID);
                 }
         }

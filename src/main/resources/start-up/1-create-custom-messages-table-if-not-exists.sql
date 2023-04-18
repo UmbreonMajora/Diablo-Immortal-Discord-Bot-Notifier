@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS custom_messages
     day              VARCHAR(10)           NOT NULL,
     time             VARCHAR(10)           NOT NULL,
     message_repeat   TINYINT(1)            NOT NULL,
-    message_id       int                   NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    message_id       VARCHAR(4)            NOT NULL PRIMARY KEY,
     message_enabled  TINYINT(1) DEFAULT 1  NOT NULL
 )

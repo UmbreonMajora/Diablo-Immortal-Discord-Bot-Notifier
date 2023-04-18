@@ -36,12 +36,15 @@ public class ClientGuild {
     @Getter
     @Setter
     private boolean isPremiumServer;
-    private final Map<Integer, CustomNotification> customNotifications;
+    @Getter
+    @Setter
+    private boolean isAutoDeleteEnabled;
+    private final Map<String, CustomNotification> customNotifications;
     private final Map<String, NotificationChannel> notificationChannels;
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isWarnMessagesEnabled, boolean isEventMessageEnabled,
-                       Map<Integer, CustomNotification> customNotifications,
+                       Map<String, CustomNotification> customNotifications,
                        Map<String, NotificationChannel> notificationChannels,
                        boolean isDaylightTimeEnabled, boolean isPremiumServer) {
         this.guildID = guildID;
@@ -87,7 +90,7 @@ public class ClientGuild {
         this.isPremiumServer = false;
     }
 
-    public Map<Integer, CustomNotification> getCustomNotifications() {
+    public Map<String, CustomNotification> getCustomNotifications() {
         return customNotifications;
     }
 
@@ -111,11 +114,11 @@ public class ClientGuild {
         customNotifications.put(customNotification.getCustomMessageID(), customNotification);
     }
 
-    public CustomNotification getCustomNotificationByID(int customNotificationID) {
+    public CustomNotification getCustomNotificationByID(String customNotificationID) {
         return customNotifications.get(customNotificationID);
     }
 
-    public void deleteCustomNotificationByID(int customNotificationID) {
+    public void deleteCustomNotificationByID(String customNotificationID) {
         customNotifications.remove(customNotificationID);
     }
 

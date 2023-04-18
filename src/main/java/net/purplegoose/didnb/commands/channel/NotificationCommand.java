@@ -2,6 +2,9 @@ package net.purplegoose.didnb.commands.channel;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.LoggingInformation;
@@ -10,11 +13,6 @@ import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.GameEvent;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-
-import java.util.Objects;
 
 import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_NAME_OPTION_NAME;
 import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_VALUE_OPTION_NAME;

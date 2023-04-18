@@ -1,15 +1,14 @@
 package net.purplegoose.didnb.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.purplegoose.didnb.enums.*;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.purplegoose.didnb.enums.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+@Slf4j
 public class CommandsUtil {
 
     private static final Properties commandsProperties = new Properties();
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommandsUtil.class);
 
     // -> Command Options
 
@@ -192,12 +191,12 @@ public class CommandsUtil {
         try (InputStream inputStream = CommandsUtil.class.getClassLoader().getResourceAsStream("commands.properties")) {
             if (inputStream != null) {
                 commandsProperties.load(inputStream);
-                LOGGER.info("Loaded command.properties file.");
+                log.info("Loaded command.properties file.");
             } else {
-                LOGGER.warn("Failed to load command.properties! Input stream for command.properties was null.");
+                log.warn("Failed to load command.properties! Input stream for command.properties was null.");
             }
         } catch (IOException e) {
-            LOGGER.warn("Failed to load command.properties!", e);
+            log.warn("Failed to load command.properties!", e);
             e.printStackTrace();
         }
 

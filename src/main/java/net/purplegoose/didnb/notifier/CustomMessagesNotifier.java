@@ -1,17 +1,16 @@
 package net.purplegoose.didnb.notifier;
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.CustomNotification;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.utils.TimeUtil;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class CustomMessagesNotifier {
 
@@ -47,6 +46,8 @@ public class CustomMessagesNotifier {
                         TextChannel textChannel = jda.getTextChannelById(channel);
                         String message = customNotification.getMessage();
 
+                        if ()
+
                         if (textChannel != null) {
                             textChannel.sendMessage(message).queue();
                         }
@@ -59,6 +60,15 @@ public class CustomMessagesNotifier {
                 }
             }
         }, TimeUtil.getNextFullMinute(), 60 * 1000);
+    }
+
+    private void sendMessageWithAutoDelete(TextChannel textChannel, String messageContext, int deleteTimeInHours) {
+        textChannel.sendMessage(messageContext).queue(message ->
+                message.delete().queueAfter(deleteTimeInHours, TimeUnit.HOURS));
+    }
+
+    private void sendMessageWithoutAutoDelete(TextChannel textChannel, String messageContext) {
+        textChannel.sendMessage(messageContext).queue();
     }
 
     private boolean isTimeValid(String timezone, String day, String time, String fullTime) {

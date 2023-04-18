@@ -1,7 +1,5 @@
 package net.purplegoose.didnb.utils;
 
-import net.purplegoose.didnb.cache.GuildsCache;
-
 import java.util.Random;
 
 public class StringUtil {
@@ -25,6 +23,12 @@ public class StringUtil {
 
     public static boolean isStringOnlyContainingNumbers(String string) {
         return string.matches("[0-9]+");
+    }
+
+    public static String generateRandomID() {
+        return new Random().ints(4, 0, 62)
+                .mapToObj("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"::charAt)
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
     }
 
 }

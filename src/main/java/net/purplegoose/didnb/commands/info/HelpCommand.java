@@ -1,10 +1,10 @@
 package net.purplegoose.didnb.commands.info;
 
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.utils.CommandsUtil;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import static net.purplegoose.didnb.utils.StringUtil.FORMATTED_MESSAGE;
 import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
