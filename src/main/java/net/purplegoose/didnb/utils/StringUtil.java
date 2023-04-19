@@ -20,7 +20,7 @@ public class StringUtil {
     }
 
     public static boolean isStringNotInTimePattern(String string) {
-        return !string.matches("^([0-1]?[\\d]]|2[0-3]):[0-5][\\d]]$");
+        return !string.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$");
     }
 
     public static String removeAllNonNumericCharacters(String value) {

@@ -43,7 +43,7 @@ public class DiabloImmortalDiscordNotifier {
                     .addEventListeners(new GuildJoin(databaseRequests, guildsCache))
                     .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache, customMessagesCache))
                     .addEventListeners(new GuildLeave(databaseRequests, guildsCache))
-                    .addEventListeners(new GuildReady())
+                    //.addEventListeners(new GuildReady())
                     .build().awaitReady();
 
         } catch (InterruptedException e) {

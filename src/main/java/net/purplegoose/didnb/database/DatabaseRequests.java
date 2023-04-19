@@ -72,10 +72,11 @@ public class DatabaseRequests {
                     boolean isDaylightTimeEnabled = (resultSet.getInt("daylight_time_enabled") == 1);
                     boolean isPremiumServer = (resultSet.getInt("premium_server") == 1);
                     int autoDeleteTimeInHours = resultSet.getInt("auto_delete_time");
+                    boolean isAutoDeleteEnabled = (resultSet.getInt("auto_delete_enabled") == 1);
 
                     ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime,
                             isWarnMessagesEnabled, isEventMessagesEnabled, isDaylightTimeEnabled, isPremiumServer,
-                            autoDeleteTimeInHours);
+                            autoDeleteTimeInHours, isAutoDeleteEnabled);
                     clientGuildData.put(guildID, clientGuild);
                 }
             }
@@ -184,7 +185,9 @@ public class DatabaseRequests {
             preparedStatement.setInt(6, clientGuild.getWarnTimeInMinutes());
             preparedStatement.setBoolean(7, clientGuild.isDaylightTimeEnabled());
             preparedStatement.setBoolean(8, clientGuild.isPremiumServer());
-            preparedStatement.setString(9, clientGuild.getGuildID());
+            preparedStatement.setBoolean(9, clientGuild.isAutoDeleteEnabled());
+            preparedStatement.setInt(10, clientGuild.getAutoDeleteTimeInHours());
+            preparedStatement.setString(11, clientGuild.getGuildID());
             preparedStatement.executeUpdate();
             log.info("Updated " + clientGuild.getGuildID() + " in database.");
         } catch (SQLException e) {

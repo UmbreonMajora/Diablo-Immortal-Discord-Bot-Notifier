@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.purplegoose.didnb.cache.ErrorCache;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
@@ -91,13 +92,17 @@ public class Notifier {
 
                         addMessageMention(notificationMessage, channel, textChannel.getGuild());
 
-                        if (clientGuild.isAutoDeleteEnabled()) {
-                            int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
-                            sendMessageWithAutoDelete(textChannel, notificationMessage.toString(), autoDeleteTimeInHours);
-                        }
+                        try {
+                            if (clientGuild.isAutoDeleteEnabled()) {
+                                int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
+                                sendMessageWithAutoDelete(textChannel, notificationMessage.toString(), autoDeleteTimeInHours);
+                            }
 
-                        if (!clientGuild.isAutoDeleteEnabled()) {
-                            sendMessageWithoutAutoDelete(textChannel, notificationMessage.toString());
+                            if (!clientGuild.isAutoDeleteEnabled()) {
+                                sendMessageWithoutAutoDelete(textChannel, notificationMessage.toString());
+                            }
+                        } catch (InsufficientPermissionException e) {
+                            log.error(e.getMessage());
                         }
 
                         log.info("Sended notification message to " + channel.getTextChannelID());

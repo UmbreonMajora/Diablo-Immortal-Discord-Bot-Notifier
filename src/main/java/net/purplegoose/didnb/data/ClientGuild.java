@@ -47,7 +47,8 @@ public class ClientGuild {
 
     public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled,
-                       boolean isDaylightTimeEnabled, boolean isPremiumServer, int autoDeleteTimeInHours) {
+                       boolean isDaylightTimeEnabled, boolean isPremiumServer, int autoDeleteTimeInHours,
+                       boolean isAutoDeleteEnabled) {
         this.guildID = guildID;
         this.guildLanguage = guildLanguage;
         this.guildTimeZone = guildTimeZone;
@@ -60,6 +61,7 @@ public class ClientGuild {
         this.isDaylightTimeEnabled = isDaylightTimeEnabled;
         this.isPremiumServer = isPremiumServer;
         this.autoDeleteTimeInHours = autoDeleteTimeInHours;
+        this.isAutoDeleteEnabled = isAutoDeleteEnabled;
     }
 
     public ClientGuild(String guildID) {

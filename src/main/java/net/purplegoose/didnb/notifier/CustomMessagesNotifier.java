@@ -67,7 +67,7 @@ public class CustomMessagesNotifier {
 
     private void sendMessageWithAutoDelete(TextChannel textChannel, String messageContext, int deleteTimeInHours) {
         textChannel.sendMessage(messageContext).queue(message ->
-                message.delete().queueAfter(deleteTimeInHours, TimeUnit.SECONDS));
+                message.delete().queueAfter(deleteTimeInHours, TimeUnit.HOURS));
     }
 
     private void sendMessageWithoutAutoDelete(TextChannel textChannel, String messageContext) {
