@@ -19,6 +19,10 @@ import java.util.Properties;
 @Slf4j
 public class CommandsUtil {
 
+    private CommandsUtil() {
+        // static use only
+    }
+
     private static final Properties commandsProperties = new Properties();
 
     // -> Command Options
@@ -95,10 +99,6 @@ public class CommandsUtil {
             new OptionData(OptionType.BOOLEAN, MESSAGE_VALUE_OPTION_NAME, "Enable or disable your custom " +
                     "notification message", true);
 
-    public static final String BOOLEAN_OPTION_NAME = "boolean";
-    private static final OptionData REQUIRED_BOOLEAN_OPTION =
-            new OptionData(OptionType.BOOLEAN, BOOLEAN_OPTION_NAME, "Enable or disable it.", true);
-
     public static final String EDIT_MESSAGE_OPTION_NAME = "editmessage";
     private static final OptionData REQUIRED_EDIT_MESSAGE_OPTION =
             new OptionData(OptionType.STRING, EDIT_MESSAGE_OPTION_NAME, "What would you like to change?", true);
@@ -107,7 +107,14 @@ public class CommandsUtil {
     private static final OptionData REQUIRED_EDIT_MESSAGE_VALUE_OPTION =
             new OptionData(OptionType.STRING, EDIT_MESSAGE_VALUE_OPTION_NAME, "Enter here your new value.", true);
 
+    public static final String AUTO_DELETE_TIME_OPTION_NAME = "autodeletevalue";
+    private static final OptionData AUTO_DELETE_OPTION =
+            new OptionData(OptionType.INTEGER, AUTO_DELETE_TIME_OPTION_NAME, "Enter your time in hours!", false);
+
     // -> Commands & Command Descriptions
+
+    public static final String COMMAND_AUTODELETE = "autodelete";
+    private static final String COMMAND_AUTODELETE_DESC;
 
     public static final String COMMAND_NOTIFICATION = "notification";
     private static final String COMMAND_NOTIFICATION_DESC;
@@ -181,9 +188,6 @@ public class CommandsUtil {
     public static final String COMMAND_TIMEZONE = "timezone";
     private static final String COMMAND_TIMEZONE_DESC;
 
-    public static final String COMMAND_DAYLIGHTTIME = "daylighttime";
-    private static final String COMMAND_DAYLIGHTTIME_DESC;
-
     public static final String COMMAND_EDIT_MESSAGE = "editmessage";
     private static final String COMMAND_EDIT_MESSAGE_DESC;
 
@@ -225,8 +229,8 @@ public class CommandsUtil {
         }
 
         REQUIRED_EDIT_MESSAGE_OPTION.addChoice("time", "time");
-        REQUIRED_EDIT_MESSAGE_OPTION.addChoice("message", "message");
-        REQUIRED_EDIT_MESSAGE_OPTION.addChoice("weekday", "weekday");
+        REQUIRED_EDIT_MESSAGE_OPTION.addChoice(MESSAGE_OPTION_NAME, MESSAGE_OPTION_NAME);
+        REQUIRED_EDIT_MESSAGE_OPTION.addChoice(WEEKDAY_OPTION_NAME, WEEKDAY_OPTION_NAME);
 
         for (int i = 12; i > -12; i--) {
             String timezoneMessage;
@@ -264,8 +268,8 @@ public class CommandsUtil {
         COMMAND_LANGUAGE_DESC = commandsProperties.get(COMMAND_LANGUAGE).toString();
         COMMAND_SERVER_DESC = commandsProperties.get(COMMAND_SERVER).toString();
         COMMAND_TIMEZONE_DESC = commandsProperties.get(COMMAND_TIMEZONE).toString();
-        COMMAND_DAYLIGHTTIME_DESC = commandsProperties.get(COMMAND_DAYLIGHTTIME).toString();
         COMMAND_EDIT_MESSAGE_DESC = commandsProperties.get(COMMAND_EDIT_MESSAGE).toString();
+        COMMAND_AUTODELETE_DESC = commandsProperties.get(COMMAND_AUTODELETE).toString();
     }
 
     public static Properties getCommandsProperties() {
@@ -341,9 +345,10 @@ public class CommandsUtil {
         // -> Commmand: /message [Required: messagevalue] [Required: MessageID]
         commandDataList.add(Commands.slash(COMMAND_MESSAGE, COMMAND_MESSAGE_DESC)
                 .addOptions(REQUIRED_MESSAGE_VALUE_OPTION, REQUIRED_MESSAGE_ID_OPTION));
-        // -> Command: /daylighttime [Required: boolean]
-        //commandDataList.add(Commands.slash(COMMAND_DAYLIGHTTIME, COMMAND_DAYLIGHTTIME_DESC)
-        //        .addOptions(REQUIRED_BOOLEAN_OPTION)); todo this command is not working properly?
+
+        // -> Command: /autodelete [Not Required: autoDeleteTimeInHours]
+        commandDataList.add(Commands.slash(COMMAND_AUTODELETE, COMMAND_AUTODELETE_DESC)
+                .addOptions(AUTO_DELETE_OPTION));
 
         return commandDataList;
     }

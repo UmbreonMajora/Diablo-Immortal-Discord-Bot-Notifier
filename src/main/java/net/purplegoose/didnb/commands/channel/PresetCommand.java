@@ -151,6 +151,7 @@ public class PresetCommand implements IClientCommand {
         notificationChannel.setAncientNightmareMessageEnabled(true);
         notificationChannel.setDemonGatesMessageEnabled(true);
         notificationChannel.setHauntedCarriageMessageEnabled(true);
+        notificationChannel.setOnSlaughtMessagesEnabled(true);
     }
 
     // Ancient Arena - OFF, Ancient Nightmare - OFF, Demon Gates - OFF, Haunted Carriage - OFF
@@ -159,6 +160,7 @@ public class PresetCommand implements IClientCommand {
         notificationChannel.setAncientNightmareMessageEnabled(false);
         notificationChannel.setDemonGatesMessageEnabled(false);
         notificationChannel.setHauntedCarriageMessageEnabled(false);
+        notificationChannel.setOnSlaughtMessagesEnabled(false);
     }
 
     // Battleground - ON, Wrathborne Invasion - ON

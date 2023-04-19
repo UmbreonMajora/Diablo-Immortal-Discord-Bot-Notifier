@@ -24,7 +24,7 @@ public class DiabloImmortalDiscordNotifier {
         CustomMessagesCache customMessagesCache = new CustomMessagesCache();
 
         MySQLDatabaseConnection mySQLDatabaseConnection = new MySQLDatabaseConnection();
-        DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection);
+        DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
         try {
             guildsCache.setGuilds(databaseRequests.loadDataFromDatabaseToCache());
         } catch (SQLException e) {

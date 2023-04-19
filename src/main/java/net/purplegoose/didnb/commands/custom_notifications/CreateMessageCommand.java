@@ -71,6 +71,7 @@ public class CreateMessageCommand implements IClientCommand {
         String targetTextChannelID = getTargetTextChannel(event).getId();
         boolean repeating = getRepeating(event);
         String id = getNextFreeId();
+        addIdentifierToCache(id);
         CustomNotification cn = new CustomNotification(targetTextChannelID, guildID, message, weekday.rawName, time, id, repeating, true);
         databaseRequests.createCustomNotification(cn);
         clientGuild.addCustomNotification(cn);
@@ -87,6 +88,10 @@ public class CreateMessageCommand implements IClientCommand {
         }
 
         return id;
+    }
+
+    private void addIdentifierToCache(String identifier) {
+        customMessagesCache.addIdentifier(identifier);
     }
 
     private String getWeekday(SlashCommandInteractionEvent event) {

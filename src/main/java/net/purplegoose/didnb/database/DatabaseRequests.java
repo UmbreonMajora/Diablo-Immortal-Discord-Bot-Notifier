@@ -2,6 +2,7 @@ package net.purplegoose.didnb.database;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.purplegoose.didnb.cache.CustomMessagesCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.CustomNotification;
 import net.purplegoose.didnb.data.EventGameData;
@@ -22,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DatabaseRequests {
 
     private final IDatabaseConnection databaseConnection;
+    private final CustomMessagesCache customMessagesCache;
 
     public Set<EventGameData> getEventTimes(String table, boolean everyDay) {
         Set<EventGameData> listEventTimeTables = new HashSet<>();
@@ -69,8 +71,11 @@ public class DatabaseRequests {
                     boolean isEventMessagesEnabled = (resultSet.getInt("event_messages_enabled") == 1);
                     boolean isDaylightTimeEnabled = (resultSet.getInt("daylight_time_enabled") == 1);
                     boolean isPremiumServer = (resultSet.getInt("premium_server") == 1);
+                    int autoDeleteTimeInHours = resultSet.getInt("auto_delete_time");
 
-                    ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime, isWarnMessagesEnabled, isEventMessagesEnabled, isDaylightTimeEnabled, isPremiumServer);
+                    ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime,
+                            isWarnMessagesEnabled, isEventMessagesEnabled, isDaylightTimeEnabled, isPremiumServer,
+                            autoDeleteTimeInHours);
                     clientGuildData.put(guildID, clientGuild);
                 }
             }
@@ -90,6 +95,7 @@ public class DatabaseRequests {
                     boolean repeat = (resultSet.getInt("message_repeat") == 1);
                     String id = resultSet.getString("message_id");
                     boolean enabled = (resultSet.getInt("message_enabled") == 1);
+                    customMessagesCache.addIdentifier(id);
                     CustomNotification cn = new CustomNotification(channelID, guildID, message, day, time, id, repeat, enabled);
                     if (clientGuildData.containsKey(guildID)) {
                         clientGuildData.get(guildID).addCustomNotification(cn);

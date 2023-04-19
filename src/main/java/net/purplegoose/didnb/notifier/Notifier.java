@@ -3,11 +3,8 @@ package net.purplegoose.didnb.notifier;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.purplegoose.didnb.cache.ErrorCache;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
@@ -18,6 +15,7 @@ import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
 @Slf4j
@@ -60,7 +58,7 @@ public class Notifier {
 
                 for (ClientGuild clientGuild : guildsCache.getAllGuilds().values()) {
 
-                    if (clientGuild.getNotificationChannelCount() == 0) {
+                    if (isChannelCountZero(clientGuild)) {
                         continue;
                     }
 
@@ -93,23 +91,13 @@ public class Notifier {
 
                         addMessageMention(notificationMessage, channel, textChannel.getGuild());
 
-                        try {
-                            textChannel.sendMessage(notificationMessage.toString()).queue();
-                        } catch (InsufficientPermissionException e) {
-                            String guildID = clientGuild.getGuildID();
-                            Guild guild = client.getGuildById(guildID);
-                            if (guild != null) {
-                                Member guildOwner = guild.getOwner();
-                                if (guildOwner != null) {
-                                    User guildOwnerUser = guildOwner.getUser();
-                                    guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
-                                        privateChannel.sendMessage("Hey, I am missing permissions to send " +
-                                                "message in " + textChannel.getName()).queue();
-                                    });
-                                }
-                            }
-                            log.info("Failed to send notification.");
-                            continue;
+                        if (clientGuild.isAutoDeleteEnabled()) {
+                            int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
+                            sendMessageWithAutoDelete(textChannel, notificationMessage.toString(), autoDeleteTimeInHours);
+                        }
+
+                        if (!clientGuild.isAutoDeleteEnabled()) {
+                            sendMessageWithoutAutoDelete(textChannel, notificationMessage.toString());
                         }
 
                         log.info("Sended notification message to " + channel.getTextChannelID());
@@ -117,6 +105,19 @@ public class Notifier {
                 }
             }
         }, TimeUtil.getNextFullMinute(), 60 * 1000);
+    }
+
+    private boolean isChannelCountZero(ClientGuild clientGuild) {
+        return clientGuild.getNotificationChannelCount() == 0;
+    }
+
+    private void sendMessageWithAutoDelete(TextChannel textChannel, String messageContext, int deleteTimeInHours) {
+        textChannel.sendMessage(messageContext).queue(message ->
+                message.delete().queueAfter(deleteTimeInHours, TimeUnit.HOURS));
+    }
+
+    private void sendMessageWithoutAutoDelete(TextChannel textChannel, String messageContext) {
+        textChannel.sendMessage(messageContext).queue();
     }
 
     private void addMessageMention(StringBuilder sb, NotificationChannel channel, Guild guild) {

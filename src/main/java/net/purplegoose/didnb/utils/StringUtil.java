@@ -4,17 +4,23 @@ import java.util.Random;
 
 public class StringUtil {
 
-    public final static String EMPTY_STRING = "";
-    public final static String NEW_LINE = "\n";
-    public final static String FORMATTED_MESSAGE = "```";
-    public final static String FAILED_MESSAGE = "FAILED!";
+    private StringUtil() {
+        // static use only
+    }
+
+    public static final String EMPTY_STRING = "";
+    public static final String NEW_LINE = "\n";
+    public static final String FORMATTED_MESSAGE = "```";
+    public static final String FAILED_MESSAGE = "FAILED!";
+
+    private static final Random random = new Random();
 
     public static boolean isStringSingleDashWithDigits(String string) {
-        return string.matches("-[0-9]+");
+        return string.matches("-[\\d]]+");
     }
 
     public static boolean isStringNotInTimePattern(String string) {
-        return !string.matches("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$");
+        return !string.matches("^([0-1]?[\\d]]|2[0-3]):[0-5][\\d]]$");
     }
 
     public static String removeAllNonNumericCharacters(String value) {
@@ -22,11 +28,11 @@ public class StringUtil {
     }
 
     public static boolean isStringOnlyContainingNumbers(String string) {
-        return string.matches("[0-9]+");
+        return string.matches("[\\d]]+");
     }
 
     public static String generateRandomID() {
-        return new Random().ints(4, 0, 62)
+        return random.ints(4, 0, 62)
                 .mapToObj("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"::charAt)
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
     }

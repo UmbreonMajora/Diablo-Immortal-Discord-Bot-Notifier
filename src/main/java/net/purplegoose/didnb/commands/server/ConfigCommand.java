@@ -62,6 +62,8 @@ public class ConfigCommand implements IClientCommand {
         embed.addField("Warn-Time:", String.valueOf(clientGuild.getWarnTimeInMinutes()), true);
         embed.addField("Custom messages count:", String.valueOf(clientGuild.getCustomNotificationSize()), true);
         embed.addField("Registered channels:", String.valueOf(clientGuild.getNotificationChannelCount()), true);
+        embed.addField("Auto Delete:", clientGuild.isAutoDeleteEnabled() ? "Enabled" : "Disabled", true);
+        embed.addField("Auto Delete Time:", String.valueOf(clientGuild.getAutoDeleteTimeInHours()), true);
         return embed.build();
     }
 

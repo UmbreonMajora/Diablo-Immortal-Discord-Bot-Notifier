@@ -1,5 +1,6 @@
 package net.purplegoose.didnb.commands.channel;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -17,45 +18,50 @@ import net.purplegoose.didnb.utils.TimeUtil;
 
 /**
  * @author Umbreon Majora
- * This command show's a user all infos about a registered channel.
- * Command: /info [Not required: targetchannel]
+ * <p>
+ * @Command: /info [Not required: targetchannel]
+ * <p>
+ * @Description:
+ * This command show's a user all information about a registered channel.
+ * The command without a following parameter will print the information about the channel the command is sent in.
+ * With a following text channel parameter it will print the information about the given channel.
  */
 @Slf4j
+@AllArgsConstructor
 public class InfoCommand implements IClientCommand {
 
     private final GuildsCache guildsCache;
 
-    public InfoCommand(GuildsCache guildsCache) {
-        this.guildsCache = guildsCache;
-    }
-
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         TextChannel targetTextChannel = getTargetTextChannel(event);
-        String targetTextChannelName = targetTextChannel.getName();
-        String targetTextChannelID = targetTextChannel.getId();
+        String channelName = targetTextChannel.getName();
+        String channelID = targetTextChannel.getId();
         String guildID = logInfo.getGuildID();
 
         Language language = guildsCache.getGuildLanguage(guildID);
-        if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
+        if (!isTextChannelRegistered(guildID, channelID)) {
             log.error("{} used /info. Error: Channel not registered. Guild: {}({}). Channel: {}({})",
-                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannel.getName(), targetTextChannelID);
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, channelName, channelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANNEL-NOT-REGISTERED"));
             return;
         }
 
-        log.error("{} used /info. Guild: {}({}). Channel: {}({})",
-                logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannel.getName(), targetTextChannelID);
-        String mentionRoleID = getMentionRoleID(guildID, targetTextChannelID);
+        log.info("{} used /info. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannel.getName(), channelID);
+        String mentionRoleID = getMentionRoleID(guildID, channelID);
         replyEphemeralToUser(event, buildInfoEmbed(targetTextChannel, mentionRoleID, guildID));
     }
 
     private String getMentionRoleID(String guildID, String targetTextChannelID) {
-        return guildsCache.getClientGuildByID(guildID).getNotificationChannel(targetTextChannelID).getMentionRoleID();
+        return guildsCache.getClientGuildByID(guildID)
+                .getNotificationChannel(targetTextChannelID)
+                .getMentionRoleID();
     }
 
     private boolean isTextChannelRegistered(String guildID, String textChannelID) {
-        return guildsCache.getClientGuildByID(guildID).isChannelRegistered(textChannelID);
+        return guildsCache.getClientGuildByID(guildID)
+                .isChannelRegistered(textChannelID);
     }
 
     private MessageEmbed buildInfoEmbed(TextChannel textChannel, String mentionRoleID, String guildID) {
@@ -110,6 +116,5 @@ public class InfoCommand implements IClientCommand {
                 "Onslaught: " + (channel.isOnSlaughtMessagesEnabled() ? "Enabled" : "Disabled");
         return new MessageEmbed.Field("Events", content, false);
     }
-
 
 }

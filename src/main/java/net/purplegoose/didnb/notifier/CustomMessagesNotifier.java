@@ -46,10 +46,13 @@ public class CustomMessagesNotifier {
                         TextChannel textChannel = jda.getTextChannelById(channel);
                         String message = customNotification.getMessage();
 
-                        if ()
+                        if (clientGuild.isAutoDeleteEnabled() && textChannel != null) {
+                            int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
+                            sendMessageWithAutoDelete(textChannel, message, autoDeleteTimeInHours);
+                        }
 
-                        if (textChannel != null) {
-                            textChannel.sendMessage(message).queue();
+                        if (!clientGuild.isAutoDeleteEnabled() && textChannel != null) {
+                            sendMessageWithoutAutoDelete(textChannel, message);
                         }
 
                         if (!customNotification.isRepeating()) {
@@ -64,7 +67,7 @@ public class CustomMessagesNotifier {
 
     private void sendMessageWithAutoDelete(TextChannel textChannel, String messageContext, int deleteTimeInHours) {
         textChannel.sendMessage(messageContext).queue(message ->
-                message.delete().queueAfter(deleteTimeInHours, TimeUnit.HOURS));
+                message.delete().queueAfter(deleteTimeInHours, TimeUnit.SECONDS));
     }
 
     private void sendMessageWithoutAutoDelete(TextChannel textChannel, String messageContext) {

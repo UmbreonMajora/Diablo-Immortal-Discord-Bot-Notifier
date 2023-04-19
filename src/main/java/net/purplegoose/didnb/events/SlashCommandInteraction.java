@@ -57,7 +57,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final ServerCommand serverCommand;
     private final TimeZoneCommand timeZoneCommand;
     private final WarnTimeCommand warnTimeCommand;
-    private final DaylightTimeCommand daylightTimeCommand;
+    private final AutoDeleteCommand autoDeleteCommand;
 
     public SlashCommandInteraction(GuildsCache guildsCache,
                                    DatabaseRequests databaseRequests,
@@ -93,9 +93,8 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.serverCommand = new ServerCommand(guildsCache, databaseRequests);
         this.timeZoneCommand = new TimeZoneCommand(guildsCache, databaseRequests);
         this.warnTimeCommand = new WarnTimeCommand(databaseRequests, guildsCache);
-
-        this.daylightTimeCommand = new DaylightTimeCommand(databaseRequests, guildsCache);
         this.messageCommand = new MessageCommand(databaseRequests, guildsCache);
+        this.autoDeleteCommand = new AutoDeleteCommand(guildsCache);
     }
 
     @Override
@@ -103,7 +102,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
         Member member = event.getMember();
         Guild guild = event.getGuild();
         String fullUsername = event.getUser().getName() + "#" + event.getUser().getDiscriminator();
-        if (isEventInPrivatChat(guild, member)) {
+        if (isEventInPrivateChat(guild, member)) {
             log.error(fullUsername + " used a command in private chat.");
             return;
         }
@@ -195,9 +194,6 @@ public class SlashCommandInteraction extends ListenerAdapter {
             case COMMAND_ADMIN_ROLE:
                 adminRoleCommand.runCommand(event, logInfo);
                 break;
-            case COMMAND_HELP:
-                helpCommand.runCommand(event, logInfo);
-                break;
             case COMMAND_PRESET:
                 presetCommand.runCommand(event, logInfo);
                 break;
@@ -210,9 +206,11 @@ public class SlashCommandInteraction extends ListenerAdapter {
             case COMMAND_EDIT_MESSAGE:
                 editMessageCommand.runCommand(event, logInfo);
                 break;
-            case COMMAND_DAYLIGHTTIME:
-                daylightTimeCommand.runCommand(event, logInfo);
+            case COMMAND_AUTODELETE:
+                autoDeleteCommand.runCommand(event, logInfo);
                 break;
+            default:
+                helpCommand.runCommand(event, logInfo);
         }
     }
 
@@ -221,7 +219,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
     }
 
     //javadoc says: This is null if the interaction is not from a guild.
-    private boolean isEventInPrivatChat(Guild guild, Member member) {
+    private boolean isEventInPrivateChat(Guild guild, Member member) {
         return guild == null || member == null;
     }
 
