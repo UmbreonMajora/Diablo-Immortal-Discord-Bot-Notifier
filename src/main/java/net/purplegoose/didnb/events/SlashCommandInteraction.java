@@ -16,6 +16,7 @@ import net.purplegoose.didnb.commands.server.*;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
+import net.purplegoose.didnb.utils.PermissionUtil;
 import org.jetbrains.annotations.NotNull;
 
 import static net.purplegoose.didnb.utils.CommandsUtil.*;
@@ -121,13 +122,16 @@ public class SlashCommandInteraction extends ListenerAdapter {
             databaseRequests.createGuild(clientGuild);
         }
 
-        String guildAdminRoleID = guildsCache.getGuildAdminRoleID(guildID);
-        if (!isUserPermitted(member, guildAdminRoleID)) return;
-
-        event.deferReply().queue();
-
         LoggingInformation logInfo = new LoggingInformation(fullUsername, guild.getName(), guildID,
                 event.getChannel().getName(), event.getChannel().getId());
+
+        String guildAdminRoleID = guildsCache.getGuildAdminRoleID(guildID);
+        if (!PermissionUtil.isUserPermitted(member, guildAdminRoleID)) {
+            log.info("{} tried to use a command without permissions.", logInfo.getExecutor());
+            return;
+        }
+
+        event.deferReply().queue();
         executeCommand(event, logInfo);
     }
 

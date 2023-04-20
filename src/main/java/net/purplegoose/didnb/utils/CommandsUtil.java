@@ -1,9 +1,6 @@
 package net.purplegoose.didnb.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -23,6 +20,18 @@ public class CommandsUtil {
         // static use only
     }
 
+    public static final String BOOL_OPTION_NAME = "bool_option";
+    private static final OptionData REQUIRED_BOOL_OPTION =
+            new OptionData(OptionType.BOOLEAN, BOOL_OPTION_NAME, "Yes / No", true);
+    private static final OptionData NOT_REQUIRED_BOOL_OPTION =
+            new OptionData(OptionType.BOOLEAN, BOOL_OPTION_NAME, "", false);
+
+    public static final String ROLE_OPTION_NAME = "role_option";
+    private static final OptionData REQUIRED_ROLE_OPTION =
+            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "", true);
+    private static final OptionData NOT_REQUIRED_ROLE_OPTION =
+            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "", false);
+
     private static final Properties commandsProperties = new Properties();
 
     // -> Command Options
@@ -31,19 +40,9 @@ public class CommandsUtil {
     private static final OptionData REQUIRED_EVENT_NAME_OPTION =
             new OptionData(OptionType.STRING, EVENT_NAME_OPTION_NAME, "Allows you to enable or disable a specific event notification for that channel.", true);
 
-    public static final String EVENT_VALUE_OPTION_NAME = "eventvalue";
-    private static final OptionData REQUIRED_EVENT_VALUE_OPTION =
-            new OptionData(OptionType.BOOLEAN, EVENT_VALUE_OPTION_NAME, "Select that event you want to change.", true);
-
     public static final String TARGET_CHANNEL_OPTION_NAME = "targetchannel";
     private static final OptionData NOT_REQUIRED_CHANNEL_OPTION =
             new OptionData(OptionType.CHANNEL, TARGET_CHANNEL_OPTION_NAME, "Enter here your channel.", false);
-
-    public static final String ROLE_OPTION_NAME = "role";
-    private static final OptionData REQUIRED_ROLE_OPTION =
-            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "Enter here your role", true);
-    private static final OptionData NOT_REQUIRED_ROLE_OPTION =
-            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "Enter here your role", false);
 
     public static final String PRESET_OPTION_NAME = "preset";
     private static final OptionData REQUIRED_PRESET_OPTION =
@@ -57,17 +56,13 @@ public class CommandsUtil {
     private static final OptionData CREATE_CUSTOM_MESSAGE_TIME_OPTION =
             new OptionData(OptionType.STRING, TIME_OPTION_NAME, "At what time would you like to get the message?", true);
 
-    public static final String REPEATING_OPTION_NAME = "repeating";
-    private static final OptionData CREATE_CUSTOM_MESSAGE_REPEATING_OPTION =
-            new OptionData(OptionType.BOOLEAN, REPEATING_OPTION_NAME, "Should the message be sent every week or only once?", true);
-
     public static final String MESSAGE_OPTION_NAME = "message";
     private static final OptionData CREATE_CUSTOM_MESSAGE_MESSAGE_OPTION =
             new OptionData(OptionType.STRING, MESSAGE_OPTION_NAME, "Enter here your message.", true);
 
     public static final String CUSTOM_MESSAGE_ID_OPTION_NAME = "custommessageid";
     private static final OptionData REQUIRED_CUSTOM_MESSAGE_ID_OPTION =
-            new OptionData(OptionType.INTEGER, CUSTOM_MESSAGE_ID_OPTION_NAME, "Enter your custom message ID here.", true);
+            new OptionData(OptionType.STRING, CUSTOM_MESSAGE_ID_OPTION_NAME, "Enter your custom message ID here.", true);
 
     public static final String MESSAGE_ID_OPTION_NAME = "messageid";
     private static final OptionData REQUIRED_MESSAGE_ID_OPTION =
@@ -81,10 +76,6 @@ public class CommandsUtil {
     private static final OptionData REQUIRED_SERVER_SETTING_OPTION =
             new OptionData(OptionType.STRING, SERVER_SETTING_OPTION_NAME, "Select your server setting here.", true);
 
-    public static final String SERVER_SETTING_VALUE_OPTION_NAME = "servervalue";
-    private static final OptionData REQUIRED_SERVER_VALUE_OPTION =
-            new OptionData(OptionType.BOOLEAN, SERVER_SETTING_VALUE_OPTION_NAME, "Turn this setting on or off?", true);
-
     public static final String TIMEZONE_OPTION_NAME = "timezone";
     private static final OptionData REQUIRED_TIMEZONE_OPTION =
             new OptionData(OptionType.STRING, TIMEZONE_OPTION_NAME, "Select here your matching GMT timezone. " +
@@ -93,11 +84,6 @@ public class CommandsUtil {
     public static final String WARN_TIME_OPTION_NAME = "warntime";
     private static final OptionData REQUIRED_WARN_TIME_OPTION =
             new OptionData(OptionType.INTEGER, WARN_TIME_OPTION_NAME, "Change your warn message time", true);
-
-    public static final String MESSAGE_VALUE_OPTION_NAME = "messagevalue";
-    private static final OptionData REQUIRED_MESSAGE_VALUE_OPTION =
-            new OptionData(OptionType.BOOLEAN, MESSAGE_VALUE_OPTION_NAME, "Enable or disable your custom " +
-                    "notification message", true);
 
     public static final String EDIT_MESSAGE_OPTION_NAME = "editmessage";
     private static final OptionData REQUIRED_EDIT_MESSAGE_OPTION =
@@ -281,7 +267,7 @@ public class CommandsUtil {
 
         // -> /event <GAME_EVENT> <ON/OFF>
         commandDataList.add(Commands.slash(COMMAND_NOTIFICATION, COMMAND_NOTIFICATION_DESC)
-                .addOptions(REQUIRED_EVENT_NAME_OPTION, REQUIRED_EVENT_VALUE_OPTION));
+                .addOptions(REQUIRED_EVENT_NAME_OPTION, REQUIRED_BOOL_OPTION));
         // -> /info <CHANNEL>
         commandDataList.add(Commands.slash(COMMAND_INFO, COMMAND_INFO_DESC)
                 .addOptions(NOT_REQUIRED_CHANNEL_OPTION));
@@ -301,7 +287,7 @@ public class CommandsUtil {
                 .addOptions(NOT_REQUIRED_CHANNEL_OPTION));
         // -> /createcustommessage <WEEKDAY> <TIME> <BOOL_REPEATING> <MESSAGE>
         commandDataList.add(Commands.slash(COMMAND_CREATE_MESSAGE, COMMAND_CREATE_MESSAGE_DESC)
-                .addOptions(CREATE_CUSTOM_MESSAGE_WEEKDAY_OPTION, CREATE_CUSTOM_MESSAGE_TIME_OPTION, CREATE_CUSTOM_MESSAGE_REPEATING_OPTION, CREATE_CUSTOM_MESSAGE_MESSAGE_OPTION));
+                .addOptions(CREATE_CUSTOM_MESSAGE_WEEKDAY_OPTION, CREATE_CUSTOM_MESSAGE_TIME_OPTION, REQUIRED_BOOL_OPTION, CREATE_CUSTOM_MESSAGE_MESSAGE_OPTION));
         // -> /custommessageinfo <ID>
         commandDataList.add(Commands.slash(COMMAND_CUSTOM_MESSAGE_INFO, COMMAND_CUSTOM_MESSAGE_INFO_DESC)
                 .addOptions(REQUIRED_CUSTOM_MESSAGE_ID_OPTION));
@@ -335,7 +321,7 @@ public class CommandsUtil {
                 .addOptions(REQUIRED_LANGUAGE_OPTION));
         // -> Command: /server [Required: serversetting] [Required: servervalue]
         commandDataList.add(Commands.slash(COMMAND_SERVER, COMMAND_SERVER_DESC)
-                .addOptions(REQUIRED_SERVER_SETTING_OPTION, REQUIRED_SERVER_VALUE_OPTION));
+                .addOptions(REQUIRED_SERVER_SETTING_OPTION, REQUIRED_BOOL_OPTION));
         // -> Command: /timezone [Required: timezone]
         commandDataList.add(Commands.slash(COMMAND_TIMEZONE, COMMAND_TIMEZONE_DESC)
                 .addOptions(REQUIRED_TIMEZONE_OPTION));
@@ -344,50 +330,13 @@ public class CommandsUtil {
                 .addOptions(REQUIRED_WARN_TIME_OPTION));
         // -> Commmand: /message [Required: messagevalue] [Required: MessageID]
         commandDataList.add(Commands.slash(COMMAND_MESSAGE, COMMAND_MESSAGE_DESC)
-                .addOptions(REQUIRED_MESSAGE_VALUE_OPTION, REQUIRED_MESSAGE_ID_OPTION));
+                .addOptions(REQUIRED_BOOL_OPTION, REQUIRED_MESSAGE_ID_OPTION));
 
         // -> Command: /autodelete [Not Required: autoDeleteTimeInHours]
         commandDataList.add(Commands.slash(COMMAND_AUTODELETE, COMMAND_AUTODELETE_DESC)
                 .addOptions(AUTO_DELETE_OPTION));
 
         return commandDataList;
-    }
-
-    public static boolean isUserPermitted(Member member, String guildAdminRoleID) {
-        if (isServerOwner(member) || isAdmin(member)) {
-            return true;
-        }
-
-        List<Role> roles = member.getRoles();
-        if (guildAdminRoleID == null) {
-            return doMemberHasDefaultAdminRole(roles);
-        }
-
-        return doMemberHasCustomAdminRole(roles, guildAdminRoleID);
-    }
-
-    private static boolean isServerOwner(final Member member) {
-        return member.isOwner();
-    }
-
-    private static boolean isAdmin(Member member) {
-        return member.hasPermission(Permission.ADMINISTRATOR);
-    }
-
-    private static boolean doMemberHasDefaultAdminRole(List<Role> roles) {
-        Role tempRole = roles.stream()
-                .filter(role -> role.getName().equalsIgnoreCase("Bot Admin"))
-                .findFirst()
-                .orElse(null);
-        return tempRole != null;
-    }
-
-    private static boolean doMemberHasCustomAdminRole(List<Role> roles, String guildAdminRoleID) {
-        Role tempRole = roles.stream()
-                .filter(role -> role.getId().equals(guildAdminRoleID))
-                .findFirst()
-                .orElse(null);
-        return tempRole != null;
     }
 
 }

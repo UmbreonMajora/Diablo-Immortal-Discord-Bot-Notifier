@@ -105,7 +105,7 @@ public class CreateMessageCommand implements IClientCommand {
     }
 
     private boolean getRepeating(SlashCommandInteractionEvent event) {
-        OptionMapping repeatingOption = event.getOption(REPEATING_OPTION_NAME);
+        OptionMapping repeatingOption = event.getOption(BOOL_OPTION_NAME);
         return repeatingOption != null && repeatingOption.getAsBoolean();
     }
 

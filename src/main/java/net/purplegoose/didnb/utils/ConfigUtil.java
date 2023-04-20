@@ -8,6 +8,10 @@ import java.util.Properties;
 @Slf4j
 public class ConfigUtil {
 
+    private ConfigUtil() {
+        // static use only
+    }
+
     private static final Properties CLIENT_PROPERTIES = new Properties();
 
     private static final int DEFAULT_WARN_TIME;

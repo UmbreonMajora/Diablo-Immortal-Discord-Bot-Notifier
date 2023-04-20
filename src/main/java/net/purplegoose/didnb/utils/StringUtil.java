@@ -12,6 +12,8 @@ public class StringUtil {
     public static final String NEW_LINE = "\n";
     public static final String FORMATTED_MESSAGE = "```";
     public static final String FAILED_MESSAGE = "FAILED!";
+    public static final String ENABLED_MESSAGE = "Enabled";
+    public static final String DISABLE_MESSAGE = "Disabled";
 
     private static final Random random = new Random();
 

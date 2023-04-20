@@ -4,16 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.purplegoose.didnb.annotations.CommandAnnotation;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.enums.GameEvent;
 
-/**
- * @author Umbreon Majora
- * Show's a list of all available game events.
- * Command: /listNotifications
- */
 @Slf4j
+@CommandAnnotation(
+        name = "listnotifications",
+        usage = "/listnotifications",
+        description = "Show's a list of all available game events."
+)
 public class ListNotificationsCommand implements IClientCommand {
 
     private static final MessageEmbed notificationListEmbed;
@@ -29,8 +30,9 @@ public class ListNotificationsCommand implements IClientCommand {
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
-        log.info("{} used /listnotifications. Guild: {}({}). Channel: {}({})",
-                logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+        log.info("{} used /{}. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), getClass().getAnnotation(CommandAnnotation.class).name(),
+                logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
         replyEphemeralToUser(event, notificationListEmbed);
     }
 

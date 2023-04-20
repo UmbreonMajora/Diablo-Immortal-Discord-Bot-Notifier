@@ -14,8 +14,7 @@ import net.purplegoose.didnb.enums.GameEvent;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_NAME_OPTION_NAME;
-import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_VALUE_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.*;
 
 /**
  * @author Umbreon Majora
@@ -125,7 +124,7 @@ public class NotificationCommand implements IClientCommand {
     }
 
     private boolean getEventValue(SlashCommandInteractionEvent event) {
-        OptionMapping eventValueOption = event.getOption(EVENT_VALUE_OPTION_NAME);
+        OptionMapping eventValueOption = event.getOption(BOOL_OPTION_NAME);
         return eventValueOption != null && eventValueOption.getAsBoolean();
     }
 }

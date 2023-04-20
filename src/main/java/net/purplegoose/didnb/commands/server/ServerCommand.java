@@ -13,8 +13,7 @@ import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.ServerSetting;
 import net.purplegoose.didnb.languages.LanguageController;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.SERVER_SETTING_OPTION_NAME;
-import static net.purplegoose.didnb.utils.CommandsUtil.SERVER_SETTING_VALUE_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.*;
 
 /**
  * @author Umbreon Majora
@@ -83,7 +82,7 @@ public class ServerCommand implements IClientCommand {
     }
 
     private boolean getServerSettingValue(SlashCommandInteractionEvent event) {
-        OptionMapping serverSettingValue = event.getOption(SERVER_SETTING_VALUE_OPTION_NAME);
+        OptionMapping serverSettingValue = event.getOption(BOOL_OPTION_NAME);
         return serverSettingValue != null && serverSettingValue.getAsBoolean();
     }
 }

@@ -9,6 +9,7 @@ import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.LoggingInformation;
+import net.purplegoose.didnb.utils.PermissionUtil;
 
 import static net.purplegoose.didnb.utils.StringUtil.FAILED_MESSAGE;
 
@@ -56,7 +57,7 @@ public class ConfigCommand implements IClientCommand {
 
         String adminRoleID = clientGuild.getGuildAdminRoleID();
         embed.addField("Admin Role:", getAdminRole(guild, adminRoleID), true);
-        embed.addField("Is user admin?", isUserPermitted(member, adminRoleID) ? "Yes" : "No", true);
+        embed.addField("Is user admin?", PermissionUtil.isUserPermitted(member, adminRoleID) ? "Yes" : "No", true);
         embed.addField("Event-Messages:", clientGuild.isEventMessageEnabled() ? "Enabled" : "Disabled", true);
         embed.addField("Warn-Messages:", clientGuild.isWarnMessagesEnabled() ? "Enabled" : "Disabled", true);
         embed.addField("Warn-Time:", String.valueOf(clientGuild.getWarnTimeInMinutes()), true);
