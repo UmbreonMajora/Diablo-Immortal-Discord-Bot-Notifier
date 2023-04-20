@@ -1,53 +1,45 @@
 package net.purplegoose.didnb.commands.server;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.ServerSetting;
 import net.purplegoose.didnb.languages.LanguageController;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
-
-import static net.purplegoose.didnb.utils.CommandsUtil.SERVER_SETTING_OPTION_NAME;
-import static net.purplegoose.didnb.utils.CommandsUtil.SERVER_SETTING_VALUE_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.*;
 
 /**
  * @author Umbreon Majora
+ * <p>
  * Allow's user to enable or disable head up / event messages server wide.
+ * <p>
  * Command: /server [Required: serversetting] [Required: servervalue]
  */
+@Slf4j
+@AllArgsConstructor
 public class ServerCommand implements IClientCommand {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(ServerCommand.class);
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
 
-    public ServerCommand(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
-        this.guildsCache = guildsCache;
-        this.databaseRequests = databaseRequests;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
-        User user = event.getUser();
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
         Language language = guildsCache.getGuildLanguage(guildID);
 
         String serverSettingRawName = getServerSetting(event);
         ServerSetting serverSetting = ServerSetting.findServerSettingByRawName(serverSettingRawName);
 
-        String executingUser = getFullUsernameWithDiscriminator(user);
-
         if (serverSetting == null) {
-            createLog(LOGGER, executingUser + " tried to use /server but the setting is null.");
+            log.error("{} used /server. Error: Server setting null. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(), logInfo.getChannelID());
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INVALID-SERVER-SETTING"));
             return;
         }
@@ -55,8 +47,9 @@ public class ServerCommand implements IClientCommand {
         boolean serverSettingValue = getServerSettingValue(event);
         updateClientGuild(serverSetting, guildID, serverSettingValue);
 
-        createLog(LOGGER, executingUser + " set serversetting " + serverSettingRawName + " to " +
-                serverSettingValue);
+        log.info("{} used /server. {} is now {} Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), serverSettingRawName, serverSettingValue, logInfo.getGuildName(),
+                guildID, logInfo.getChannelName(), logInfo.getChannelID());
 
         String replyMessage = getReplyMessage(serverSetting, serverSettingValue, language);
         replyEphemeralToUser(event, replyMessage);
@@ -89,7 +82,7 @@ public class ServerCommand implements IClientCommand {
     }
 
     private boolean getServerSettingValue(SlashCommandInteractionEvent event) {
-        OptionMapping serverSettingValue = event.getOption(SERVER_SETTING_VALUE_OPTION_NAME);
+        OptionMapping serverSettingValue = event.getOption(BOOL_OPTION_NAME);
         return serverSettingValue != null && serverSettingValue.getAsBoolean();
     }
 }

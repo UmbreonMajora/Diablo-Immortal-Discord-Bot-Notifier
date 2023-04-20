@@ -1,14 +1,16 @@
 package net.purplegoose.didnb.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 @Slf4j
 public class ConfigUtil {
+
+    private ConfigUtil() {
+        // static use only
+    }
 
     private static final Properties CLIENT_PROPERTIES = new Properties();
 

@@ -1,10 +1,11 @@
 package net.purplegoose.didnb;
 
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.purplegoose.didnb.cache.CustomMessagesCache;
 import net.purplegoose.didnb.cache.ErrorCache;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
-import net.purplegoose.didnb.data.ClientGuild;
-import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.database.MySQLDatabaseConnection;
 import net.purplegoose.didnb.events.*;
@@ -12,8 +13,6 @@ import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
 import net.purplegoose.didnb.utils.ConfigUtil;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
 
 import java.sql.SQLException;
 
@@ -22,9 +21,10 @@ public class DiabloImmortalDiscordNotifier {
     public static void main(String[] args) {
         GameDataCache gameDataCache = new GameDataCache();
         GuildsCache guildsCache = new GuildsCache();
+        CustomMessagesCache customMessagesCache = new CustomMessagesCache();
 
         MySQLDatabaseConnection mySQLDatabaseConnection = new MySQLDatabaseConnection();
-        DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection);
+        DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
         try {
             guildsCache.setGuilds(databaseRequests.loadDataFromDatabaseToCache());
         } catch (SQLException e) {
@@ -41,9 +41,9 @@ public class DiabloImmortalDiscordNotifier {
 
                     .addEventListeners(new ChannelDelete(databaseRequests, guildsCache))
                     .addEventListeners(new GuildJoin(databaseRequests, guildsCache))
-                    .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache))
+                    .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache, customMessagesCache))
                     .addEventListeners(new GuildLeave(databaseRequests, guildsCache))
-                    .addEventListeners(new GuildReady())
+                    //.addEventListeners(new GuildReady())
                     .build().awaitReady();
 
         } catch (InterruptedException e) {

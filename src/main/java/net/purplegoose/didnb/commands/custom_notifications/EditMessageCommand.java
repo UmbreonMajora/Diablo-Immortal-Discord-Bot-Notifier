@@ -1,17 +1,18 @@
 package net.purplegoose.didnb.commands.custom_notifications;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.CustomNotification;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.Weekday;
 import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.StringUtil;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -22,28 +23,22 @@ import static net.purplegoose.didnb.utils.CommandsUtil.CUSTOM_MESSAGE_ID_OPTION_
  * Allow's users to edit their custom notifications.
  * Command: /editmessage [Required: custommessageid] [Required: what2change] [Required: newvalue]
  */
-
+@Slf4j
+@AllArgsConstructor
 public class EditMessageCommand implements IClientCommand {
-
-    private final Logger logger = LoggerFactory.getLogger(EditMessageCommand.class);
 
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
 
-    public EditMessageCommand(DatabaseRequests databaseRequests, GuildsCache guildsCache) {
-        this.databaseRequests = databaseRequests;
-        this.guildsCache = guildsCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
         Language language = guildsCache.getGuildLanguage(guildID);
-        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
 
-        int customMessageID = getCustomMessageID(event);
-        if (customMessageID == -1) {
-            createLog(logger, executingUser + " tried to edit a custom notification but the id was invalid.");
+        String customMessageID = getCustomMessageID(event);
+        if (Objects.equals(customMessageID, StringUtil.FAILED_MESSAGE)) {
+            log.error("{} used /editmessage. Error: ID invalid. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INFO-CUSTOM-MESSAGE-FAILED-ID-NULL"));
             return;
         }
@@ -54,8 +49,8 @@ public class EditMessageCommand implements IClientCommand {
 
         if (newValue == null || valueToChange == null) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "EDIT-MESSAGE-FAILED"));
-            createLog(logger, executingUser + " tried to change a custom notification but it failed because " +
-                    "a value was null.");
+            log.error("{} used /editmessage. Error: Null value. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
             return;
         }
 
@@ -63,46 +58,49 @@ public class EditMessageCommand implements IClientCommand {
             case "time":
                 if (StringUtil.isStringNotInTimePattern(newValue)) {
                     replyEphemeralToUser(event, LanguageController.getMessage(language, "EDIT-MESSAGE-FAILED") + " " + LanguageController.getMessage(language, "TIME-INVALID"));
-                    createLog(logger, executingUser + " tried to edit a custom notification but it failed because the time was not in pattern.");
+                    log.error("{} used /editmessage. Error: Time invalid. Guild: {}({}). Channel: {}({})",
+                            logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
                     return;
                 }
-
+                String oldTime = customNotification.getTime();
                 customNotification.setTime(newValue);
-                createLog(logger, executingUser + " changed the time of custom notification with id " +
-                        customMessageID + " to " + valueToChange);
+                log.info("{} used /editmessage. Time {} -> {}. Guild: {}({}). Channel: {}({})",
+                        logInfo.getExecutor(), oldTime, newValue, logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+
                 replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "MESSAGE-EDITED-TIME"), newValue));
                 break;
             case "message":
                 customNotification.setMessage(newValue);
-                createLog(logger, executingUser + " changed the message of custom notificaiton with id " +
-                        customMessageID + " to " + valueToChange);
+                log.info("{} used /editmessage. Message changed. Guild: {}({}). Channel: {}({})",
+                        logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
                 replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "MESSAGE-EDITED-MESSAGE"), newValue));
                 break;
             case "weekday":
                 Weekday weekday = Weekday.findWeekdayByRawName(newValue);
                 if (weekday == null) {
                     replyEphemeralToUser(event, LanguageController.getMessage(language, "EDIT-MESSAGE-FAILED") + " " + LanguageController.getMessage(language, "WEEKDAY-INVALID"));
-                    createLog(logger, executingUser + " tried to edit a custom notification but it failed because the weekday was invalid.");
+                    log.error("{} used /editmessage. Weekday invalid. Guild: {}({}). Channel: {}({})",
+                            logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
                     return;
                 }
-
+                String oldWeekday = customNotification.getWeekday();
                 customNotification.setWeekday(weekday.rawName);
-                createLog(logger, executingUser + " changed to weekday of custom notification with id " +
-                        customMessageID + " to " + valueToChange);
+                log.info("{} used /editmessage. Weekday {} -> {}. Guild: {}({}). Channel: {}({})",
+                        logInfo.getExecutor(), oldWeekday, weekday.rawName, logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
                 replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "MESSAGE-EDITED-WEEKDAY"), newValue));
                 break;
             default:
-                createLog(logger, executingUser + " tried to change a custom notification but it failed " +
-                        "because the value to change was invalid.");
+                log.info("{} used /editmessage. Value2Change invalid. Guild: {}({}). Channel: {}({})",
+                        logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
                 replyEphemeralToUser(event, LanguageController.getMessage(language, "EDIT-MESSAGE-FAILED"));
                 return;
         }
         databaseRequests.updateCustomNotification(customNotification);
     }
 
-    private int getCustomMessageID(SlashCommandInteractionEvent event) {
+    private String getCustomMessageID(SlashCommandInteractionEvent event) {
         OptionMapping customMessageIdOption = event.getOption(CUSTOM_MESSAGE_ID_OPTION_NAME);
-        return customMessageIdOption != null ? customMessageIdOption.getAsInt() : -1;
+        return customMessageIdOption != null ? customMessageIdOption.getAsString() : StringUtil.FAILED_MESSAGE;
     }
 
     private String getToChangeValue(SlashCommandInteractionEvent event) {

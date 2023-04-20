@@ -1,22 +1,21 @@
 package net.purplegoose.didnb.commands.custom_notifications;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.purplegoose.didnb.cache.CustomMessagesCache;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.CustomNotification;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.Weekday;
 import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.ConfigUtil;
 import net.purplegoose.didnb.utils.StringUtil;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.sql.SQLException;
-import java.util.Objects;
 
 import static net.purplegoose.didnb.utils.CommandsUtil.*;
 
@@ -25,80 +24,74 @@ import static net.purplegoose.didnb.utils.CommandsUtil.*;
  * Allow's user to create custom notification messages.
  * Command: /createmessage [Required: weekday] [Required: time] [Required: custommessagerepeating] [Required: custommessagemessage]
  */
+@Slf4j
+@AllArgsConstructor
 public class CreateMessageCommand implements IClientCommand {
-
-    private final Logger logger = LoggerFactory.getLogger(CreateMessageCommand.class);
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
-
-    public CreateMessageCommand(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
-        this.guildsCache = guildsCache;
-        this.databaseRequests = databaseRequests;
-    }
+    private final CustomMessagesCache customMessagesCache;
 
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
         Language language = guildsCache.getGuildLanguage(guildID);
-        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
 
-        String weekdayRawName = getWeekday(event);
-        if (weekdayRawName == null) {
-            replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-NULL"));
-            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the weekday was null.");
+        if (!isWeekdayValid(getWeekday(event), logInfo)) {
+            replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-INVALID"));
             return;
         }
 
+        String weekdayRawName = getWeekday(event);
         Weekday weekday = Weekday.findWeekdayByRawName(weekdayRawName);
-        if (weekday == null) {
-            replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-INVALID"));
-            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the weekday was invalid.");
+
+        if (!isTimeValid(getTime(event), logInfo)) {
+            replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-TIME-INVALID"));
             return;
         }
 
         String time = getTime(event);
-        if (time == null) {
-            replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-TIME-NULL"));
-            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the time was null.");
-            return;
-        }
-
-        if (StringUtil.isStringNotInTimePattern(time)) {
-            replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-TIME-INVALID"));
-            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the time was invalid.");
-            return;
-        }
-
         String message = getMessage(event);
+
         if (message == null) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-MESSAGE-NULL"));
-            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the time was invalid.");
+            log.error("{} used /createmessage. Error: Message invalid. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
             return;
         }
 
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
         if (clientGuild.getCustomNotificationSize() >= ConfigUtil.getCustomNotificationMax() && !clientGuild.isPremiumServer()) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "MESSAGE-MAX-REACHED"));
-            createLog(logger, executingUser + " tried to create a message on " + guildID + " but the max was reached.");
+            log.error("{} used /createmessage. Error: Max reached. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
             return;
         }
 
         String targetTextChannelID = getTargetTextChannel(event).getId();
         boolean repeating = getRepeating(event);
-        // int nextAutoIncrementNumber = databaseRequests.getGetCustomMessageNextAutoIncrementValue();
+        String id = getNextFreeId();
+        addIdentifierToCache(id);
+        CustomNotification cn = new CustomNotification(targetTextChannelID, guildID, message, weekday.rawName, time, id, repeating, true);
+        databaseRequests.createCustomNotification(cn);
+        clientGuild.addCustomNotification(cn);
+        log.info("{} used /createmessage. ID: {} Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), id, logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CREATED-CUSTOM-MESSAGE"), id));
+    }
 
-        CustomNotification customNotification = new CustomNotification(targetTextChannelID, guildID, message, weekday.rawName, time, repeating, true);
-        databaseRequests.createCustomNotification(customNotification);
+    private String getNextFreeId() {
+        String id = StringUtil.generateRandomID();
 
-        try {
-            guildsCache.setGuilds(databaseRequests.loadDataFromDatabaseToCache());
-        } catch (SQLException e) {
-            e.printStackTrace();
+        while (customMessagesCache.isIdentifierInUse(id)) {
+            id = StringUtil.generateRandomID();
         }
 
-        createLog(logger, executingUser + " created a new message on " + guildID + " with id " + "?");
-        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CREATED-CUSTOM-MESSAGE"), "?"));
+        return id;
+    }
+
+    private void addIdentifierToCache(String identifier) {
+        customMessagesCache.addIdentifier(identifier);
     }
 
     private String getWeekday(SlashCommandInteractionEvent event) {
@@ -112,12 +105,45 @@ public class CreateMessageCommand implements IClientCommand {
     }
 
     private boolean getRepeating(SlashCommandInteractionEvent event) {
-        OptionMapping repeatingOption = event.getOption(REPEATING_OPTION_NAME);
+        OptionMapping repeatingOption = event.getOption(BOOL_OPTION_NAME);
         return repeatingOption != null && repeatingOption.getAsBoolean();
     }
 
     private String getMessage(SlashCommandInteractionEvent event) {
         OptionMapping messageOption = event.getOption(MESSAGE_OPTION_NAME);
         return messageOption != null ? messageOption.getAsString() : null;
+    }
+
+    private boolean isWeekdayValid(String weekdayRawName, LoggingInformation logInfo) {
+        if (weekdayRawName == null) {
+            log.error("{} used /createmessage. Error: Weekday null. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+            return false;
+        }
+
+        Weekday weekday = Weekday.findWeekdayByRawName(weekdayRawName);
+        if (weekday == null) {
+            log.error("{} used /createmessage. Error: Weekday invalid. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isTimeValid(String time, LoggingInformation logInfo) {
+        if (time == null) {
+            log.error("{} used /createmessage. Error: Time null. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+            return false;
+        }
+
+        if (StringUtil.isStringNotInTimePattern(time)) {
+            log.error("{} used /createmessage. Error: Time invalid. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+            return false;
+        }
+
+        return true;
     }
 }

@@ -1,18 +1,24 @@
 package net.purplegoose.didnb.utils;
 
-import net.purplegoose.didnb.cache.GuildsCache;
-
 import java.util.Random;
 
 public class StringUtil {
 
-    public final static String EMPTY_STRING = "";
-    public final static String NEW_LINE = "\n";
-    public final static String FORMATTED_MESSAGE = "```";
-    public final static String FAILED_MESSAGE = "FAILED!";
+    private StringUtil() {
+        // static use only
+    }
+
+    public static final String EMPTY_STRING = "";
+    public static final String NEW_LINE = "\n";
+    public static final String FORMATTED_MESSAGE = "```";
+    public static final String FAILED_MESSAGE = "FAILED!";
+    public static final String ENABLED_MESSAGE = "Enabled";
+    public static final String DISABLE_MESSAGE = "Disabled";
+
+    private static final Random random = new Random();
 
     public static boolean isStringSingleDashWithDigits(String string) {
-        return string.matches("-[0-9]+");
+        return string.matches("-[\\d]]+");
     }
 
     public static boolean isStringNotInTimePattern(String string) {
@@ -24,7 +30,13 @@ public class StringUtil {
     }
 
     public static boolean isStringOnlyContainingNumbers(String string) {
-        return string.matches("[0-9]+");
+        return string.matches("[\\d]]+");
+    }
+
+    public static String generateRandomID() {
+        return random.ints(4, 0, 62)
+                .mapToObj("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"::charAt)
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
     }
 
 }

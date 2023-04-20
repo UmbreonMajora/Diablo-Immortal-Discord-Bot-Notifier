@@ -1,9 +1,9 @@
 package net.purplegoose.didnb.events;
 
 import lombok.extern.slf4j.Slf4j;
-import net.purplegoose.didnb.utils.CommandsUtil;
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.purplegoose.didnb.utils.CommandsUtil;
 import org.jetbrains.annotations.NotNull;
 @Slf4j
 public class GuildReady extends ListenerAdapter {
