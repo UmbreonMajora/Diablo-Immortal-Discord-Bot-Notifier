@@ -120,7 +120,9 @@ public class InfoCommand implements IClientCommand {
                 StringUtil.NEW_LINE +
                 "Wrathborne Invasion: " + (channel.isWrathborneInvasionEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
                 StringUtil.NEW_LINE +
-                "Onslaught: " + (channel.isOnSlaughtMessagesEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE);
+                "Onslaught: " + (channel.isOnSlaughtMessagesEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
+                StringUtil.NEW_LINE +
+                "Tower of Victory: " + (channel.isTowerOfVictoryMessagesEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE);
         return new MessageEmbed.Field("Events", content, false);
     }
 

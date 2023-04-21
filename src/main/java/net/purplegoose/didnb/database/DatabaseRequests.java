@@ -133,11 +133,13 @@ public class DatabaseRequests {
                     boolean ancientarenaembed = (resultSet.getInt("ancientarenaembed") == 1);
                     boolean wrathborneInvasionEnabled = (resultSet.getInt("wrathborneinvasion") == 1);
                     boolean isOnSlaughtMessagesEnabled = (resultSet.getInt("onslaught_event_enabled") == 1);
+                    boolean towerOfVictoryMessagesEnabled = (resultSet.getInt("tower_of_victory_enabled") == 1);
 
                     NotificationChannel notificationChannel = new NotificationChannel(roleID, guildID, textChannelID,
                             headup, message, assembly, vault, demongates, ancientarena, shadowlottery,
                             battlegrounds, hauntedcarriage, ancientnightmare, demongatesembed, ancientarenaembed,
-                            hauntedcarriageembed, ancientnightmareembed, wrathborneInvasionEnabled, isOnSlaughtMessagesEnabled);
+                            hauntedcarriageembed, ancientnightmareembed, wrathborneInvasionEnabled, isOnSlaughtMessagesEnabled,
+                            towerOfVictoryMessagesEnabled);
 
                     if (clientGuildData.containsKey(guildID)) {
                         clientGuildData.get(guildID).addNewNotificationChannel(notificationChannel);

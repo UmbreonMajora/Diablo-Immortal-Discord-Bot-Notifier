@@ -18,5 +18,6 @@ CREATE TABLE IF NOT EXISTS channel_notification
     ancientnightmareembed   TINYINT(1) DEFAULT 1 NOT NULL,
     ancientarenaembed       TINYINT(1) DEFAULT 1 NOT NULL,
     wrathborneinvasion      TINYINT(1) DEFAULT 1 NOT NULL,
-    onslaught_event_enabled TINYINT(1) DEFAULT 1 NOT NULL
+    onslaught_event_enabled TINYINT(1) DEFAULT 1 NOT NULL,
+    tower_of_victory_enabled TINYINT(1) DEFAULT 1 NOT NULL
 );
