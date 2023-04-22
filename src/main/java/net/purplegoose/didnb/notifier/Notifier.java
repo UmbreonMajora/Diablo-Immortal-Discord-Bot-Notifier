@@ -35,6 +35,7 @@ public class Notifier {
     private final WrathborneInvasionEvent wrathborneInvasionEvent;
     private final DemonGatesEvent demonGatesEvent;
     private final OnSlaughtEvent onSlaughtEvent;
+    private final TowerOfVictoryEvent towerOfVictoryEvent;
 
     public Notifier(GuildsCache guildsCache, GameDataCache gameDataCache, ErrorCache errorCache) {
         this.guildsCache = guildsCache;
@@ -50,6 +51,7 @@ public class Notifier {
         this.wrathborneInvasionEvent = new WrathborneInvasionEvent(gameDataCache);
         this.demonGatesEvent = new DemonGatesEvent(gameDataCache);
         this.onSlaughtEvent = new OnSlaughtEvent(gameDataCache);
+        this.towerOfVictoryEvent = new TowerOfVictoryEvent(gameDataCache);
     }
 
     public void runNotificationScheduler(JDA client) {
@@ -75,6 +77,7 @@ public class Notifier {
                         notificationMessage.append(shadowLotteryEvent.appendShadowLotteryNotificationIfHappening(clientGuild, channel));
                         notificationMessage.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
                         notificationMessage.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
+                        notificationMessage.append(towerOfVictoryEvent.appendTowerOfVictoryNotificationIfHappening(clientGuild, channel));
 
                         TextChannel textChannel = client.getTextChannelById(channel.getTextChannelID());
 
@@ -109,7 +112,7 @@ public class Notifier {
                     }
                 }
             }
-        }, TimeUtil.getNextFullMinute(), 60 * 1000);
+        }, TimeUtil.getNextFullMinute(), 60L * 1000L);
     }
 
     private boolean isChannelCountZero(ClientGuild clientGuild) {

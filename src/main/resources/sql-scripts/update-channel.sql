@@ -13,5 +13,6 @@ SET roleID                = ?,
     demongatesembed       = ?,
     ancientnightmareembed = ?,
     hauntedcarriageembed  = ?,
-    wrathborneinvasion    = ?
+    wrathborneinvasion    = ?,
+    tower_of_victory_enabled = ?
 WHERE textChannelID = ?;

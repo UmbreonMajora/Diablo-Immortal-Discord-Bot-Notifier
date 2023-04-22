@@ -21,6 +21,7 @@ public class NotificationChannel {
     private boolean ancientNightmareMessageEnabled;
     private boolean wrathborneInvasionEnabled;
     private boolean isOnSlaughtMessagesEnabled;
+    private boolean towerOfVictoryMessagesEnabled;
 
     private boolean demonGatesMessageEmbedEnabled;
     private boolean ancientArenaMessageEmbedEnabled;
@@ -40,6 +41,7 @@ public class NotificationChannel {
         this.ancientNightmareMessageEnabled = true;
         this.wrathborneInvasionEnabled = true;
         this.isOnSlaughtMessagesEnabled = true;
+        this.towerOfVictoryMessagesEnabled = true;
 
         this.demonGatesMessageEmbedEnabled = false;
         this.ancientArenaMessageEmbedEnabled = false;
@@ -59,7 +61,8 @@ public class NotificationChannel {
                                boolean hauntedCarriageMessageEnabled, boolean ancientNightmareMessageEnabled,
                                boolean demonGatesMessageEmbedEnabled, boolean ancientArenaMessageEmbedEnabled,
                                boolean hauntedCarriageMessageEmbedEnabled, boolean ancientNightmareMessageEmbedEnabled,
-                               boolean wrathborneInvasionEnabled, boolean isOnSlaughtMessagesEnabled) {
+                               boolean wrathborneInvasionEnabled, boolean isOnSlaughtMessagesEnabled,
+                               boolean towerOfVictoryMessagesEnabled) {
         this.mentionRoleID = mentionRoleID;
         this.guildID = guildID;
         this.textChannelID = textChannelID;
@@ -79,6 +82,7 @@ public class NotificationChannel {
         this.ancientNightmareMessageEmbedEnabled = ancientNightmareMessageEmbedEnabled;
         this.wrathborneInvasionEnabled = wrathborneInvasionEnabled;
         this.isOnSlaughtMessagesEnabled = isOnSlaughtMessagesEnabled;
+        this.towerOfVictoryMessagesEnabled = towerOfVictoryMessagesEnabled;
     }
 
 }

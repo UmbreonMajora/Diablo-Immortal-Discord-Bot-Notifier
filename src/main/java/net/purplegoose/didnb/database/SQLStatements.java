@@ -1,5 +1,6 @@
 package net.purplegoose.didnb.database;
 
+import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -7,6 +8,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class SQLStatements {
+
+    private SQLStatements() {
+        // static use only
+    }
 
     private static final String DEFAULT_PATH = "sql-scripts/";
 
@@ -27,10 +32,7 @@ public class SQLStatements {
     private static final String UPDATE_CHANNEL_STATEMENT;
     private static final String DELETE_CHANNEL_BY_GUILD_ID_STATEMENT;
 
-    private static final String GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE;
-
     static {
-
         GET_ALL_GUILDS_STATEMENT = loadResourceToString(DEFAULT_PATH + "get-all-guilds.sql");
         CREATE_NEW_GUILD_STATEMENT = loadResourceToString(DEFAULT_PATH + "create-new-guild.sql");
         UPDATE_GUILD_STATEMENT = loadResourceToString(DEFAULT_PATH + "update-guild.sql");
@@ -47,8 +49,6 @@ public class SQLStatements {
         DELETE_CHANNEL_BY_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-channel-by-id.sql");
         UPDATE_CHANNEL_STATEMENT = loadResourceToString(DEFAULT_PATH + "update-channel.sql");
         DELETE_CHANNEL_BY_GUILD_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-channels-by-guildid.sql");
-
-        GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE = loadResourceToString(DEFAULT_PATH + "get-custom-message-next-auto-increment-value.sql");
     }
 
     private static String loadResourceToString(String path) {
@@ -132,11 +132,4 @@ public class SQLStatements {
         return DELETE_CHANNEL_BY_GUILD_ID_STATEMENT;
     }
 
-    /*
-     *
-     */
-
-    public static String getGetCustomMessageNextAutoIncrementValue() {
-        return GET_CUSTOM_MESSAGE_NEXT_AUTO_INCREMENT_VALUE;
-    }
 }
