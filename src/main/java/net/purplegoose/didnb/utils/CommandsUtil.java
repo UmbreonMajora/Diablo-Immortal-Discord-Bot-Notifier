@@ -24,13 +24,13 @@ public class CommandsUtil {
     private static final OptionData REQUIRED_BOOL_OPTION =
             new OptionData(OptionType.BOOLEAN, BOOL_OPTION_NAME, "Yes / No", true);
     private static final OptionData NOT_REQUIRED_BOOL_OPTION =
-            new OptionData(OptionType.BOOLEAN, BOOL_OPTION_NAME, "", false);
+            new OptionData(OptionType.BOOLEAN, BOOL_OPTION_NAME, "X", false);
 
     public static final String ROLE_OPTION_NAME = "role_option";
     private static final OptionData REQUIRED_ROLE_OPTION =
-            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "", true);
+            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "X", true);
     private static final OptionData NOT_REQUIRED_ROLE_OPTION =
-            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "", false);
+            new OptionData(OptionType.ROLE, ROLE_OPTION_NAME, "X", false);
 
     private static final Properties commandsProperties = new Properties();
 

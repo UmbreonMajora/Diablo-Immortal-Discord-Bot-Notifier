@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.purplegoose.didnb.annotations.CommandAnnotation;
+import net.purplegoose.didnb.annotations.GameEvent;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.LoggingInformation;
@@ -16,6 +17,8 @@ import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.StringUtil;
 import net.purplegoose.didnb.utils.TimeUtil;
+
+import java.lang.reflect.Field;
 
 import static net.purplegoose.didnb.utils.StringUtil.DISABLE_MESSAGE;
 import static net.purplegoose.didnb.utils.StringUtil.ENABLED_MESSAGE;
@@ -102,28 +105,22 @@ public class InfoCommand implements IClientCommand {
     }
 
     private MessageEmbed.Field getNotificationsField(NotificationChannel channel) {
-        String content = "Ancient Arena: " + (channel.isAncientArenaMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Ancient Nigtmare: " + (channel.isAncientNightmareMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Assembly: " + (channel.isAssemblyMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Battleground: " + (channel.isBattlegroundsMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Vault: " + (channel.isVaultMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Demon Gates: " + (channel.isDemonGatesMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Shadow Lottery: " + (channel.isShadowLotteryMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Haunted Carriage: " + (channel.isHauntedCarriageMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Wrathborne Invasion: " + (channel.isWrathborneInvasionEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Onslaught: " + (channel.isOnSlaughtMessagesEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
-                StringUtil.NEW_LINE +
-                "Tower of Victory: " + (channel.isTowerOfVictoryMessagesEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE);
-        return new MessageEmbed.Field("Events", content, false);
+        StringBuilder sb = new StringBuilder(100);
+        for (Field f : channel.getClass().getDeclaredFields()) {
+            if (f.isAnnotationPresent(GameEvent.class)) {
+                GameEvent gameEvent = f.getAnnotation(GameEvent.class);
+                f.setAccessible(true);
+                try {
+                    sb.append(gameEvent.eventName()).append(": ");
+                    sb.append(f.getBoolean(channel) ? ENABLED_MESSAGE : DISABLE_MESSAGE);
+                    sb.append(StringUtil.NEW_LINE);
+                } catch (IllegalAccessException e) {
+                    log.error("Failed to generate content for info command.", e);
+                    return new MessageEmbed.Field("Events", "Failed to generate! Please report.", false);
+                }
+            }
+        }
+        return new MessageEmbed.Field("Events", sb.toString(), false);
     }
 
 }

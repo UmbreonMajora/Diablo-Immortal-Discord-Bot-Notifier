@@ -11,42 +11,46 @@ import java.util.Date;
 
 public class TimeUtil {
 
+    private static final String HOURS_MINUTE_FORMAT = "HH:mm";
+    private static final String WEEKDAY_FORMAT = "EEEE";
+
     private TimeUtil() {
         // all static methods.
     }
 
     public static String getTimeWithWeekday(String timeZone) {
         ZonedDateTime dateTime = Instant.now().atZone(ZoneId.of(timeZone, ZoneId.SHORT_IDS));
-        return dateTime.format(DateTimeFormatter.ofPattern("EEEE HH:mm"));
+        return dateTime.format(DateTimeFormatter.ofPattern(WEEKDAY_FORMAT + " " + HOURS_MINUTE_FORMAT));
     }
 
     public static String getCurrentWeekday(String timeZone) {
         ZonedDateTime dateTime = Instant.now().atZone(ZoneId.of(timeZone, ZoneId.SHORT_IDS));
-        return dateTime.format(DateTimeFormatter.ofPattern("EEEE"));
+        return dateTime.format(DateTimeFormatter.ofPattern(WEEKDAY_FORMAT));
     }
 
     public static String getTime(String timezone) {
         ZonedDateTime dateTime = Instant.now().atZone(ZoneId.of(timezone, ZoneId.SHORT_IDS));
-        return dateTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+        return dateTime.format(DateTimeFormatter.ofPattern(HOURS_MINUTE_FORMAT));
     }
 
     public static boolean isTimeInBetween(String currentTime, String startTime, String endTime) {
         try {
-            Date currentTimeDate = new SimpleDateFormat("HH:mm").parse(currentTime);
+            Date currentTimeDate = new SimpleDateFormat(HOURS_MINUTE_FORMAT).parse(currentTime);
             Calendar cal = Calendar.getInstance();
             cal.setTime(currentTimeDate);
 
             Calendar warnStartCalender = Calendar.getInstance();
-            warnStartCalender.setTime(new SimpleDateFormat("HH:mm").parse(startTime));
+            warnStartCalender.setTime(new SimpleDateFormat(HOURS_MINUTE_FORMAT).parse(startTime));
 
             Calendar warnEndCalender = Calendar.getInstance();
-            warnEndCalender.setTime(new SimpleDateFormat("HH:mm").parse(endTime));
+            warnEndCalender.setTime(new SimpleDateFormat(HOURS_MINUTE_FORMAT).parse(endTime));
 
             if (cal.equals(warnStartCalender)) {
                 return true;
             }
 
-            return currentTimeDate.after(warnStartCalender.getTime()) && currentTimeDate.before(warnEndCalender.getTime());
+            return currentTimeDate.after(warnStartCalender.getTime()) &&
+                    currentTimeDate.before(warnEndCalender.getTime());
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -65,7 +69,7 @@ public class TimeUtil {
 
     public static Date getTimeAsCalendar(String time) {
         try {
-            Date date = new SimpleDateFormat("HH:mm").parse(time);
+            Date date = new SimpleDateFormat(HOURS_MINUTE_FORMAT).parse(time);
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
             calendar.add(Calendar.DATE, 1);
