@@ -7,16 +7,16 @@ public class CustomMessagesCache {
 
     private final List<String> usedIdentifiers = new ArrayList<>();
 
-    public boolean isIdentifierInUse(String ID) {
-        return usedIdentifiers.contains(ID);
+    public boolean isIdentifierInUse(String identifier) {
+        return usedIdentifiers.contains(identifier);
     }
 
-    public void addIdentifier(String ID) {
-        usedIdentifiers.add(ID);
+    public void addIdentifier(String identifier) {
+        usedIdentifiers.add(identifier);
     }
 
-    public void removeIdentifier(String ID) {
-        usedIdentifiers.remove(ID);
+    public void removeIdentifier(String identifier) {
+        usedIdentifiers.remove(identifier);
     }
 
 }
