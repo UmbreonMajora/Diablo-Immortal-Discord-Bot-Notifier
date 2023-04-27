@@ -9,5 +9,5 @@ INSERT INTO channel_notification (textChannelID,
                                   battlegrounds,
                                   vault, demongates, shadowlottery, hauntedcarriage,
                                   demongatesembed, ancientarenaembed, hauntedcarriageembed, ancientnightmareembed,
-                                  wrathborneinvasion, tower_of_victory_enabled)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                  wrathborneinvasion, tower_of_victory_enabled, shadow_war_enabled)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

@@ -13,7 +13,8 @@ public enum GameEvent {
     HAUNTED_CARRIAGE("hauntedcarriage", "This is the event notification for Haunted Carriage."),
     WRATHBORNE_INVASION("wrathborneinvasion", "This is the event notification for the Wrathborne Invasion."),
     ON_SLAUGHT("onslaught", "This is the event notification for Onslaught."),
-    TOWER_OF_VICTORY("towerofvictory", "This is the event notification for Tower of Victory .");
+    TOWER_OF_VICTORY("towerofvictory", "This is the event notification for Tower of Victory ."),
+    SHADOW_WAR("shadowwar", "This is the event notification for the Shadow War.");
 
     public final String rawName;
     public final String description;

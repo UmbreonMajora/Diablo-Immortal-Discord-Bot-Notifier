@@ -123,3 +123,6 @@ MESSAGE-MAX-REACHED: "Has alcanzado el número máximo de notificaciones persona
 # Added with the new 'Tower of Victory' event.
 EVENT-TOWER-OF-VICTORY: "The Tower of Victory event is starting!"
 EVENT-TOWER-OF-VICTORY-WARN: "The Tower of Victory event is about to start in %s minutes."
+# Added with the new 'Shadow war' event.
+EVENT-SHADOW-WAR-WARN: "The doors to the Shadow wars have opened!"
+EVENT-SHADOW-WAR: "The Shadow War has begun."

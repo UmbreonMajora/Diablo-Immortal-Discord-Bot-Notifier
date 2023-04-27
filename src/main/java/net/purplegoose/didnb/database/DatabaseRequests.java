@@ -25,8 +25,8 @@ public class DatabaseRequests {
     private final IDatabaseConnection databaseConnection;
     private final CustomMessagesCache customMessagesCache;
 
-    public Set<EventGameData> getEventTimes(String table, boolean everyDay) {
-        Set<EventGameData> listEventTimeTables = new HashSet<>();
+    public HashSet<EventGameData> getEventTimes(String table, boolean everyDay) {
+        HashSet<EventGameData> listEventTimeTables = new HashSet<>();
         try (
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + table)
@@ -72,7 +72,7 @@ public class DatabaseRequests {
                     boolean isDaylightTimeEnabled = (resultSet.getInt("daylight_time_enabled") == 1);
                     boolean isPremiumServer = (resultSet.getInt("premium_server") == 1);
                     int autoDeleteTimeInHours = resultSet.getInt("auto_delete_time");
-                    boolean isAutoDeleteEnabled = (resultSet.getInt("auto_delete_enabled") == 1);
+                    boolean isAutoDeleteEnabled = (resultSet.getInt("auto_delete") == 1);
 
                     ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime,
                             isWarnMessagesEnabled, isEventMessagesEnabled, isDaylightTimeEnabled, isPremiumServer,
@@ -139,7 +139,7 @@ public class DatabaseRequests {
                             headup, message, assembly, vault, demongates, ancientarena, shadowlottery,
                             battlegrounds, hauntedcarriage, ancientnightmare, demongatesembed, ancientarenaembed,
                             hauntedcarriageembed, ancientnightmareembed, wrathborneInvasionEnabled, isOnSlaughtMessagesEnabled,
-                            towerOfVictoryMessagesEnabled);
+                            towerOfVictoryMessagesEnabled, false);
 
                     if (clientGuildData.containsKey(guildID)) {
                         clientGuildData.get(guildID).addNewNotificationChannel(notificationChannel);
@@ -300,6 +300,8 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(16, notificationChannel.isHauntedCarriageMessageEmbedEnabled());
             preparedStatement.setBoolean(17, notificationChannel.isAncientNightmareMessageEmbedEnabled());
             preparedStatement.setBoolean(18, notificationChannel.isWrathborneInvasionEnabled());
+            preparedStatement.setBoolean(19, notificationChannel.isTowerOfVictoryMessagesEnabled());
+            preparedStatement.setBoolean(20, notificationChannel.isShadowWarMessagesEnabled());
             preparedStatement.executeUpdate();
             log.info("Created Notification Channel on guild " + notificationChannel.getGuildID() + " with " +
                     "channel id " + notificationChannel.getTextChannelID());
@@ -328,7 +330,8 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(13, notificationChannel.isAncientNightmareMessageEmbedEnabled());
             preparedStatement.setBoolean(14, notificationChannel.isHauntedCarriageMessageEmbedEnabled());
             preparedStatement.setBoolean(15, notificationChannel.isWrathborneInvasionEnabled());
-            preparedStatement.setString(16, notificationChannel.getTextChannelID());
+            preparedStatement.setBoolean(16, notificationChannel.isShadowWarMessagesEnabled());
+            preparedStatement.setString(17, notificationChannel.getTextChannelID());
             preparedStatement.executeUpdate();
             log.info("Updated Notification Channel on guild " + notificationChannel.getGuildID() + " with channel id " +
                     notificationChannel.getTextChannelID());
