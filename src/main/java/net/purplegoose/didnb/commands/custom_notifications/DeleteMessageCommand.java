@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.purplegoose.didnb.cache.CustomMessagesCache;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.CustomNotification;
@@ -28,6 +29,7 @@ public class DeleteMessageCommand implements IClientCommand {
 
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
+    private final CustomMessagesCache customMessagesCache;
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
@@ -53,6 +55,7 @@ public class DeleteMessageCommand implements IClientCommand {
         guildsCache.getClientGuildByID(guildID).deleteCustomNotificationByID(customMessageID);
         log.info("{} used /deletemessage. ID: {}. Guild: {}({}). Channel: {}({})",
                 logInfo.getExecutor(), customMessageID, logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+        customMessagesCache.removeIdentifier(customMessageID);
         replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "DELETED-CUSTOM-MESSAGE"), customMessageID));
     }
 

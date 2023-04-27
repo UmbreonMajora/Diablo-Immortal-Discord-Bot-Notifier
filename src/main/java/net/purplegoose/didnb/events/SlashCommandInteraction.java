@@ -77,7 +77,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
 
         this.createMessageCommand = new CreateMessageCommand(guildsCache, databaseRequests, customMessagesCache);
         this.messageInfoCommand = new MessageInfoCommand(guildsCache);
-        this.deleteMessageCommand = new DeleteMessageCommand(databaseRequests, guildsCache);
+        this.deleteMessageCommand = new DeleteMessageCommand(databaseRequests, guildsCache, customMessagesCache);
         this.listMessagesCommand = new ListMessagesCommand(guildsCache);
         this.editMessageCommand = new EditMessageCommand(databaseRequests, guildsCache);
 
@@ -138,83 +138,32 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private void executeCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String command = event.getName().toLowerCase();
         switch (command) {
-            case COMMAND_TODAY:
-                todayCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_UPCOMING:
-                upComingCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_CREATE_MESSAGE:
-                createMessageCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_DELETE_CUSTOM_MESSAGE:
-                deleteMessageCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_CUSTOM_MESSAGE_INFO:
-                messageInfoCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_LIST_MESSAGES:
-                listMessagesCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_REGISTER:
-                registerCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_UNREGISTER:
-                unregisterCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_MENTION_ROLE:
-                mentionRoleCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_INFO:
-                infoCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_INSTALL:
-                instructionsCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_LANGUAGES:
-                languagesCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_TIMEZONES:
-                timeZonesCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_NOTIFICATION:
-                notificationCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_LIST_NOTIFICATIONS:
-                listNotificationsCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_TIMEZONE:
-                timeZoneCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_LANGUAGE:
-                languageCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_SERVER:
-                serverCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_CONFIG:
-                configCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_ADMIN_ROLE:
-                adminRoleCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_PRESET:
-                presetCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_WARN_TIME:
-                warnTimeCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_MESSAGE:
-                messageCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_EDIT_MESSAGE:
-                editMessageCommand.runCommand(event, logInfo);
-                break;
-            case COMMAND_AUTODELETE:
-                autoDeleteCommand.runCommand(event, logInfo);
-                break;
-            default:
-                helpCommand.runCommand(event, logInfo);
+            case COMMAND_TODAY -> todayCommand.runCommand(event, logInfo);
+            case COMMAND_UPCOMING -> upComingCommand.runCommand(event, logInfo);
+            case COMMAND_CREATE_MESSAGE -> createMessageCommand.runCommand(event, logInfo);
+            case COMMAND_DELETE_CUSTOM_MESSAGE -> deleteMessageCommand.runCommand(event, logInfo);
+            case COMMAND_CUSTOM_MESSAGE_INFO -> messageInfoCommand.runCommand(event, logInfo);
+            case COMMAND_LIST_MESSAGES -> listMessagesCommand.runCommand(event, logInfo);
+            case COMMAND_REGISTER -> registerCommand.runCommand(event, logInfo);
+            case COMMAND_UNREGISTER -> unregisterCommand.runCommand(event, logInfo);
+            case COMMAND_MENTION_ROLE -> mentionRoleCommand.runCommand(event, logInfo);
+            case COMMAND_INFO -> infoCommand.runCommand(event, logInfo);
+            case COMMAND_INSTALL -> instructionsCommand.runCommand(event, logInfo);
+            case COMMAND_LANGUAGES -> languagesCommand.runCommand(event, logInfo);
+            case COMMAND_TIMEZONES -> timeZonesCommand.runCommand(event, logInfo);
+            case COMMAND_NOTIFICATION -> notificationCommand.runCommand(event, logInfo);
+            case COMMAND_LIST_NOTIFICATIONS -> listNotificationsCommand.runCommand(event, logInfo);
+            case COMMAND_TIMEZONE -> timeZoneCommand.runCommand(event, logInfo);
+            case COMMAND_LANGUAGE -> languageCommand.runCommand(event, logInfo);
+            case COMMAND_SERVER -> serverCommand.runCommand(event, logInfo);
+            case COMMAND_CONFIG -> configCommand.runCommand(event, logInfo);
+            case COMMAND_ADMIN_ROLE -> adminRoleCommand.runCommand(event, logInfo);
+            case COMMAND_PRESET -> presetCommand.runCommand(event, logInfo);
+            case COMMAND_WARN_TIME -> warnTimeCommand.runCommand(event, logInfo);
+            case COMMAND_MESSAGE -> messageCommand.runCommand(event, logInfo);
+            case COMMAND_EDIT_MESSAGE -> editMessageCommand.runCommand(event, logInfo);
+            case COMMAND_AUTODELETE -> autoDeleteCommand.runCommand(event, logInfo);
+            default -> helpCommand.runCommand(event, logInfo);
         }
     }
 
