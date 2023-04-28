@@ -53,6 +53,7 @@ public class CustomMessagesNotifier extends NotifierHelper {
                                 .getNotificationChannel(textChannel.getId());
                         StringBuilder sb = new StringBuilder(message);
                         addMessageMention(sb, notificationChannel, textChannel.getGuild());
+                        message = sb.toString();
 
                         if (clientGuild.isAutoDeleteEnabled()) {
                             int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
