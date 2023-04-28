@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
+import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.CustomNotification;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
@@ -36,7 +37,7 @@ public class DeleteMessageCommand implements IClientCommand {
 
         String customMessageID = getCustomMessageID(event);
         if (Objects.equals(customMessageID, StringUtil.FAILED_MESSAGE)) {
-            log.error("{} used /deletemessage. Error: ID invalid. Max reached. Guild: {}({}). Channel: {}({})",
+            log.error("{} used /deletemessage. Error: ID invalid. Guild: {}({}). Channel: {}({})",
                     logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INFO-CUSTOM-MESSAGE-FAILED-ID-NULL"));
             return;
@@ -49,8 +50,16 @@ public class DeleteMessageCommand implements IClientCommand {
             return;
         }
 
+        ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
+        if (clientGuild.doCustomMessageExists(customMessageID)) {
+            log.error("{} used /deletemessage. Error: Custom message with id does not exist. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+            replyEphemeralToUser(event, LanguageController.getMessage(language, "CUSTOM-MESSAGE-WITH-ID-NONEXISTENT"));
+            return;
+        }
+
         databaseRequests.deleteCustomNotificationByID(customMessageID);
-        guildsCache.getClientGuildByID(guildID).deleteCustomNotificationByID(customMessageID);
+        clientGuild.deleteCustomNotificationByID(customMessageID);
         log.info("{} used /deletemessage. ID: {}. Guild: {}({}). Channel: {}({})",
                 logInfo.getExecutor(), customMessageID, logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
         replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "DELETED-CUSTOM-MESSAGE"), customMessageID));
@@ -63,10 +72,7 @@ public class DeleteMessageCommand implements IClientCommand {
 
     private boolean isCustomMessageGuildIdCurrentGuildId(String guildID, String customMessageID) {
         CustomNotification customNotification = guildsCache.getClientGuildByID(guildID).getCustomNotificationByID(customMessageID);
-        //Todo: Add a sperate error message, like "Custom Message with ID <ID> does not exists.
-        if (customNotification == null) {
-            return false;
-        }
+        if (customNotification == null) return false;
         String targetGuildID = customNotification.getGuildID();
         return Objects.equals(guildID, targetGuildID);
     }

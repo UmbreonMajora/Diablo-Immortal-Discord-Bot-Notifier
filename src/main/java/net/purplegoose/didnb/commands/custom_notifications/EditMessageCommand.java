@@ -16,6 +16,7 @@ import net.purplegoose.didnb.utils.StringUtil;
 
 import java.util.Objects;
 
+import static net.purplegoose.didnb.utils.CommandsUtil.COMMAND_EDIT_MESSAGE;
 import static net.purplegoose.didnb.utils.CommandsUtil.CUSTOM_MESSAGE_ID_OPTION_NAME;
 
 /**
@@ -104,7 +105,7 @@ public class EditMessageCommand implements IClientCommand {
     }
 
     private String getToChangeValue(SlashCommandInteractionEvent event) {
-        OptionMapping changeValueOption = event.getOption("editmessage");
+        OptionMapping changeValueOption = event.getOption(COMMAND_EDIT_MESSAGE);
         return changeValueOption != null ? changeValueOption.getAsString() : null;
     }
 

@@ -2,8 +2,6 @@ package net.purplegoose.didnb.notifier;
 
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.purplegoose.didnb.cache.ErrorCache;
@@ -16,11 +14,8 @@ import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
-import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
 @Slf4j
-public class Notifier {
+public class Notifier extends NotifierHelper {
 
     private final GuildsCache guildsCache;
     private final ErrorCache errorCache;
@@ -119,41 +114,4 @@ public class Notifier {
         return clientGuild.getNotificationChannelCount() == 0;
     }
 
-    private void sendMessageWithAutoDelete(TextChannel textChannel, String messageContext, int deleteTimeInHours) {
-        textChannel.sendMessage(messageContext).queue(message ->
-                message.delete().queueAfter(deleteTimeInHours, TimeUnit.HOURS));
-    }
-
-    private void sendMessageWithoutAutoDelete(TextChannel textChannel, String messageContext) {
-        textChannel.sendMessage(messageContext).queue();
-    }
-
-    private void addMessageMention(StringBuilder sb, NotificationChannel channel, Guild guild) {
-        String mentionID = channel.getMentionRoleID();
-
-        if (mentionID == null) {
-            return; // add no mention role if null.
-        }
-
-        switch (mentionID.toUpperCase()) {
-            case "HERE":
-                sb.append(NEW_LINE).append("@here");
-                break;
-            case "EVERYONE":
-                sb.append(NEW_LINE).append("@everyone");
-                break;
-            default:
-                Role mentionRole = guild.getRoleById(mentionID);
-                if (mentionRole != null) {
-                    sb.append(NEW_LINE).append(mentionRole.getAsMention());
-                } else {
-                    sb.append(NEW_LINE).append("Failed to append mention role. Please re-set your mention role.");
-                    String guildID = guild.getId();
-                    String guildName = guild.getName();
-                    String textChannelID = channel.getTextChannelID();
-                    log.info("Failed to append mention role for guild " +
-                            guildName + "(" + guildID + ") in " + textChannelID);
-                }
-        }
-    }
 }

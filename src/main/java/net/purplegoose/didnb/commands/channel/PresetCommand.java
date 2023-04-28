@@ -67,21 +67,22 @@ public class PresetCommand implements IClientCommand {
         Preset selectedPreset = Preset.findPresetByChoiceName(preset);
 
         switch (updateChannel(selectedPreset, notificationChannel)) {
-            case RETURN_LIST:
+            case RETURN_LIST -> {
                 log.info("{} used /preset. Output: List. Guild: {}({}). Channel: {}({})",
                         logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
                 replyEphemeralToUser(event, presetInfoMessage);
-                return;
-            case RETURN_INVALID:
+            }
+            case RETURN_INVALID -> {
                 log.error("{} used /preset. Error: Preset invalid. Guild: {}({}). Channel: {}({})",
                         logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
-                return;
-            case RETURN_SUCCESS:
+            }
+            case RETURN_SUCCESS -> {
                 String rawPresetString = preset.replace("preset", "");
                 log.error("{} used /preset. Applied preset {}. Guild: {}({}). Channel: {}({})",
                         logInfo.getExecutor(), rawPresetString, logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
                 String response = String.format(LanguageController.getMessage(language, "APPLIED-PRESET-TO-CHANNEL"), rawPresetString, targetTextChannel.getAsMention());
                 replyEphemeralToUser(event, response);
+            }
         }
 
     }
@@ -95,28 +96,18 @@ public class PresetCommand implements IClientCommand {
 
     private int updateChannel(Preset selectedPreset, NotificationChannel notificationChannel) {
         switch (selectedPreset) {
-            case PRESET_SHADOW:
-                setShadowPreset(notificationChannel);
-                break;
-            case PRESET_IMMORTAL:
-                setImmortalPreset(notificationChannel);
-                break;
-            case PRESET_DAILY_ON:
-                setDailyEventOnPreset(notificationChannel);
-                break;
-            case PRESET_DAILY_OFF:
-                setDailyEventOffPreset(notificationChannel);
-                break;
-            case PRESET_OVERWORLD_ON:
-                setOverworldOnPreset(notificationChannel);
-                break;
-            case PRESET_OVERWORLD_OFF:
-                setOverworldOffPreset(notificationChannel);
-                break;
-            case PRESET_LIST:
+            case PRESET_SHADOW -> setShadowPreset(notificationChannel);
+            case PRESET_IMMORTAL -> setImmortalPreset(notificationChannel);
+            case PRESET_DAILY_ON -> setDailyEventOnPreset(notificationChannel);
+            case PRESET_DAILY_OFF -> setDailyEventOffPreset(notificationChannel);
+            case PRESET_OVERWORLD_ON -> setOverworldOnPreset(notificationChannel);
+            case PRESET_OVERWORLD_OFF -> setOverworldOffPreset(notificationChannel);
+            case PRESET_LIST -> {
                 return RETURN_LIST;
-            default:
+            }
+            default -> {
                 return RETURN_INVALID;
+            }
         }
         databaseRequests.updateNotificationChannel(notificationChannel);
         return RETURN_SUCCESS;

@@ -13,7 +13,8 @@ import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.ServerSetting;
 import net.purplegoose.didnb.languages.LanguageController;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.*;
+import static net.purplegoose.didnb.utils.CommandsUtil.MESSAGE_REPEATING_BOOL;
+import static net.purplegoose.didnb.utils.CommandsUtil.SERVER_SETTING_OPTION_NAME;
 
 /**
  * @author Umbreon Majora
@@ -66,12 +67,8 @@ public class ServerCommand implements IClientCommand {
     private void updateClientGuild(ServerSetting serverSetting, String guildID, boolean serverSettingValue) {
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
         switch (serverSetting) {
-            case EVENT_MESSAGES:
-                clientGuild.setEventMessageEnabled(serverSettingValue);
-                break;
-            case WARN_MESSAGES:
-                clientGuild.setWarnMessagesEnabled(serverSettingValue);
-                break;
+            case EVENT_MESSAGES -> clientGuild.setEventMessageEnabled(serverSettingValue);
+            case WARN_MESSAGES -> clientGuild.setWarnMessagesEnabled(serverSettingValue);
         }
         databaseRequests.updateGuild(clientGuild);
     }
@@ -82,7 +79,7 @@ public class ServerCommand implements IClientCommand {
     }
 
     private boolean getServerSettingValue(SlashCommandInteractionEvent event) {
-        OptionMapping serverSettingValue = event.getOption(BOOL_OPTION_NAME);
+        OptionMapping serverSettingValue = event.getOption(MESSAGE_REPEATING_BOOL);
         return serverSettingValue != null && serverSettingValue.getAsBoolean();
     }
 }
