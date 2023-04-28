@@ -1,4 +1,3 @@
-CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-NULL: "Failed to create a new custom message, the weekday was null."
 CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-INVALID: "Failed to create a new custom message, the weekday was invalid."
 CREATE-CUSTOM-MESSAGE-FAILED-TIME-NULL: "Failed to create a new custom message, the weekday was null."
 CREATE-CUSTOM-MESSAGE-FAILED-TIME-INVALID: "Failed to create a new custom message, the weekday was invalid."

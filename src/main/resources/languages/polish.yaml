@@ -1,4 +1,3 @@
-CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-NULL: "Nie udało się utworzyć nowej niestandardowej wiadomości, dzień tygodnia był pusty."
 CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-INVALID: "Nie udało się utworzyć nowej niestandardowej wiadomości, dzień tygodnia był nieprawidłowy."
 CREATE-CUSTOM-MESSAGE-FAILED-TIME-NULL: "Nie udało się utworzyć nowej niestandardowej wiadomości, dzień tygodnia był pusty."
 CREATE-CUSTOM-MESSAGE-FAILED-TIME-INVALID: "Nie udało się utworzyć nowej niestandardowej wiadomości, dzień tygodnia był nieprawidłowy."
