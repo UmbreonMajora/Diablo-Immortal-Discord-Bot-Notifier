@@ -1,6 +1,5 @@
 package net.purplegoose.didnb.database;
 
-import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;

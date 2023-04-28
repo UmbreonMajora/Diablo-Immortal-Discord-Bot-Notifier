@@ -14,7 +14,8 @@ import net.purplegoose.didnb.enums.GameEvent;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.*;
+import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_NAME_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_TOGGLE_OPTION_NAME;
 
 /**
  * @author Umbreon Majora
@@ -74,42 +75,20 @@ public class NotificationCommand implements IClientCommand {
     private void updateNotificationChannel(GameEvent gameEvent, boolean gameEventValue, String guildID, String textChannelID) {
         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID).getNotificationChannel(textChannelID);
         switch (gameEvent) {
-            case ANCIENT_ARENA:
-                notificationChannel.setAncientArenaMessageEnabled(gameEventValue);
-                break;
-            case VAULT:
-                notificationChannel.setVaultMessageEnabled(gameEventValue);
-                break;
-            case HEAD_UP:
-                notificationChannel.setEventWarnMessage(gameEventValue);
-                break;
-            case MESSAGE:
-                notificationChannel.setEventMessageEnabled(gameEventValue);
-                break;
-            case ASSEMBLY:
-                notificationChannel.setAssemblyMessageEnabled(gameEventValue);
-                break;
-            case DEMON_GATES:
-                notificationChannel.setDemonGatesMessageEnabled(gameEventValue);
-                break;
-            case BATTLEGROUNDS:
-                notificationChannel.setBattlegroundsMessageEnabled(gameEventValue);
-                break;
-            case SHADOW_LOTTERY:
-                notificationChannel.setShadowLotteryMessageEnabled(gameEventValue);
-                break;
-            case HAUNTED_CARRIAGE:
-                notificationChannel.setHauntedCarriageMessageEnabled(gameEventValue);
-                break;
-            case ANCIENT_NIGHTMARE:
-                notificationChannel.setAncientNightmareMessageEnabled(gameEventValue);
-                break;
-            case WRATHBORNE_INVASION:
-                notificationChannel.setWrathborneInvasionEnabled(gameEventValue);
-                break;
-            case ON_SLAUGHT:
-                notificationChannel.setOnSlaughtMessagesEnabled(gameEventValue);
-                break;
+            case ANCIENT_ARENA -> notificationChannel.setAncientArenaMessageEnabled(gameEventValue);
+            case VAULT -> notificationChannel.setVaultMessageEnabled(gameEventValue);
+            case HEAD_UP -> notificationChannel.setEventWarnMessage(gameEventValue);
+            case MESSAGE -> notificationChannel.setEventMessageEnabled(gameEventValue);
+            case ASSEMBLY -> notificationChannel.setAssemblyMessageEnabled(gameEventValue);
+            case DEMON_GATES -> notificationChannel.setDemonGatesMessageEnabled(gameEventValue);
+            case BATTLEGROUNDS -> notificationChannel.setBattlegroundsMessageEnabled(gameEventValue);
+            case SHADOW_LOTTERY -> notificationChannel.setShadowLotteryMessageEnabled(gameEventValue);
+            case HAUNTED_CARRIAGE -> notificationChannel.setHauntedCarriageMessageEnabled(gameEventValue);
+            case ANCIENT_NIGHTMARE -> notificationChannel.setAncientNightmareMessageEnabled(gameEventValue);
+            case WRATHBORNE_INVASION -> notificationChannel.setWrathborneInvasionEnabled(gameEventValue);
+            case ON_SLAUGHT -> notificationChannel.setOnSlaughtMessagesEnabled(gameEventValue);
+            case TOWER_OF_VICTORY -> notificationChannel.setTowerOfVictoryMessagesEnabled(gameEventValue);
+            case SHADOW_WAR -> notificationChannel.setShadowWarMessagesEnabled(gameEventValue);
         }
         databaseRequests.updateNotificationChannel(notificationChannel);
     }
@@ -124,7 +103,7 @@ public class NotificationCommand implements IClientCommand {
     }
 
     private boolean getEventValue(SlashCommandInteractionEvent event) {
-        OptionMapping eventValueOption = event.getOption(BOOL_OPTION_NAME);
+        OptionMapping eventValueOption = event.getOption(EVENT_TOGGLE_OPTION_NAME);
         return eventValueOption != null && eventValueOption.getAsBoolean();
     }
 }

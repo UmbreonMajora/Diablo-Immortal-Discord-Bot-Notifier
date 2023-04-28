@@ -44,6 +44,7 @@ public class CreateMessageCommand implements IClientCommand {
 
         String weekdayRawName = getWeekday(event);
         Weekday weekday = Weekday.findWeekdayByRawName(weekdayRawName);
+        assert weekday != null : "Weekday is null!";
 
         if (!isTimeValid(getTime(event), logInfo)) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-TIME-INVALID"));
@@ -105,7 +106,7 @@ public class CreateMessageCommand implements IClientCommand {
     }
 
     private boolean getRepeating(SlashCommandInteractionEvent event) {
-        OptionMapping repeatingOption = event.getOption(BOOL_OPTION_NAME);
+        OptionMapping repeatingOption = event.getOption(MESSAGE_REPEATING_BOOL);
         return repeatingOption != null && repeatingOption.getAsBoolean();
     }
 

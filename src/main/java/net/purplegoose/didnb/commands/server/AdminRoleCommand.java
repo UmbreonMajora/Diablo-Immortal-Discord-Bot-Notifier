@@ -13,7 +13,7 @@ import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.ROLE_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.ADMIN_ROLE_OPTION_NAME;
 
 /**
  * @author Umbreon Majora
@@ -56,7 +56,7 @@ public class AdminRoleCommand implements IClientCommand {
     }
 
     private Role getNewBotAdminRole(SlashCommandInteractionEvent event) {
-        OptionMapping roleOption = event.getOption(ROLE_OPTION_NAME);
+        OptionMapping roleOption = event.getOption(ADMIN_ROLE_OPTION_NAME);
         return roleOption != null ? roleOption.getAsRole() : null;
     }
 }

@@ -128,4 +128,9 @@ public class ClientGuild {
         return customNotifications.size();
     }
 
+    // custom messages
+
+    public boolean doCustomMessageExists(String customMessageID) {
+        return customNotifications.containsKey(customMessageID);
+    }
 }

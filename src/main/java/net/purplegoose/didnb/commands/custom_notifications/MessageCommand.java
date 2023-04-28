@@ -15,6 +15,9 @@ import net.purplegoose.didnb.utils.StringUtil;
 
 import java.util.Objects;
 
+import static net.purplegoose.didnb.utils.CommandsUtil.ACTIVATION_BOOL;
+import static net.purplegoose.didnb.utils.CommandsUtil.MESSAGE_ID_OPTION_NAME;
+
 /**
  * @author Umbreon Majora
  * Allow's user to enable or disable custom notification messages.
@@ -56,12 +59,12 @@ public class MessageCommand implements IClientCommand {
     }
 
     private boolean getMessageValue(SlashCommandInteractionEvent event) {
-        OptionMapping messageValueOption = event.getOption("messagevalue");
+        OptionMapping messageValueOption = event.getOption(ACTIVATION_BOOL);
         return messageValueOption != null && messageValueOption.getAsBoolean();
     }
 
     private String getMessageID(SlashCommandInteractionEvent event) {
-        OptionMapping messageIdOption = event.getOption("messageid");
+        OptionMapping messageIdOption = event.getOption(MESSAGE_ID_OPTION_NAME);
         return messageIdOption != null ? messageIdOption.getAsString() : StringUtil.FAILED_MESSAGE;
     }
 

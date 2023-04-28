@@ -9,14 +9,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.purplegoose.didnb.annotations.CommandAnnotation;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
-import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.ROLE_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.COMMAND_MENTION_ROLE;
 
 @Slf4j
 @AllArgsConstructor
@@ -67,7 +66,7 @@ public class MentionRoleCommand implements IClientCommand {
     }
 
     private Role getMentionRole(SlashCommandInteractionEvent event) {
-        OptionMapping mentionRoleOption = event.getOption(ROLE_OPTION_NAME);
+        OptionMapping mentionRoleOption = event.getOption(COMMAND_MENTION_ROLE);
         return mentionRoleOption != null ? mentionRoleOption.getAsRole() : null;
     }
 }

@@ -5,14 +5,14 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.CustomNotification;
+import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
-public class CustomMessagesNotifier {
+public class CustomMessagesNotifier extends NotifierHelper {
 
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
@@ -46,12 +46,20 @@ public class CustomMessagesNotifier {
                         TextChannel textChannel = jda.getTextChannelById(channel);
                         String message = customNotification.getMessage();
 
-                        if (clientGuild.isAutoDeleteEnabled() && textChannel != null) {
+                        assert textChannel != null : "Text Channel is null.";
+
+                        // mention
+                        NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID)
+                                .getNotificationChannel(textChannel.getId());
+                        StringBuilder sb = new StringBuilder(message);
+                        addMessageMention(sb, notificationChannel, textChannel.getGuild());
+
+                        if (clientGuild.isAutoDeleteEnabled()) {
                             int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
                             sendMessageWithAutoDelete(textChannel, message, autoDeleteTimeInHours);
                         }
 
-                        if (!clientGuild.isAutoDeleteEnabled() && textChannel != null) {
+                        if (!clientGuild.isAutoDeleteEnabled()) {
                             sendMessageWithoutAutoDelete(textChannel, message);
                         }
 
@@ -62,16 +70,7 @@ public class CustomMessagesNotifier {
                     }
                 }
             }
-        }, TimeUtil.getNextFullMinute(), 60 * 1000);
-    }
-
-    private void sendMessageWithAutoDelete(TextChannel textChannel, String messageContext, int deleteTimeInHours) {
-        textChannel.sendMessage(messageContext).queue(message ->
-                message.delete().queueAfter(deleteTimeInHours, TimeUnit.HOURS));
-    }
-
-    private void sendMessageWithoutAutoDelete(TextChannel textChannel, String messageContext) {
-        textChannel.sendMessage(messageContext).queue();
+        }, TimeUtil.getNextFullMinute(), 60L * 1000L);
     }
 
     private boolean isTimeValid(String timezone, String day, String time, String fullTime) {
