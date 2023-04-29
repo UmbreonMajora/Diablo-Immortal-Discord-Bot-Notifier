@@ -30,7 +30,6 @@ REACTION-ROLE-CREATED: "Se ha creado un nuevo rol de reacción, usa /reactionrol
 REMOVE-REACTION-ROLE-FAILED-MESSAGE-ID-NULL: "Error al eliminar el rol de reacción. El ID del mensaje estaba vacío."
 REMOVE-REACTION-ROLE-FAILED-EMOTE-NULL: "Error al crear un nuevo rol de reacción. El emoji estaba vacío."
 REACTION-ROLE-REMOVED: "Se ha eliminado el rol de reacción del mensaje."
-CHANGE-BOT-ADMIN-ROLE-FAILED-ROLE-NULL: "Error al cambiar el rol de administrador del bot. El nuevo rol no es válido."
 CHANGED-BOT-ADMIN-ROLE: "Rol de administrador de bot cambiado. El nuevo rol de administrador es %s"
 CHANGE-TIMEZONE-FAILED-INVALID: "Error al cambiar la zona horaria. Nueva zona horaria no es válida."
 CHANGE-TIMEZONE-FAILED-NULL: "Error al cambiar la zona horaria. La nueva zona horaria es nula."
