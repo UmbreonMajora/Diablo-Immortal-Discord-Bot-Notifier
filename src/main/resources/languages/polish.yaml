@@ -30,7 +30,6 @@ REACTION-ROLE-CREATED: "Utworzono nową rolę reakcji użyj /reactionroleslist, 
 REMOVE-REACTION-ROLE-FAILED-MESSAGE-ID-NULL: "Nie udało się usunąć roli reakcji. ID wiadomości było puste."
 REMOVE-REACTION-ROLE-FAILED-EMOTE-NULL: "Nie udało się usunąć roli reakcji. Emotka była pusta."
 REACTION-ROLE-REMOVED: "Usunięto rolę reakcji z wiadomości."
-CHANGE-BOT-ADMIN-ROLE-FAILED-ROLE-NULL: "Nie udało się zmienić roli administratora bota. Nowa rola jest nieprawidłowa."
 CHANGED-BOT-ADMIN-ROLE: "Zmieniono rolę administratora bota. Nowa rola administratora to %s"
 CHANGE-TIMEZONE-FAILED-INVALID: "Nie udało się zmienić strefy czasowej. Nowa strefa czasowa jest nieprawidłowa."
 CHANGE-TIMEZONE-FAILED-NULL: "Nie udało się zmienić strefy czasowej. Nowa strefa czasowa była pusta."

@@ -27,7 +27,6 @@ REMOVE-REACTION-ROLE-FAILED-MESSAGE-ID-NULL: "Failed to remove reaction role. Th
 REMOVE-REACTION-ROLE-FAILED-EMOTE-NULL: "Failed to remove reaction role. The emote was empty." 
 REACTION-ROLE-REMOVED: "Removed reaction role from message."
 
-CHANGE-BOT-ADMIN-ROLE-FAILED-ROLE-NULL: "Failed to change bot admin role. The new role was invalid." 
 CHANGED-BOT-ADMIN-ROLE: "Bot Admin role changed. New Admin role is %s" 
 CHANGE-TIMEZONE-FAILED-INVALID: "Failed to change timezone. New timezone was invalid." 
 CHANGE-TIMEZONE-FAILED-NULL: "Failed to change timezone. New timezone was null." 

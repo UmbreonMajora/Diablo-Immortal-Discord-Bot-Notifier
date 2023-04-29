@@ -30,7 +30,6 @@ REACTION-ROLE-CREATED: "Um novo cargo por emoji foi criado. use /reactionrolesli
 REMOVE-REACTION-ROLE-FAILED-MESSAGE-ID-NULL: "Falha ao excluir o cargo por emoji. O ID da mensagem estava vazio."
 REMOVE-REACTION-ROLE-FAILED-EMOTE-NULL: "Falha ao excluir o cargo por emoji. O emoji não foi inserido."
 REACTION-ROLE-REMOVED: "O cargo por emoji foi excluído da mensagem."
-CHANGE-BOT-ADMIN-ROLE-FAILED-ROLE-NULL: "Falha ao alterar o cargo de administrador do bot. O novo cargo é inválido."
 CHANGED-BOT-ADMIN-ROLE: "Cargo de administrador do bot alterado. O novo cargo de administrador é %s"
 CHANGE-TIMEZONE-FAILED-INVALID: "Falha ao mudar o fuso horário. Novo fuso horário é inválido."
 CHANGE-TIMEZONE-FAILED-NULL: "Falha ao mudar o fuso horário. Novo fuso horário é nulo."
