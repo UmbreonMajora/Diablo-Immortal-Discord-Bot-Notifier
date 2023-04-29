@@ -9,6 +9,8 @@ import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
+import net.purplegoose.didnb.enums.Language;
+import net.purplegoose.didnb.languages.LanguageController;
 
 import static net.purplegoose.didnb.utils.CommandsUtil.WARN_TIME_OPTION_NAME;
 
@@ -32,25 +34,25 @@ public class WarnTimeCommand implements IClientCommand {
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
         int newWarnTime = getWarnTime(event);
+        ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
+        Language language = clientGuild.getGuildLanguage();
 
         if (newWarnTime == INVALID_NEW_WARNTIME) {
             log.error("{} used /warntime. Error: Time was not in the given range. Guild: {}({}). Channel: {}({})",
                     logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(),
                     logInfo.getChannelID());
-            //todo: new error message for invalid new warntime
-            replyEphemeralToUser(event, "Invalid new warntime.");
+            replyEphemeralToUser(event, LanguageController.getMessage(language, "INVALID-WARN-TIME"));
             return;
         }
 
-        ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
+
         int oldWarnTime = clientGuild.getWarnTimeInMinutes();
         updateWarnTime(clientGuild, newWarnTime);
 
         log.info("{} used /warntime. Old warn time: {}. New warn time: {}. Guild: {}({}). Channel: {}({})",
                 logInfo.getExecutor(), oldWarnTime, newWarnTime, logInfo.getGuildName(), guildID, logInfo.getChannelName(),
                 logInfo.getChannelID());
-        //todo: update message for new warntime
-        replyEphemeralToUser(event, "Warn time changed to " + newWarnTime);
+        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "UPDATED-WARN-TIME"), newWarnTime));
     }
 
     private void updateWarnTime(ClientGuild clientGuild, int warntime) {

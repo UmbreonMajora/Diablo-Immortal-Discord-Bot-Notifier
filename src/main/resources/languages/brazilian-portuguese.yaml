@@ -127,3 +127,6 @@ EVENT-SHADOW-WAR-WARN: "The doors to the Shadow wars have opened!"
 EVENT-SHADOW-WAR: "The Shadow War has begun."
 # Added with Issue "Add a seperate error message"
 CUSTOM-MESSAGE-WITH-ID-NONEXISTENT: "Custom Message with ID %s does not exists."
+# Added with issue #10: No error message for invalid new warntime #10
+INVALID-WARN-TIME: "The time was not in the given range. (1 - 15)"
+UPDATED-WARN-TIME: "Your new warn time is now %s minutes."
