@@ -10,6 +10,7 @@ import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.gameevents.*;
+import net.purplegoose.didnb.gameevents.embedded.HauntedCarriageEmbed;
 import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
@@ -31,6 +32,8 @@ public class Notifier extends NotifierHelper {
     private final DemonGatesEvent demonGatesEvent;
     private final OnSlaughtEvent onSlaughtEvent;
     private final TowerOfVictoryEvent towerOfVictoryEvent;
+    // Embedded
+    private final HauntedCarriageEmbed hauntedCarriageEmbed;
 
     public Notifier(GuildsCache guildsCache, GameDataCache gameDataCache, ErrorCache errorCache) {
         this.guildsCache = guildsCache;
@@ -47,6 +50,8 @@ public class Notifier extends NotifierHelper {
         this.demonGatesEvent = new DemonGatesEvent(gameDataCache);
         this.onSlaughtEvent = new OnSlaughtEvent(gameDataCache);
         this.towerOfVictoryEvent = new TowerOfVictoryEvent(gameDataCache);
+        // Embedded
+        this.hauntedCarriageEmbed = new HauntedCarriageEmbed(gameDataCache);
     }
 
     public void runNotificationScheduler(JDA client) {
@@ -73,6 +78,8 @@ public class Notifier extends NotifierHelper {
                         notificationMessage.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
                         notificationMessage.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
                         notificationMessage.append(towerOfVictoryEvent.appendTowerOfVictoryNotificationIfHappening(clientGuild, channel));
+
+                        hauntedCarriageEmbed.sendHauntedCarriageEmbedIfHappening(clientGuild, channel, client);
 
                         TextChannel textChannel = client.getTextChannelById(channel.getTextChannelID());
 

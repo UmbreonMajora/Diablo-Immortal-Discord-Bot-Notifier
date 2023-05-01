@@ -31,7 +31,7 @@ public class ShadowLotteryEvent implements IGameEvent {
         }
 
         Set<EventGameData> eventGameDataSet = gameDataCache.getShadowLotteryDataSet();
-        String timeZone = guild.getGuildTimeZone();
+        String timeZone = guild.getTimeZone();
         Language language = guild.getGuildLanguage();
 
         if (!isTimeInWarnRange(eventGameDataSet, timeZone).equals(EMPTY_STRING)) {

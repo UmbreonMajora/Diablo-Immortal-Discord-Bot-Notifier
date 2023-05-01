@@ -32,7 +32,7 @@ public class HauntedCarriageEvent implements IGameEvent {
         }
 
         Set<EventGameData> eventGameDataSet = gameDataCache.getHauntedCarriageDataSet();
-        String timeZone = guild.getGuildTimeZone();
+        String timeZone = guild.getTimeZone();
         Language language = guild.getGuildLanguage();
 
         if (!isTimeInWarnRange(eventGameDataSet, timeZone).equals(EMPTY_STRING)) {

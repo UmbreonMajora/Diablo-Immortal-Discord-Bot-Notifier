@@ -1,6 +1,7 @@
 package net.purplegoose.didnb;
 
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.purplegoose.didnb.annotations.GameDataCacheSet;
@@ -15,9 +16,12 @@ import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
 import net.purplegoose.didnb.utils.ConfigUtil;
+import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+
+import static net.purplegoose.didnb.utils.TimeUtil.HOURS_IN_SECONDS;
 
 @Slf4j
 public class DiabloImmortalDiscordNotifier {

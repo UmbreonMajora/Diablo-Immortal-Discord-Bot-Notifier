@@ -52,7 +52,7 @@ public class ConfigCommand implements IClientCommand {
         String languageRawName = clientGuild.getGuildLanguage().rawName;
         embed.addField("Language:", languageRawName, true);
 
-        String timeZone = clientGuild.getGuildTimeZone();
+        String timeZone = clientGuild.getTimeZone();
         embed.addField("TimeZone:", timeZone, true);
 
         String adminRoleID = clientGuild.getGuildAdminRoleID();

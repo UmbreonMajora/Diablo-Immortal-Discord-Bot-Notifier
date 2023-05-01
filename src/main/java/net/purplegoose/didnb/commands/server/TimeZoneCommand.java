@@ -55,7 +55,7 @@ public class TimeZoneCommand implements IClientCommand {
         }
 
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
-        String oldTimeZone = clientGuild.getGuildTimeZone();
+        String oldTimeZone = clientGuild.getTimeZone();
         updateTimeZone(clientGuild, newTimeZone);
 
         log.info("{} used /timezone. Old timezone: {}. New timezone {}. Guild: {}({}). Channel: {}({})",
@@ -66,7 +66,7 @@ public class TimeZoneCommand implements IClientCommand {
     }
 
     private void updateTimeZone(ClientGuild clientGuild, String timeZone) {
-        clientGuild.setGuildTimeZone(timeZone);
+        clientGuild.setTimeZone(timeZone);
         databaseRequests.updateGuild(clientGuild);
     }
 

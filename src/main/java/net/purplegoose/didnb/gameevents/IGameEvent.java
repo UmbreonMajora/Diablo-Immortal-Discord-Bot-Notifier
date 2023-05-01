@@ -60,10 +60,21 @@ public interface IGameEvent {
         String currentTimeAsString = TimeUtil.getTime(timeZone);
 
         for (EventGameData data : eventGameDataSet) {
-            if (data.getWeekday() == null || data.getWeekday().equalsIgnoreCase(TimeUtil.getCurrentWeekday(timeZone))) {
-                if (currentTimeAsString.equals(data.getEventStartTime())) {
-                    return true;
-                }
+            if (data.getWeekday() == null ||
+                    data.getWeekday().equalsIgnoreCase(TimeUtil.getCurrentWeekday(timeZone)) &&
+                            (currentTimeAsString.equals(data.getEventStartTime()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    default boolean isEventAboutToStart(Set<EventGameData> eventGameDataSet, String time, String weekday) {
+        for (EventGameData data : eventGameDataSet) {
+            if (data.getWeekday() == null ||
+                    data.getWeekday().equalsIgnoreCase(weekday) &&
+                            (time.equals(data.getEventStartTime()))) {
+                return true;
             }
         }
         return false;

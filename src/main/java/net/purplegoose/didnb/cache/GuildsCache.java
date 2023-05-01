@@ -15,7 +15,7 @@ public class GuildsCache {
     }
 
     public String getGuildTimeZone(String guildID) {
-        return guilds.get(guildID).getGuildTimeZone();
+        return guilds.get(guildID).getTimeZone();
     }
 
     public String getGuildAdminRoleID(String guildID) {

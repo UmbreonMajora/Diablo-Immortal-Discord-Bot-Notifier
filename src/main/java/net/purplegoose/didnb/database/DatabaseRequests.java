@@ -161,7 +161,7 @@ public class DatabaseRequests {
         ) {
             preparedStatement.setString(1, clientGuild.getGuildID());
             preparedStatement.setString(2, clientGuild.getGuildLanguage().shortName);
-            preparedStatement.setString(3, clientGuild.getGuildTimeZone());
+            preparedStatement.setString(3, clientGuild.getTimeZone());
             preparedStatement.setBoolean(4, clientGuild.isWarnMessagesEnabled());
             preparedStatement.setBoolean(5, clientGuild.isEventMessageEnabled());
             preparedStatement.setBoolean(6, clientGuild.isDaylightTimeEnabled());
@@ -179,7 +179,7 @@ public class DatabaseRequests {
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getUpdateGuildStatement())
         ) {
             preparedStatement.setString(1, clientGuild.getGuildLanguage().shortName);
-            preparedStatement.setString(2, clientGuild.getGuildTimeZone());
+            preparedStatement.setString(2, clientGuild.getTimeZone());
             preparedStatement.setBoolean(3, clientGuild.isWarnMessagesEnabled());
             preparedStatement.setBoolean(4, clientGuild.isEventMessageEnabled());
             preparedStatement.setString(5, clientGuild.getGuildAdminRoleID());
