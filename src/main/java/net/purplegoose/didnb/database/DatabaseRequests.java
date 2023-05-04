@@ -72,10 +72,11 @@ public class DatabaseRequests {
                     boolean isPremiumServer = (resultSet.getInt("premium_server") == 1);
                     int autoDeleteTimeInHours = resultSet.getInt("auto_delete_time");
                     boolean isAutoDeleteEnabled = (resultSet.getInt("auto_delete") == 1);
+                    long embedLeadTime = resultSet.getLong("embed_lead_time");
 
                     ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime,
                             isWarnMessagesEnabled, isEventMessagesEnabled, isDaylightTimeEnabled, isPremiumServer,
-                            autoDeleteTimeInHours, isAutoDeleteEnabled);
+                            autoDeleteTimeInHours, isAutoDeleteEnabled, embedLeadTime);
                     clientGuildData.put(guildID, clientGuild);
                 }
             }

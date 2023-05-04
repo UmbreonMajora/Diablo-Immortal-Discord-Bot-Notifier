@@ -19,14 +19,14 @@ import static net.purplegoose.didnb.utils.TimeUtil.HOURS_IN_SECONDS;
 
 @Slf4j
 @AllArgsConstructor
-public class HauntedCarriageEmbed implements IGameEvent {
+public class AncientNightmareEmbed implements IGameEvent {
 
     private final GameDataCache gameDataCache;
 
-    public void sendHauntedCarriageEmbedIfHappening(ClientGuild guild, NotificationChannel channel, JDA client) {
-        if (!channel.isHauntedCarriageMessageEmbedEnabled()) return;
+    public void sendAncientNightmareEmbedIfHappening(ClientGuild guild, NotificationChannel channel, JDA client) {
+        if (!channel.isAncientNightmareMessageEmbedEnabled()) return;
 
-        Set<EventGameData> eventGameDataSet = gameDataCache.getHauntedCarriageDataSet();
+        Set<EventGameData> eventGameDataSet = gameDataCache.getAncientNightmareDataSet();
         String timeZone = guild.getTimeZone();
         long embedLeadTime = guild.getEmbedLeadTime();
         String time = TimeUtil.getCurrentTimeMinusGivenHours(timeZone, embedLeadTime);
@@ -38,21 +38,21 @@ public class HauntedCarriageEmbed implements IGameEvent {
                         guild.getGuildID(), channel.getTextChannelID());
                 return;
             }
-            textChannel.sendMessageEmbeds(createHauntedCarriageEmbed(timeZone, embedLeadTime)).queue();
+            textChannel.sendMessageEmbeds(createAncientNightmareEmbed(timeZone, embedLeadTime)).queue();
         }
     }
 
-    private MessageEmbed createHauntedCarriageEmbed(String timeZone, long leadTime) {
+    private MessageEmbed createAncientNightmareEmbed(String timeZone, long leadTime) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
         long unix = TimeUtil.getCurrentUnixTime(timeZone) + (HOURS_IN_SECONDS * leadTime);
 
-        embedBuilder.setTitle("Haunted Carriage | World Event");
+        embedBuilder.setTitle("Ancient Nightmare | World Event");
         embedBuilder.addField("Start time:", "<t:" + unix + ">", true);
         embedBuilder.addField("Time till start:", "<t:" + unix + ":R>", true);
-        embedBuilder.addField("World Ashwold Cemetery", "Carriage Landing", false);
+        embedBuilder.addField("World Mount Zavian", "Misty Valley", false);
 
-        embedBuilder.setImage("https://assets.maxroll.gg/wordpress/ZoneEvents_Ashwold_v1.1.jpg");
+        embedBuilder.setImage("https://assets.maxroll.gg/wordpress/ZoneEvents_Ancient_v1.1.jpg");
 
         return embedBuilder.build();
     }

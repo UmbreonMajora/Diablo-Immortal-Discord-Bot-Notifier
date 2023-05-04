@@ -19,14 +19,14 @@ import static net.purplegoose.didnb.utils.TimeUtil.HOURS_IN_SECONDS;
 
 @Slf4j
 @AllArgsConstructor
-public class HauntedCarriageEmbed implements IGameEvent {
+public class DemonGatesEmbed implements IGameEvent {
 
     private final GameDataCache gameDataCache;
 
-    public void sendHauntedCarriageEmbedIfHappening(ClientGuild guild, NotificationChannel channel, JDA client) {
-        if (!channel.isHauntedCarriageMessageEmbedEnabled()) return;
+    public void sendDemonGatesEmbedIfHappening(ClientGuild guild, NotificationChannel channel, JDA client) {
+        if (!channel.isDemonGatesMessageEmbedEnabled()) return;
 
-        Set<EventGameData> eventGameDataSet = gameDataCache.getHauntedCarriageDataSet();
+        Set<EventGameData> eventGameDataSet = gameDataCache.getDemonGatesDataSet();
         String timeZone = guild.getTimeZone();
         long embedLeadTime = guild.getEmbedLeadTime();
         String time = TimeUtil.getCurrentTimeMinusGivenHours(timeZone, embedLeadTime);
@@ -38,21 +38,21 @@ public class HauntedCarriageEmbed implements IGameEvent {
                         guild.getGuildID(), channel.getTextChannelID());
                 return;
             }
-            textChannel.sendMessageEmbeds(createHauntedCarriageEmbed(timeZone, embedLeadTime)).queue();
+            textChannel.sendMessageEmbeds(createDemonGatesEmbed(timeZone, embedLeadTime)).queue();
         }
     }
 
-    private MessageEmbed createHauntedCarriageEmbed(String timeZone, long leadTime) {
+    private MessageEmbed createDemonGatesEmbed(String timeZone, long leadTime) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
         long unix = TimeUtil.getCurrentUnixTime(timeZone) + (HOURS_IN_SECONDS * leadTime);
 
-        embedBuilder.setTitle("Haunted Carriage | World Event");
+        embedBuilder.setTitle("Demon Gates | World Event");
         embedBuilder.addField("Start time:", "<t:" + unix + ">", true);
         embedBuilder.addField("Time till start:", "<t:" + unix + ":R>", true);
-        embedBuilder.addField("World Ashwold Cemetery", "Carriage Landing", false);
+        embedBuilder.addField("World Realm of Damnation", "Realm of Damnation", false);
 
-        embedBuilder.setImage("https://assets.maxroll.gg/wordpress/ZoneEvents_Ashwold_v1.1.jpg");
+        embedBuilder.setImage("https://media.diablofans.com/attachments/23/560/screenshot-2022-05-28-204043.jpg");
 
         return embedBuilder.build();
     }

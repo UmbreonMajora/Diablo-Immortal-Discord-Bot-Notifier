@@ -91,7 +91,7 @@ public class TimeUtil {
         return Instant.now().atZone(ZoneId.of(timeZoneId)).toEpochSecond();
     }
 
-    public static String getCurrentTimeMinusGivenHours(String timeZoneId, int hours) {
+    public static String getCurrentTimeMinusGivenHours(String timeZoneId, long hours) {
         return LocalTime.now(ZoneId.of(timeZoneId)).minusHours(hours).toString();
     }
 

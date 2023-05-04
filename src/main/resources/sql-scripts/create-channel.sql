@@ -7,7 +7,15 @@ INSERT INTO channel_notification (textChannelID,
                                   ancientnightmare,
                                   assembly,
                                   battlegrounds,
-                                  vault, demongates, shadowlottery, hauntedcarriage,
-                                  demongatesembed, ancientarenaembed, hauntedcarriageembed, ancientnightmareembed,
-                                  wrathborneinvasion, tower_of_victory_enabled, shadow_war_enabled)
+                                  vault,
+                                  demongates,
+                                  shadowlottery,
+                                  hauntedcarriage,
+                                  demongatesembed,
+                                  ancientarenaembed,
+                                  hauntedcarriageembed,
+                                  ancientnightmareembed,
+                                  wrathborneinvasion,
+                                  tower_of_victory_enabled,
+                                  shadow_war_enabled)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
