@@ -71,7 +71,7 @@ public class DatabaseRequests {
                     boolean isDaylightTimeEnabled = (resultSet.getInt("daylight_time_enabled") == 1);
                     boolean isPremiumServer = (resultSet.getInt("premium_server") == 1);
                     int autoDeleteTimeInHours = resultSet.getInt("auto_delete_time");
-                    boolean isAutoDeleteEnabled = (resultSet.getInt("auto_delete") == 1);
+                    boolean isAutoDeleteEnabled = (resultSet.getInt("auto_delete_enabled") == 1);
                     long embedLeadTime = resultSet.getLong("embed_lead_time");
 
                     ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime,
@@ -167,6 +167,7 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(5, clientGuild.isEventMessageEnabled());
             preparedStatement.setBoolean(6, clientGuild.isDaylightTimeEnabled());
             preparedStatement.setBoolean(7, clientGuild.isPremiumServer());
+            preparedStatement.setLong(8, clientGuild.getEmbedLeadTime());
             preparedStatement.executeUpdate();
             log.info("Registered new guild in database! GuildID: " + clientGuild.getGuildID());
         } catch (SQLException e) {
@@ -189,7 +190,8 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(8, clientGuild.isPremiumServer());
             preparedStatement.setBoolean(9, clientGuild.isAutoDeleteEnabled());
             preparedStatement.setInt(10, clientGuild.getAutoDeleteTimeInHours());
-            preparedStatement.setString(11, clientGuild.getGuildID());
+            preparedStatement.setLong(11, clientGuild.getEmbedLeadTime());
+            preparedStatement.setString(12, clientGuild.getGuildID());
             preparedStatement.executeUpdate();
             log.info("Updated " + clientGuild.getGuildID() + " in database.");
         } catch (SQLException e) {
@@ -330,8 +332,9 @@ public class DatabaseRequests {
             preparedStatement.setBoolean(13, notificationChannel.isAncientNightmareMessageEmbedEnabled());
             preparedStatement.setBoolean(14, notificationChannel.isHauntedCarriageMessageEmbedEnabled());
             preparedStatement.setBoolean(15, notificationChannel.isWrathborneInvasionEnabled());
-            preparedStatement.setBoolean(16, notificationChannel.isShadowWarMessagesEnabled());
-            preparedStatement.setString(17, notificationChannel.getTextChannelID());
+            preparedStatement.setBoolean(16, notificationChannel.isTowerOfVictoryMessagesEnabled());
+            preparedStatement.setBoolean(17, notificationChannel.isShadowWarMessagesEnabled());
+            preparedStatement.setString(18, notificationChannel.getTextChannelID());
             preparedStatement.executeUpdate();
             log.info("Updated Notification Channel on guild " + notificationChannel.getGuildID() + " with channel id " +
                     notificationChannel.getTextChannelID());

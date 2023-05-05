@@ -9,6 +9,9 @@ jar {
         )
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 group 'net.purplegoose.didnb'
@@ -20,25 +23,30 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.1'
+    // https://mvnrepository.com/artifact/net.dv8tion/JDA
+    implementation group: 'net.dv8tion', name: 'JDA', version: '5.0.0-beta.9'
+    // https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+    implementation group: 'com.mysql', name: 'mysql-connector-j', version: '8.0.33'
+    // https://mvnrepository.com/artifact/org.yaml/snakeyaml
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+
 
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.6'
-    implementation 'net.dv8tion:JDA:5.0.0-alpha.22'
-    implementation 'mysql:mysql-connector-java:8.0.31'
-    implementation 'org.yaml:snakeyaml:1.33'
-    implementation 'commons-io:commons-io:2.11.0'
+    implementation group: 'org.slf4j', name: 'log4j-over-slf4j', version: '2.0.6'
+
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.4.5'
 
     implementation 'org.projectlombok:lombok:1.18.24'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    implementation group: 'org.slf4j', name: 'log4j-over-slf4j', version: '2.0.6'
-
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.1.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.1.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 }
 
 test {

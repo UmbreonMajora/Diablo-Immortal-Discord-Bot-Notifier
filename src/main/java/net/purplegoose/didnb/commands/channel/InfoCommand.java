@@ -20,8 +20,7 @@ import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.lang.reflect.Field;
 
-import static net.purplegoose.didnb.utils.StringUtil.DISABLE_MESSAGE;
-import static net.purplegoose.didnb.utils.StringUtil.ENABLED_MESSAGE;
+import static net.purplegoose.didnb.utils.StringUtil.*;
 
 @Slf4j
 @AllArgsConstructor
@@ -81,6 +80,7 @@ public class InfoCommand implements IClientCommand {
         embedBuilder.setDescription(description);
         embedBuilder.addField(getGeneralField(notificationChannel));
         embedBuilder.addField(getNotificationsField(notificationChannel));
+        embedBuilder.addField(getEmbedNotificationsField(notificationChannel));
         embedBuilder.setFooter("purplegoose.net");
 
         return embedBuilder.build();
@@ -94,6 +94,9 @@ public class InfoCommand implements IClientCommand {
     }
 
     private String getMentionRoleContext(TextChannel textChannel, String mentionRoleID) {
+        if (mentionRoleID == null) {
+            return "None" + StringUtil.NEW_LINE;
+        }
         if (StringUtil.isStringOnlyContainingNumbers(mentionRoleID)) {
             Role mentionRole = textChannel.getGuild().getRoleById(mentionRoleID);
             if (mentionRole == null) {
@@ -121,6 +124,17 @@ public class InfoCommand implements IClientCommand {
             }
         }
         return new MessageEmbed.Field("Events", sb.toString(), false);
+    }
+
+    private MessageEmbed.Field getEmbedNotificationsField(NotificationChannel channel) {
+        String string = "Ancient Arena: " + (channel.isAncientArenaMessageEmbedEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
+                NEW_LINE +
+                "Demon Gates: " + (channel.isDemonGatesMessageEmbedEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
+                NEW_LINE +
+                "Ancient Nightmare: " + (channel.isAncientNightmareMessageEmbedEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
+                NEW_LINE +
+                "Haunted Carriage:" + (channel.isHauntedCarriageMessageEmbedEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE);
+        return new MessageEmbed.Field("Embeds", string, false);
     }
 
 }

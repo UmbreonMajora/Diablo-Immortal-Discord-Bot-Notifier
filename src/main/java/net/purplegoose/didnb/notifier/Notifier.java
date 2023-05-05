@@ -18,6 +18,7 @@ import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
 @Slf4j
 public class Notifier extends NotifierHelper {
 
@@ -76,8 +77,22 @@ public class Notifier extends NotifierHelper {
 
                     for (NotificationChannel channel : clientGuild.getAllNotificationChannels()) {
                         StringBuilder notificationMessage = new StringBuilder();
-                        appendNotificationMessageIfHappening(notificationMessage, clientGuild, channel);
-                        sendEmbedMessages(clientGuild, channel, client);
+                        notificationMessage.append(vaultEvent.appendVaultNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(battlegroundEvent.appendBattlegroundsNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(ancientArenaEvent.appendAncientArenaNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(demonGatesEvent.appendDemonGatesNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(assemblyEvent.appendAssemblyNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(hauntedCarriageEvent.appendHauntedCarriageNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(ancientNightmareEvent.appendAncientNightmareNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(shadowLotteryEvent.appendShadowLotteryNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
+                        notificationMessage.append(towerOfVictoryEvent.appendTowerOfVictoryNotificationIfHappening(clientGuild, channel));
+
+                        hauntedCarriageEmbed.sendHauntedCarriageEmbedIfHappening(clientGuild, channel, client);
+                        demonGatesEmbed.sendDemonGatesEmbedIfHappening(clientGuild, channel, client);
+                        ancientArenaEmbed.sendAncientArenaEmbedIfHappening(clientGuild, channel, client);
+                        ancientNightmareEmbed.sendAncientNightmareEmbedIfHappening(clientGuild, channel, client);
 
                         TextChannel textChannel = client.getTextChannelById(channel.getTextChannelID());
 
@@ -96,52 +111,27 @@ public class Notifier extends NotifierHelper {
                         addMessageMention(notificationMessage, channel, textChannel.getGuild());
 
                         try {
-                            sendNotificationMessage(clientGuild, notificationMessage, textChannel);
+                            if (clientGuild.isAutoDeleteEnabled()) {
+                                int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
+                                sendMessageWithAutoDelete(textChannel, notificationMessage.toString(), autoDeleteTimeInHours);
+                            }
+
+                            if (!clientGuild.isAutoDeleteEnabled()) {
+                                sendMessageWithoutAutoDelete(textChannel, notificationMessage.toString());
+                            }
                         } catch (InsufficientPermissionException e) {
-                            log.error(e.getMessage(), e);
+                            log.error(e.getMessage());
                         }
 
-                        log.info("Sended notification message to " + channel.getTextChannelID());
+                        log.info("Sended notification message to channel: " + channel.getTextChannelID() + ", GuildID: " +
+                                clientGuild.getGuildID());
                     }
                 }
             }
         }, TimeUtil.getNextFullMinute(), 60L * 1000L);
     }
 
-    private void sendNotificationMessage(final ClientGuild clientGuild, final StringBuilder notificationMessage, final TextChannel textChannel) {
-        if (clientGuild.isAutoDeleteEnabled()) {
-            int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
-            sendMessageWithAutoDelete(textChannel, notificationMessage.toString(), autoDeleteTimeInHours);
-        }
-
-        if (!clientGuild.isAutoDeleteEnabled()) {
-            sendMessageWithoutAutoDelete(textChannel, notificationMessage.toString());
-        }
-    }
-
     private boolean isChannelCountZero(ClientGuild clientGuild) {
         return clientGuild.getNotificationChannelCount() == 0;
     }
-
-    private void sendEmbedMessages(ClientGuild clientGuild, NotificationChannel channel, JDA client) {
-        hauntedCarriageEmbed.sendHauntedCarriageEmbedIfHappening(clientGuild, channel, client);
-        demonGatesEmbed.sendDemonGatesEmbedIfHappening(clientGuild, channel, client);
-        ancientNightmareEmbed.sendAncientNightmareEmbedIfHappening(clientGuild, channel, client);
-        ancientArenaEmbed.sendAncientArenaEmbedIfHappening(clientGuild, channel, client);
-    }
-
-    private void appendNotificationMessageIfHappening(StringBuilder sb, ClientGuild clientGuild, NotificationChannel channel) {
-        sb.append(vaultEvent.appendVaultNotificationIfHappening(clientGuild, channel));
-        sb.append(battlegroundEvent.appendBattlegroundsNotificationIfHappening(clientGuild, channel));
-        sb.append(ancientArenaEvent.appendAncientArenaNotificationIfHappening(clientGuild, channel));
-        sb.append(demonGatesEvent.appendDemonGatesNotificationIfHappening(clientGuild, channel));
-        sb.append(assemblyEvent.appendAssemblyNotificationIfHappening(clientGuild, channel));
-        sb.append(hauntedCarriageEvent.appendHauntedCarriageNotificationIfHappening(clientGuild, channel));
-        sb.append(ancientNightmareEvent.appendAncientNightmareNotificationIfHappening(clientGuild, channel));
-        sb.append(shadowLotteryEvent.appendShadowLotteryNotificationIfHappening(clientGuild, channel));
-        sb.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
-        sb.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
-        sb.append(towerOfVictoryEvent.appendTowerOfVictoryNotificationIfHappening(clientGuild, channel));
-    }
-
 }

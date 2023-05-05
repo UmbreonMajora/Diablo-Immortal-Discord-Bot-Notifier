@@ -25,10 +25,11 @@ public class HelpCommand implements IClientCommand {
                 .append("Diablo Immortal Discord Notifier Bot:")
                 .append(NEW_LINE)
                 .append(NEW_LINE);
+
         CommandsUtil.getCommandsProperties().forEach((command, description) ->
                 helpMessageBuilder.append("/").append(command)
                         .append(NEW_LINE)
-                        .append(description.toString())
+                        .append((description.toString() != null ? description : "FAILED"))
                         .append(NEW_LINE)
                         .append(NEW_LINE));
         helpMessageBuilder.append("Diablo Immortal Discord Notifier Bot created by Umbreon.")
