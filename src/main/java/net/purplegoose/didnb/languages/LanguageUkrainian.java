@@ -12,7 +12,8 @@ public class LanguageUkrainian {
 
     static {
         Yaml yaml = new Yaml();
-        InputStream inputStream = LanguageUkrainian.class.getClassLoader().getResourceAsStream(Language.UKRAINIAN.path);
+        InputStream inputStream = LanguageUkrainian.class.getClassLoader()
+                .getResourceAsStream(Language.UKRAINIAN.path);
         messages = yaml.load(inputStream);
     }
 

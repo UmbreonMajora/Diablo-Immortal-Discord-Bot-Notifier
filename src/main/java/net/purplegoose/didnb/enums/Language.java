@@ -7,10 +7,11 @@ public enum Language {
     INDONESIA("Indonesia", "IND", "languages/indonesia.yaml"),
     ITALIAN("Italian", "ITA", "languages/italian.yaml"),
     POLISH("Polish", "POL", "languages/polish.yaml"),
-    SPAIN("Spain", "ESP", "languages/spain.yaml"),
     UKRAINIAN("Ukrainian", "UKR", "languages/ukrainian.yaml"),
     RUSSIAN("Russia", "RUS", "languages/russian.yaml"),
-    BRAZILIAN_PORTUGUESE("Brazilian-Portuguese", "BRPT", "languages/brazilian-portuguese.yaml");
+    BRAZILIAN_PORTUGUESE("Brazilian-Portuguese", "BRPT", "languages/brazilian-portuguese.yaml"),
+    AMERICA_SPANISH("America-Spanish", "USA-ESP", "languages/america-spanish.yaml"),
+    SPAIN_SPANISH("Spain-Spanish", "ESP", "languages/spain-spanish.yaml");
 
     public final String rawName;
     public final String shortName;

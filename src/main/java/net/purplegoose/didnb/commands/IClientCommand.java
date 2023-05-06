@@ -17,11 +17,11 @@ public interface IClientCommand {
     }
 
     default void replyEphemeralToUser(SlashCommandInteractionEvent event, String message) {
-        event.getHook().sendMessage(message).setEphemeral(true).queue();
+        event.getHook().setEphemeral(true).sendMessage(message).queue();
     }
 
     default void replyEphemeralToUser(SlashCommandInteractionEvent event, MessageEmbed messageEmbed) {
-        event.getHook().sendMessageEmbeds(messageEmbed).setEphemeral(true).queue();
+        event.getHook().setEphemeral(true).sendMessageEmbeds(messageEmbed).queue();
     }
 
     default TextChannel getTargetTextChannel(SlashCommandInteraction event) {

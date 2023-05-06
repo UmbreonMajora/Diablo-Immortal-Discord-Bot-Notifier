@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS guilds
 (
     guildID                CHAR(20) PRIMARY KEY      NOT NULL,
-    language               CHAR(5)     DEFAULT 'ENG' NOT NULL,
+    language               CHAR(20)     DEFAULT 'ENG' NOT NULL,
     timezone               CHAR(10)    DEFAULT 'GMT' NOT NULL,
     warn_messages_enabled  TINYINT(1)  DEFAULT 1     NOT NULL,
     event_messages_enabled TINYINT(1)  DEFAULT 1     NOT NULL,

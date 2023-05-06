@@ -6,18 +6,18 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
 import java.util.Map;
 
-public class LanguagePolish {
+public class LanguageSpainSpanish {
 
     private static final Map<String, Object> messages;
 
     static {
         Yaml yaml = new Yaml();
-        InputStream inputStream = LanguagePolish.class.getClassLoader()
-                .getResourceAsStream(Language.POLISH.path);
+        InputStream inputStream = LanguageSpainSpanish.class.getClassLoader()
+                .getResourceAsStream(Language.SPAIN_SPANISH.path);
         messages = yaml.load(inputStream);
     }
 
-    private LanguagePolish() {
+    private LanguageSpainSpanish() {
         //All static methods.
     }
 

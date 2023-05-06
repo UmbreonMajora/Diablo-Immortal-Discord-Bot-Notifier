@@ -51,8 +51,9 @@ public class MentionRoleCommand implements IClientCommand {
         updateChannel(logInfo.getGuildID(), channel.getId(), mentionRole);
         if (mentionRole == null) {
             replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "MENTION-ROLE-DISABLED"), channel.getAsMention()));
+        } else {
+            replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CHANGED-MENTION-ROLE"), mentionRole, channel.getAsMention()));
         }
-        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CHANGED-MENTION-ROLE"), mentionRole, channel.getAsMention()));
     }
 
     private void updateChannel(String guildID, String targetTextChannelID, Role mentionRole) {
