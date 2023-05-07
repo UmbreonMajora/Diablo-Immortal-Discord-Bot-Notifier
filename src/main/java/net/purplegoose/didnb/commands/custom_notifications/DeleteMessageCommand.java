@@ -53,10 +53,10 @@ public class DeleteMessageCommand implements IClientCommand {
         }
 
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
-        if (clientGuild.doCustomMessageExists(customMessageID)) {
+        if (!clientGuild.doCustomMessageExists(customMessageID)) {
             log.error("{} used /deletemessage. Error: Custom message with id does not exist. Guild: {}({}). Channel: {}({})",
                     logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
-            replyEphemeralToUser(event, LanguageController.getMessage(language, "CUSTOM-MESSAGE-WITH-ID-NONEXISTENT"));
+            replyEphemeralToUser(event, LanguageController.getMessage(language, "CM-NOT-EXISTS"));
             return;
         }
 

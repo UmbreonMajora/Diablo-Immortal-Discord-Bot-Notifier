@@ -1,18 +1,25 @@
 package net.purplegoose.didnb.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.zone.ZoneRulesException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
+@Slf4j
 public class TimeUtil {
 
-    private static final String HOURS_MINUTE_FORMAT = "HH:mm";
+        private static final String HOURS_MINUTE_FORMAT = "HH:mm";
     private static final String WEEKDAY_FORMAT = "EEEE";
+    public static final int HOURS_IN_SECONDS = 3600;
 
     private TimeUtil() {
         // all static methods.
@@ -52,7 +59,7 @@ public class TimeUtil {
             return currentTimeDate.after(warnStartCalender.getTime()) &&
                     currentTimeDate.before(warnEndCalender.getTime());
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("Failed to check if time is in between.", e);
         }
         return false;
     }
@@ -75,9 +82,17 @@ public class TimeUtil {
             calendar.add(Calendar.DATE, 1);
             return calendar.getTime();
         } catch (ParseException e) {
-            e.printStackTrace();
+            log.error("Failed to get current time as calendar.", e);
         }
         return null;
+    }
+
+    public static long getCurrentUnixTime(String timeZoneId) {
+        return Instant.now().atZone(ZoneId.of(timeZoneId)).toEpochSecond();
+    }
+
+    public static String getCurrentTimeMinusGivenHours(String timeZoneId, long hours) {
+        return LocalTime.now(ZoneId.of(timeZoneId)).minusHours(hours).toString();
     }
 
 }

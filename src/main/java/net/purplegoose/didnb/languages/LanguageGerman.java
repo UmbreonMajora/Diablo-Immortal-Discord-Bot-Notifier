@@ -12,7 +12,8 @@ public class LanguageGerman {
 
     static {
         Yaml yaml = new Yaml();
-        InputStream inputStream = LanguageGerman.class.getClassLoader().getResourceAsStream(Language.GERMAN.path);
+        InputStream inputStream = LanguageGerman.class.getClassLoader()
+                .getResourceAsStream(Language.GERMAN.path);
         messages = yaml.load(inputStream);
     }
 

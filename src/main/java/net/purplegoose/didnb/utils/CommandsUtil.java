@@ -178,7 +178,7 @@ public class CommandsUtil {
     public static final String MENTION_ROLE_OPTION_NAME = "mentionrole";
     private static final OptionData MENTION_ROLE_OPTION =
             new OptionData(OptionType.ROLE, MENTION_ROLE_OPTION_NAME,
-                    "Enter here your role that should get mentioned.", true);
+                    "Enter here your role that should get mentioned.", false);
 
     static {
         COMMAND_MENTION_ROLE_DESC = commandsProperties.get(COMMAND_MENTION_ROLE).toString();

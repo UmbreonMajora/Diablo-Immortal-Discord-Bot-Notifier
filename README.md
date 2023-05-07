@@ -109,5 +109,11 @@ are few ways you can do it :-
 Thanks! <3
 
 ---
+Runtime Information:
+- Written in Java 17
 
-Written in Java 17
+Running the bot with registering every command to every guild:
+- screen java -jar Diablo-Immortal-Discord-Notifier-Bot-X.X.X.jar true
+
+Running the bot without registering every command to every guild:
+- screen java -jar Diablo-Immortal-Discord-Notifier-Bot-X.X.X.jar false

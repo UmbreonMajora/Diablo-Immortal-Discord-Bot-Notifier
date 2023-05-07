@@ -10,16 +10,21 @@ import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.gameevents.*;
+import net.purplegoose.didnb.gameevents.embedded.AncientArenaEmbed;
+import net.purplegoose.didnb.gameevents.embedded.AncientNightmareEmbed;
+import net.purplegoose.didnb.gameevents.embedded.DemonGatesEmbed;
+import net.purplegoose.didnb.gameevents.embedded.HauntedCarriageEmbed;
 import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
 @Slf4j
 public class Notifier extends NotifierHelper {
 
     private final GuildsCache guildsCache;
     private final ErrorCache errorCache;
-
+    // Notification Messages
     private final VaultEvent vaultEvent;
     private final AncientArenaEvent ancientArenaEvent;
     private final AncientNightmareEvent ancientNightmareEvent;
@@ -31,6 +36,11 @@ public class Notifier extends NotifierHelper {
     private final DemonGatesEvent demonGatesEvent;
     private final OnSlaughtEvent onSlaughtEvent;
     private final TowerOfVictoryEvent towerOfVictoryEvent;
+    // Embed Messages
+    private final HauntedCarriageEmbed hauntedCarriageEmbed;
+    private final DemonGatesEmbed demonGatesEmbed;
+    private final AncientNightmareEmbed ancientNightmareEmbed;
+    private final AncientArenaEmbed ancientArenaEmbed;
 
     public Notifier(GuildsCache guildsCache, GameDataCache gameDataCache, ErrorCache errorCache) {
         this.guildsCache = guildsCache;
@@ -47,6 +57,11 @@ public class Notifier extends NotifierHelper {
         this.demonGatesEvent = new DemonGatesEvent(gameDataCache);
         this.onSlaughtEvent = new OnSlaughtEvent(gameDataCache);
         this.towerOfVictoryEvent = new TowerOfVictoryEvent(gameDataCache);
+        // Embedded
+        this.hauntedCarriageEmbed = new HauntedCarriageEmbed(gameDataCache);
+        this.demonGatesEmbed = new DemonGatesEmbed(gameDataCache);
+        this.ancientArenaEmbed = new AncientArenaEmbed(gameDataCache);
+        this.ancientNightmareEmbed = new AncientNightmareEmbed(gameDataCache);
     }
 
     public void runNotificationScheduler(JDA client) {
@@ -73,6 +88,11 @@ public class Notifier extends NotifierHelper {
                         notificationMessage.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
                         notificationMessage.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
                         notificationMessage.append(towerOfVictoryEvent.appendTowerOfVictoryNotificationIfHappening(clientGuild, channel));
+
+                        hauntedCarriageEmbed.sendHauntedCarriageEmbedIfHappening(clientGuild, channel, client);
+                        demonGatesEmbed.sendDemonGatesEmbedIfHappening(clientGuild, channel, client);
+                        ancientArenaEmbed.sendAncientArenaEmbedIfHappening(clientGuild, channel, client);
+                        ancientNightmareEmbed.sendAncientNightmareEmbedIfHappening(clientGuild, channel, client);
 
                         TextChannel textChannel = client.getTextChannelById(channel.getTextChannelID());
 
@@ -103,7 +123,8 @@ public class Notifier extends NotifierHelper {
                             log.error(e.getMessage());
                         }
 
-                        log.info("Sended notification message to " + channel.getTextChannelID());
+                        log.info("Sended notification message to channel: " + channel.getTextChannelID() + ", GuildID: " +
+                                clientGuild.getGuildID());
                     }
                 }
             }
@@ -113,5 +134,4 @@ public class Notifier extends NotifierHelper {
     private boolean isChannelCountZero(ClientGuild clientGuild) {
         return clientGuild.getNotificationChannelCount() == 0;
     }
-
 }

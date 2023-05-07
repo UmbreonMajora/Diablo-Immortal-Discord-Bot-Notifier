@@ -12,7 +12,8 @@ public class LanguageBrazilianPortuguese {
 
     static {
         Yaml yaml = new Yaml();
-        InputStream inputStream = LanguageBrazilianPortuguese.class.getClassLoader().getResourceAsStream(Language.BRAZILIAN_PORTUGUESE.path);
+        InputStream inputStream = LanguageBrazilianPortuguese.class.getClassLoader()
+                .getResourceAsStream(Language.BRAZILIAN_PORTUGUESE.path);
         messages = yaml.load(inputStream);
     }
 

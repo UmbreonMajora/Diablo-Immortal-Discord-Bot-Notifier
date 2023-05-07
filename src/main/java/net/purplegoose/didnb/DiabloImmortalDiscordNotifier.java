@@ -23,6 +23,10 @@ import java.sql.SQLException;
 public class DiabloImmortalDiscordNotifier {
 
     public static void main(String[] args) {
+        boolean registerCommandsOnGuildReady = false;
+        if (args.length > 0) {
+            registerCommandsOnGuildReady = Boolean.parseBoolean(args[0]);
+        }
         // Init caches
         GameDataCache gameDataCache = new GameDataCache();
         GuildsCache guildsCache = new GuildsCache();
@@ -34,23 +38,25 @@ public class DiabloImmortalDiscordNotifier {
         if (!fillGameDataCache(gameDataCache, databaseRequests)) return;
         if (!fillGuildsCache(guildsCache, databaseRequests)) return;
         // Register events
-        JDA jda = registerEventListeners(databaseRequests, guildsCache, gameDataCache, customMessagesCache);
+        JDA jda = registerEventListeners(databaseRequests, guildsCache, gameDataCache, customMessagesCache, registerCommandsOnGuildReady);
         // Run scheduler
         runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
     }
 
     private static JDA registerEventListeners(DatabaseRequests databaseRequests, GuildsCache guildsCache,
-                                              GameDataCache gameDataCache, CustomMessagesCache customMessagesCache) {
+                                              GameDataCache gameDataCache, CustomMessagesCache customMessagesCache,
+                                              boolean registerCommandsOnGuildReady) {
         JDA jda;
         try {
-            jda = JDABuilder.createDefault(ConfigUtil.getClientToken())
+            JDABuilder jdaBuilder = JDABuilder.createDefault(ConfigUtil.getClientToken())
                     .addEventListeners(new ChannelDelete(databaseRequests, guildsCache))
                     .addEventListeners(new GuildJoin(databaseRequests, guildsCache))
                     .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache, customMessagesCache))
-                    .addEventListeners(new GuildLeave(databaseRequests, guildsCache))
-                    .addEventListeners(new GuildReady())
-                    .build()
-                    .awaitReady();
+                    .addEventListeners(new GuildLeave(databaseRequests, guildsCache));
+
+            if (registerCommandsOnGuildReady) jdaBuilder.addEventListeners(new GuildReady());
+
+            jda = jdaBuilder.build().awaitReady();
         } catch (InterruptedException e) {
             log.error("Failed to register event listeners.", e);
             return null;

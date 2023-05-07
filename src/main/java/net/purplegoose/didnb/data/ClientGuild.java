@@ -17,7 +17,7 @@ public class ClientGuild {
     private Language guildLanguage;
     @Getter
     @Setter
-    private String guildTimeZone;
+    private String TimeZone;
     @Getter
     @Setter
     private String guildAdminRoleID;
@@ -42,16 +42,20 @@ public class ClientGuild {
     @Getter
     @Setter
     private int autoDeleteTimeInHours;
+    @Getter
+    @Setter
+    private long embedLeadTime;
+
     private final Map<String, CustomNotification> customNotifications;
     private final Map<String, NotificationChannel> notificationChannels;
 
-    public ClientGuild(String guildID, Language guildLanguage, String guildTimeZone, String guildAdminRoleID,
+    public ClientGuild(String guildID, Language guildLanguage, String TimeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled,
                        boolean isDaylightTimeEnabled, boolean isPremiumServer, int autoDeleteTimeInHours,
-                       boolean isAutoDeleteEnabled) {
+                       boolean isAutoDeleteEnabled, long embedLeadTime) {
         this.guildID = guildID;
         this.guildLanguage = guildLanguage;
-        this.guildTimeZone = guildTimeZone;
+        this.TimeZone = TimeZone;
         this.guildAdminRoleID = guildAdminRoleID;
         this.warnTimeInMinutes = warnTimeInMinutes;
         this.isWarnMessagesEnabled = isEventMessageEnabled;
@@ -62,12 +66,13 @@ public class ClientGuild {
         this.isPremiumServer = isPremiumServer;
         this.autoDeleteTimeInHours = autoDeleteTimeInHours;
         this.isAutoDeleteEnabled = isAutoDeleteEnabled;
+        this.embedLeadTime = embedLeadTime;
     }
 
     public ClientGuild(String guildID) {
         this.guildID = guildID;
         this.guildLanguage = Language.ENGLISH;
-        this.guildTimeZone = "GMT";
+        this.TimeZone = "GMT";
         this.guildAdminRoleID = null;
         this.warnTimeInMinutes = 15;
         this.isWarnMessagesEnabled = true;
@@ -78,6 +83,7 @@ public class ClientGuild {
         this.isPremiumServer = false;
         this.autoDeleteTimeInHours = 1;
         this.isAutoDeleteEnabled = false;
+        this.embedLeadTime = 1;
     }
 
     public Map<String, CustomNotification> getCustomNotifications() {

@@ -131,7 +131,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
             return;
         }
 
-        event.deferReply().queue();
+        event.deferReply().setEphemeral(true).queue();
         executeCommand(event, logInfo);
     }
 

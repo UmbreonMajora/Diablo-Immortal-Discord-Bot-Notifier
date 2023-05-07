@@ -28,7 +28,7 @@ public class TowerOfVictoryEvent implements IGameEvent {
         }
 
         Set<EventGameData> eventGameDataSet = gameDataCache.getTowerOfVictoryDataSet();
-        String timeZone = guild.getGuildTimeZone();
+        String timeZone = guild.getTimeZone();
         Language language = guild.getGuildLanguage();
 
         if (!isTimeInWarnRange(eventGameDataSet, timeZone).equals(EMPTY_STRING)) {

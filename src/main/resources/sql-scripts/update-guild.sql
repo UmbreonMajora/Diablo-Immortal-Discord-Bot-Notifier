@@ -8,5 +8,6 @@ SET language              = ?,
     daylight_time_enabled = ?,
     premium_server        = ?,
     auto_delete_enabled = ?,
-    auto_delete_time = ?
+    auto_delete_time = ?,
+    embed_lead_time = ?
 WHERE guildID = ?;
