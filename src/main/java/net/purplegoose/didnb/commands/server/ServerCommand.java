@@ -13,8 +13,7 @@ import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.ServerSetting;
 import net.purplegoose.didnb.languages.LanguageController;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.MESSAGE_REPEATING_BOOL;
-import static net.purplegoose.didnb.utils.CommandsUtil.SERVER_SETTING_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.*;
 
 /**
  * @author Umbreon Majora
@@ -66,20 +65,26 @@ public class ServerCommand implements IClientCommand {
 
     private void updateClientGuild(ServerSetting serverSetting, String guildID, boolean serverSettingValue) {
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
-        switch (serverSetting) {
-            case EVENT_MESSAGES -> clientGuild.setEventMessageEnabled(serverSettingValue);
-            case WARN_MESSAGES -> clientGuild.setWarnMessagesEnabled(serverSettingValue);
+
+        if (serverSetting == ServerSetting.EVENT_MESSAGES) {
+            clientGuild.setEventMessageEnabled(serverSettingValue);
         }
+        if (serverSetting == ServerSetting.WARN_MESSAGES) {
+            clientGuild.setWarnMessagesEnabled(serverSettingValue);
+        }
+
         databaseRequests.updateGuild(clientGuild);
     }
 
     private String getServerSetting(SlashCommandInteractionEvent event) {
         OptionMapping serverSettingOption = event.getOption(SERVER_SETTING_OPTION_NAME);
-        return serverSettingOption != null ? serverSettingOption.getAsString() : null;
+        assert serverSettingOption != null : "Server setting was null, this should not be possible.";
+        return serverSettingOption.getAsString();
     }
 
     private boolean getServerSettingValue(SlashCommandInteractionEvent event) {
-        OptionMapping serverSettingValue = event.getOption(MESSAGE_REPEATING_BOOL);
-        return serverSettingValue != null && serverSettingValue.getAsBoolean();
+        OptionMapping serverSettingValue = event.getOption(SERVER_SETTING_BOOL);
+        assert serverSettingValue != null : "Server setting value was null, this should not be possible.";
+        return serverSettingValue.getAsBoolean();
     }
 }
