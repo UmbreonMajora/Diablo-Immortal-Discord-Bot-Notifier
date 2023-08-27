@@ -8,13 +8,11 @@ DELETE-CUSTOM-MESSAGE-FAILED-NOT-PERMITTED: "Failed to delete custom notificatio
 DELETED-CUSTOM-MESSAGE: "Custom notification with ID %s was deleted."
 LIST-CUSTOM-MESSAGES-FAILED-LIST-EMPTY: "You don't have any custom notifications."
 TEXT-YOUR-CUSTOM-NOTIFICATIONS: "Your custom notifications:"
-
 ADDED-ROLE: "You've received the role %s"
 FAILED-TO-GIVE-ROLE: "Failed to give you a role. Please contact the server administrator."
 REMOVED-ROLE: "You've lost the role %s."
 FAILED-TO-REMOVE-ROLE: "Failed to remove a role from you. Please contact the server administrator."
-
-CREATE-REACTION-ROLE-FAILED-MESSAGE-ID: "Failed to create a new reaction role. The message ID was empty." 
+CREATE-REACTION-ROLE-FAILED-MESSAGE-ID: "Failed to create a new reaction role. The message ID was empty."
 CREATE-REACTION-ROLE-FAILED-ROLE: "Failed to create a new reaction role. The role was empty." 
 CREATE-REACTION-ROLE-FAILED-EMOTE: "Failed to create a new reaction role. The emote was empty." 
 CREATE-REACTION-ROLE-FAILED-EMOTE-IN-USE: "Failed to create a new reaction role. The emote was already in use." 
@@ -84,7 +82,6 @@ DEMON-GATES: "Demon Gates"
 SHADOW-LOTTERY: "Shadow Lottery messsages enabled:" 
 HAUNTED-CARRIAGE: "Haunted Carriage" 
 WRATHBORNE-INVASION: "Wrathborne Invasion"
-
 EVENT-HAUNTED-CARRIAGE: "Geister Kutsche erscheint jetzt beim Friedhof von Ashwold - Ashwold Anwesen."
 EVENT-HAUNTED-CARRIAGE-HEAD-UP: "Geister Kutsche in %s minuten beim Friedhof von Ashwold - Ashwold Anwesen."
 EVENT-DEMON-GATES: "Dämonenportale in Reich der Verdammnis."
@@ -103,38 +100,27 @@ EVENT-WRATHBORNE-INVASION: "Zornesbrut Invasion startet jetzt."
 EVENT-WRATHBORNE-INVASION-HEAD-UP: "Zornesbrut Invasion startet in %s minuten."
 EVENT-VAULT: "The doors of the vault are open."
 EVENT-VAULT-HEAD-UP: "The doors of the treasury open in %s minutes."
-
 EVENT-ON-SLAUGHT: "Onslaught is starting now!"
 EVENT-ON-SLAUGHT-WARN: "Onslaught event is starting in %s minutes."
 INVALID-ID: "Invalid ID. Possibly mistyped?"
 CM-NOT-EXISTS: "This custom notification does not exist."
 CM-ENABLED-DISABLED: "Custom Notification with ID %s is now %s"
-
-# daylight command
 DAYLIGHT-TIME-ALREADY-ENABLED: "Daylight saving time is already enabled."
 DAYLIGHT-TIME-ALREADY-DISABLED: "Daylight saving time is already disabled."
 DAYLIGHT-TIME-NOW-ENABLED: "Daylight saving time is now enabled."
 DAYLIGHT-TIME-NOW-DISABLED: "Daylight saving time is now disabled."
-
-# create message command
 MESSAGE-MAX-REACHED: "You have reached the maximum number of custom notifications."
-
-# edit message command
 EDIT-MESSAGE-FAILED: "Failed to edit your custom notification."
 MESSAGE-EDITED-TIME: "Your custom notification was edited. Time was changed to %s."
 MESSAGE-EDITED-WEEKDAY: "Your custom notification was edited. Weekday was changed to %s."
 MESSAGE-EDITED-MESSAGE: "Your custom notification was edited. Message was changed to %s."
 WEEKDAY-INVALID: "The weekday is invalid."
 TIME-INVALID: "The time is invalid."
-
 ON-SLAUGHT-ENABLED: "Onslaught messages enabled:"
 ON-SLAUGHT: "Onslaught"
-# Added with the new 'Tower of Victory' event.
 EVENT-TOWER-OF-VICTORY: "The Tower of Victory event is starting!"
 EVENT-TOWER-OF-VICTORY-WARN: "The Tower of Victory event is about to start in %s minutes."
-# Added with the new 'Shadow war' event.
 EVENT-SHADOW-WAR-WARN: "The doors to the Shadow wars have opened!"
 EVENT-SHADOW-WAR: "The Shadow War has begun."
-# Added with issue #10: No error message for invalid new warntime #10
 INVALID-WARN-TIME: "The time was not in the given range. (1 - 15)"
 UPDATED-WARN-TIME: "Your new warn time is now %s minutes."
