@@ -43,8 +43,8 @@ public class CustomMessagesNotifier extends NotifierHelper {
                         String fullTime = day + " " + time;
 
                         if (!isTimeValid(timezone, day, time, fullTime)) {
-                            log.info("{} has a custom notification with invalid time ({}), skipping...",
-                                    customNotification.getCustomMessageID(), clientGuild.getGuildID());
+                            log.info("{} has a custom notification with invalid time ({}) ID: {}, skipping...",
+                                    clientGuild.getGuildID(), fullTime, customNotification.getCustomMessageID());
                             continue;
                         }
 
@@ -62,7 +62,7 @@ public class CustomMessagesNotifier extends NotifierHelper {
                         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID)
                                 .getNotificationChannel(textChannel.getId());
                         StringBuilder sb = new StringBuilder(message);
-                        addMessageMention(sb, notificationChannel, textChannel.getGuild());
+                        addMessageMention(sb, notificationChannel, textChannel.getGuild(), clientGuild.getGuildLanguage());
                         message = sb.toString();
 
                         if (clientGuild.isAutoDeleteEnabled()) {

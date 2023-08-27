@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class StringUtilTests {
 
     @Test
@@ -33,7 +35,7 @@ class StringUtilTests {
 
                 time = timeHour + ":" + timeMinute;
                 validCombinations.add(time);
-                Assertions.assertFalse(StringUtil.isStringNotInTimePattern(time));
+                assertFalse(StringUtil.isStringNotInTimePattern(time));
             }
         }
 
@@ -55,12 +57,39 @@ class StringUtilTests {
                 time = timeHour + ":" + timeMinute;
 
                 if (validCombinations.contains(time)) {
-                    Assertions.assertFalse(StringUtil.isStringNotInTimePattern(time));
+                    assertFalse(StringUtil.isStringNotInTimePattern(time));
                 } else {
                     Assertions.assertTrue(StringUtil.isStringNotInTimePattern(time));
                 }
             }
         }
+    }
+
+    @Test
+    void testIsStringSingleDashWithDigits() {
+        assertTrue(StringUtil.isStringSingleDashWithDigits("-123"));
+        assertFalse(StringUtil.isStringSingleDashWithDigits("123"));
+        assertFalse(StringUtil.isStringSingleDashWithDigits("-12a"));
+    }
+
+    @Test
+    void testRemoveAllNonNumericCharacters() {
+        assertEquals("12345", StringUtil.removeAllNonNumericCharacters("12abc3d45"));
+        assertEquals("6789", StringUtil.removeAllNonNumericCharacters("6ef7g89"));
+    }
+
+    @Test
+    void testIsStringOnlyContainingNumbers() {
+        assertTrue(StringUtil.isStringOnlyContainingNumbers("12345"));
+        assertFalse(StringUtil.isStringOnlyContainingNumbers("12a345"));
+        assertFalse(StringUtil.isStringOnlyContainingNumbers("abc"));
+    }
+
+    @Test
+    void testGenerateRandomID() {
+        String randomID = StringUtil.generateRandomID();
+        assertNotNull(randomID);
+        assertEquals(4, randomID.length());
     }
 
 }

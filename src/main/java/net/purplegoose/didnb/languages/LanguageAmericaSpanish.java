@@ -17,9 +17,7 @@ public class LanguageAmericaSpanish {
         messages = yaml.load(inputStream);
     }
 
-    private LanguageAmericaSpanish() {
-        //All static methods.
-    }
+    private LanguageAmericaSpanish() { /* static use only */ }
 
     public static String getMessage(String message) {
         return messages.get(message).toString();

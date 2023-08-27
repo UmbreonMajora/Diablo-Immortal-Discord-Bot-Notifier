@@ -6,6 +6,8 @@ import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.enums.Language;
 
+import java.util.Arrays;
+
 import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
 
 /**
@@ -27,9 +29,15 @@ public class LanguagesCommand implements IClientCommand {
 
     private String getAvailableLanguagesList() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("```").append("Available languages:").append(NEW_LINE).append(NEW_LINE);
-        for (Language language : Language.values()) {
-            stringBuilder.append(language.rawName).append(" - ").append(language.shortName).append(NEW_LINE);
+        stringBuilder.append("```")
+                .append("Available languages:")
+                .append(NEW_LINE)
+                .append(NEW_LINE);
+        for (Language language : Language.getAllLanguages()) {
+            stringBuilder.append(language.rawName)
+                    .append(" - ")
+                    .append(language.shortName)
+                    .append(NEW_LINE);
         }
         stringBuilder.append("```");
         return stringBuilder.toString();

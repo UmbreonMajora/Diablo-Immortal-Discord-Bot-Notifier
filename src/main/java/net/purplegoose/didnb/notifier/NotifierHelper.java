@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.purplegoose.didnb.data.NotificationChannel;
+import net.purplegoose.didnb.enums.Language;
+import net.purplegoose.didnb.languages.LanguageController;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,10 +17,8 @@ public class NotifierHelper {
 
     private static final String MENTION_HERE = "HERE";
     private static final String MENTION_EVERYONE = "EVERYONE";
-    // todo: add this message to language file.
-    private static final String FAILED_TO_APPEND_MENTION_ROLE = "Failed to append mention role. Please re-set your mention role.";
 
-    void addMessageMention(StringBuilder sb, NotificationChannel channel, Guild guild) {
+    void addMessageMention(StringBuilder sb, NotificationChannel channel, Guild guild, Language language) {
         if (channel == null) {
             log.info("No notification channel specified for guild: {}. Skipping mention.", guild.getId());
             return;
@@ -39,7 +39,7 @@ public class NotifierHelper {
                 if (mentionRole != null) {
                     sb.append(NEW_LINE).append(mentionRole.getAsMention());
                 } else {
-                    handleMentionRoleError(sb, guild, channel);
+                    handleMentionRoleError(sb, guild, channel, language);
                 }
             }
         }
@@ -54,11 +54,11 @@ public class NotifierHelper {
                 message.delete().queueAfter(deleteTimeInHours, TimeUnit.HOURS));
     }
 
-    private void handleMentionRoleError(StringBuilder sb, Guild guild, NotificationChannel channel) {
+    private void handleMentionRoleError(StringBuilder sb, Guild guild, NotificationChannel channel, Language language) {
         String guildID = guild.getId();
         String guildName = guild.getName();
         String textChannelID = channel.getTextChannelID();
-        sb.append(NEW_LINE).append(FAILED_TO_APPEND_MENTION_ROLE);
+        sb.append(NEW_LINE).append(LanguageController.getMessage(language, "FAILED-TO-APPEND-MENTION-ROLE"));
         log.error("Failed to append mention role for guild {} ({}) in {}", guildName, guildID, textChannelID);
     }
 
