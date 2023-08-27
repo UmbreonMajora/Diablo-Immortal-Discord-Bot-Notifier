@@ -4,9 +4,7 @@ import java.util.Random;
 
 public class StringUtil {
 
-    private StringUtil() {
-        // static use only
-    }
+    private StringUtil() { /* static use only */ }
 
     public static final String EMPTY_STRING = "";
     public static final String NEW_LINE = "\n";
@@ -15,10 +13,10 @@ public class StringUtil {
     public static final String ENABLED_MESSAGE = "Enabled";
     public static final String DISABLE_MESSAGE = "Disabled";
 
-    private static final Random random = new Random();
+    private static final Random RANDOM = new Random();
 
     public static boolean isStringSingleDashWithDigits(String string) {
-        return string.matches("-[\\d]]+");
+        return string.matches("-[\\d]+");
     }
 
     public static boolean isStringNotInTimePattern(String string) {
@@ -30,11 +28,11 @@ public class StringUtil {
     }
 
     public static boolean isStringOnlyContainingNumbers(String string) {
-        return string.matches("[\\d]]+");
+        return string.matches("[\\d]+");
     }
 
     public static String generateRandomID() {
-        return random.ints(4, 0, 62)
+        return RANDOM.ints(4, 0, 62)
                 .mapToObj("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"::charAt)
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
     }

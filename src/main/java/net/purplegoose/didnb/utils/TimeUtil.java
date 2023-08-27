@@ -18,7 +18,7 @@ import java.util.TimeZone;
 @Slf4j
 public class TimeUtil {
 
-    private static final String HOURS_MINUTE_FORMAT = "HH:mm";
+    private static final String HOURS_MINUTE_FORMAT = "H:mm";
     private static final String WEEKDAY_FORMAT = "EEEE";
     public static final int HOURS_IN_SECONDS = 3600;
 

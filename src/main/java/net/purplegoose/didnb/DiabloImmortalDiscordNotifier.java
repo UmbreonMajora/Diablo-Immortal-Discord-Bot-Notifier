@@ -10,6 +10,7 @@ import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.database.MySQLDatabaseConnection;
+import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.events.*;
 import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
@@ -18,6 +19,7 @@ import net.purplegoose.didnb.utils.ConfigUtil;
 
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 @Slf4j
 public class DiabloImmortalDiscordNotifier {
@@ -41,6 +43,7 @@ public class DiabloImmortalDiscordNotifier {
         JDA jda = registerEventListeners(databaseRequests, guildsCache, gameDataCache, customMessagesCache, registerCommandsOnGuildReady);
         // Run scheduler
         runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
+        logContainingLanguages();
     }
 
     private static JDA registerEventListeners(DatabaseRequests databaseRequests, GuildsCache guildsCache,
@@ -99,6 +102,10 @@ public class DiabloImmortalDiscordNotifier {
             }
         }
         return true;
+    }
+
+    private static void logContainingLanguages() {
+        log.info("Loaded with these languages: " + Arrays.toString(Language.values()));
     }
 
 }
