@@ -30,7 +30,9 @@ public class CustomMessagesNotifier extends NotifierHelper {
             public void run() {
                 for (ClientGuild clientGuild : guildsCache.getAllGuilds().values()) {
                     for (CustomNotification customNotification : clientGuild.getCustomNotifications().values()) {
+
                         if (!customNotification.isEnabled()) {
+                            log.info("{} has their custom notifications disabled, skipping...", clientGuild.getGuildID());
                             continue;
                         }
 
