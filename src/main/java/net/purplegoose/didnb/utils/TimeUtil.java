@@ -1,6 +1,7 @@
 package net.purplegoose.didnb.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import net.purplegoose.didnb.exeption.TimeParseException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,13 +18,11 @@ import java.util.TimeZone;
 @Slf4j
 public class TimeUtil {
 
-        private static final String HOURS_MINUTE_FORMAT = "HH:mm";
+    private static final String HOURS_MINUTE_FORMAT = "HH:mm";
     private static final String WEEKDAY_FORMAT = "EEEE";
     public static final int HOURS_IN_SECONDS = 3600;
 
-    private TimeUtil() {
-        // all static methods.
-    }
+    private TimeUtil() { /* static use only */ }
 
     public static String getTimeWithWeekday(String timeZone) {
         ZonedDateTime dateTime = Instant.now().atZone(ZoneId.of(timeZone, ZoneId.SHORT_IDS));
@@ -59,9 +58,8 @@ public class TimeUtil {
             return currentTimeDate.after(warnStartCalender.getTime()) &&
                     currentTimeDate.before(warnEndCalender.getTime());
         } catch (ParseException e) {
-            log.error("Failed to check if time is in between.", e);
+            throw new TimeParseException("Failed to check if time is in between.", e);
         }
-        return false;
     }
 
     public static Date getNextFullMinute() {
@@ -82,9 +80,8 @@ public class TimeUtil {
             calendar.add(Calendar.DATE, 1);
             return calendar.getTime();
         } catch (ParseException e) {
-            log.error("Failed to get current time as calendar.", e);
+            throw new TimeParseException("Failed to get current time as calendar.", e);
         }
-        return null;
     }
 
     public static long getCurrentUnixTime(String timeZoneId) {

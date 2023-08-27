@@ -1,5 +1,6 @@
 package net.purplegoose.didnb.notifier;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.purplegoose.didnb.cache.GuildsCache;
@@ -12,6 +13,7 @@ import net.purplegoose.didnb.utils.TimeUtil;
 import java.util.Timer;
 import java.util.TimerTask;
 
+@Slf4j
 public class CustomMessagesNotifier extends NotifierHelper {
 
     private final DatabaseRequests databaseRequests;
@@ -28,7 +30,9 @@ public class CustomMessagesNotifier extends NotifierHelper {
             public void run() {
                 for (ClientGuild clientGuild : guildsCache.getAllGuilds().values()) {
                     for (CustomNotification customNotification : clientGuild.getCustomNotifications().values()) {
+
                         if (!customNotification.isEnabled()) {
+                            log.info("{} has their custom notifications disabled, skipping...", clientGuild.getGuildID());
                             continue;
                         }
 
@@ -39,6 +43,8 @@ public class CustomMessagesNotifier extends NotifierHelper {
                         String fullTime = day + " " + time;
 
                         if (!isTimeValid(timezone, day, time, fullTime)) {
+                            log.info("{} has a custom notification with invalid time ({}), skipping...",
+                                    customNotification.getCustomMessageID(), clientGuild.getGuildID());
                             continue;
                         }
 
@@ -46,7 +52,11 @@ public class CustomMessagesNotifier extends NotifierHelper {
                         TextChannel textChannel = jda.getTextChannelById(channel);
                         String message = customNotification.getMessage();
 
-                        assert textChannel != null : "Text Channel is null.";
+                        if (textChannel == null) {
+                            log.info("{} has a custom notification with an non existent text channel, skipping...",
+                                    clientGuild.getGuildID());
+                            continue;
+                        }
 
                         // mention
                         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID)
@@ -57,11 +67,9 @@ public class CustomMessagesNotifier extends NotifierHelper {
 
                         if (clientGuild.isAutoDeleteEnabled()) {
                             int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
-                            sendMessageWithAutoDelete(textChannel, message, autoDeleteTimeInHours);
-                        }
-
-                        if (!clientGuild.isAutoDeleteEnabled()) {
-                            sendMessageWithoutAutoDelete(textChannel, message);
+                            sendTimedMessage(textChannel, message, autoDeleteTimeInHours);
+                        } else {
+                            sendMessage(textChannel, message);
                         }
 
                         if (!customNotification.isRepeating()) {

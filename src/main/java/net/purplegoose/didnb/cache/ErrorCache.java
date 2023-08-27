@@ -30,7 +30,7 @@ public class ErrorCache {
 
         if (isMaximumAnErrorsReachedForChannel(channelID)) {
             databaseRequests.deleteNotificationChannelByID(channelID);
-            log.info(channelID + " reached the maximum of errors occurred an was removed from the system.");
+            log.info("{} reached the maximum of errors occurred an was removed from the system.", channelID);
         }
     }
 

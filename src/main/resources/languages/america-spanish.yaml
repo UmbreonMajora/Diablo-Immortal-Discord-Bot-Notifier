@@ -118,12 +118,9 @@ DAYLIGHT-TIME-ALREADY-DISABLED: "El horario de verano ya está desactivado."
 DAYLIGHT-TIME-NOW-ENABLED: "Horario de verano activado."
 DAYLIGHT-TIME-NOW-DISABLED: "Horario de verano desactivado."
 MESSAGE-MAX-REACHED: "Has alcanzado el número máximo de notificaciones personalizadas."
-# Added with the new 'Tower of Victory' event.
 EVENT-TOWER-OF-VICTORY: "¡La disputa por las Torres Malditas ha comenzado ahora!"
 EVENT-TOWER-OF-VICTORY-WARN: "¡La disputa por las Torres Malditas comenzará en %s minutos!"
-# Added with the new 'Shadow war' event.
 EVENT-SHADOW-WAR-WARN: "¡Las puertas de la Guerra Sombría han abierto!"
 EVENT-SHADOW-WAR: "¡La Guerra Sombría ha comenzado!."
-# Added with issue #10: No error message for invalid new warntime #10
-INVALID-WARN-TIME: "The time was not in the given range. (1 - 15)"
-UPDATED-WARN-TIME: "Your new warn time is now %s minutes."
+INVALID-WARN-TIME: "El tiempo no estaba dentro del rango especificado. (1 - 15)"
+UPDATED-WARN-TIME: "Tu nuevo tiempo de advertencia es ahora de %s minutos."
