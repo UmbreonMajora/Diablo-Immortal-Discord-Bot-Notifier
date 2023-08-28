@@ -1,4 +1,3 @@
-import net.purplegoose.didnb.enums.Language;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;
 
@@ -7,7 +6,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class YamlKeyConsistencyTest {
+class YamlKeyConsistencyTest {
 
     private final String directoryPath = "languages/";
 
@@ -75,8 +74,4 @@ public class YamlKeyConsistencyTest {
         return null;
     }
 
-    @Test
-    public void languagesTest() {
-        System.out.println(Arrays.toString(Language.values()));
-    }
 }

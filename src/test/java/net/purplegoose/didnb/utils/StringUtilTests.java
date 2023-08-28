@@ -91,5 +91,82 @@ class StringUtilTests {
         assertNotNull(randomID);
         assertEquals(4, randomID.length());
     }
+    /* save this for command recode
+    @Test
+    public void tests() {
+        List<CommandData> COMMANDS = new ArrayList<>();
+        try {
+            for (Class<?> aClass : getClasses("net.purplegoose.didnb.commands")) {
+                if (aClass.isAnnotationPresent(CommandAnnotation.class)) {
+                    CommandAnnotation annotation = aClass.getAnnotation(CommandAnnotation.class);
+                    String commandDescription = annotation.description();
+                    String commandName = annotation.name();
+                    String commandUsage = annotation.usage();
+                    CommandData commandData = Commands.slash(commandName, commandDescription)
+                    COMMANDS.
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    private List<Class<?>> getClasses(String packageName) throws ClassNotFoundException, IOException {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        String path = packageName.replace('.', '/');
+        Enumeration<URL> resources = classLoader.getResources(path);
+
+        List<File> dirs = new ArrayList<>();
+        List<Class<?>> classes = new ArrayList<>();
+
+        while (resources.hasMoreElements()) {
+            URL resource = resources.nextElement();
+            if (resource.getProtocol().equalsIgnoreCase("jar")) {
+                JarURLConnection jarURLConnection = (JarURLConnection) resource.openConnection();
+                JarFile jarFile = jarURLConnection.getJarFile();
+                classes.addAll(findClassesFromJar(jarFile, packageName));
+            } else {
+                dirs.add(new File(resource.getFile()));
+                for (File directory : dirs) {
+                    classes.addAll(findClasses(directory, packageName));
+                }
+            }
+        }
+
+        return classes;
+    }
+
+    private List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+        if (!directory.exists()) {
+            return Collections.emptyList();
+        }
+        List<Class<?>> classes = new ArrayList<>();
+        File[] files = directory.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                classes.addAll(findClasses(file, packageName + "." + file.getName()));
+            } else if (file.getName().endsWith(".class")) {
+                Class<?> clazz = Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6));
+                classes.add(clazz);
+            }
+        }
+        return classes;
+    }
+
+    private List<Class<?>> findClassesFromJar(JarFile jarFile, String packageName) throws ClassNotFoundException {
+        List<Class<?>> classes = new ArrayList<>();
+        Enumeration<JarEntry> entries = jarFile.entries();
+
+        while (entries.hasMoreElements()) {
+            JarEntry entry = entries.nextElement();
+            if (entry.getName().endsWith(".class") && entry.getName().startsWith(packageName.replace('.', '/'))) {
+                String className = entry.getName().replace('/', '.').replace('\\', '.').replace(".class", "");
+                classes.add(Class.forName(className));
+            }
+        }
+        return classes;
+    }
+    */
 }
