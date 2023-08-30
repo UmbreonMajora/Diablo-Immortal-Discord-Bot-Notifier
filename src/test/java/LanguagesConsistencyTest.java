@@ -6,7 +6,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class YamlKeyConsistencyTest {
+class LanguagesConsistencyTest {
 
     private final String directoryPath = "languages/";
 
