@@ -91,6 +91,7 @@ class StringUtilTests {
         assertNotNull(randomID);
         assertEquals(4, randomID.length());
     }
+
     /* save this for command recode
     @Test
     public void tests() {
