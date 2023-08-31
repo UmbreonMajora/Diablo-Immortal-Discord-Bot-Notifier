@@ -3,6 +3,7 @@ package net.purplegoose.didnb;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.purplegoose.didnb.annotations.GameDataCacheSet;
 import net.purplegoose.didnb.cache.CustomMessagesCache;
 import net.purplegoose.didnb.cache.ErrorCache;
@@ -12,6 +13,7 @@ import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.database.MySQLDatabaseConnection;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.events.*;
+import net.purplegoose.didnb.gameevents.scheduled.ScheduledEventCreator;
 import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
@@ -44,6 +46,14 @@ public class DiabloImmortalDiscordNotifier {
         // Run scheduler
         runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
         logContainingLanguages();
+
+        Guild guild = jda.getGuildById("1146370488826855435");
+        Guild guild1 = jda.getGuildById("1061634554676383775");
+        ScheduledEventCreator scheduledEventCreator = new ScheduledEventCreator();
+        Arrays.asList(guild1, guild).forEach(guild2 -> {
+            System.out.println(guild2.getId());
+            scheduledEventCreator.createScheduledEvent(guild2, guildsCache.getClientGuildByID(guild2.getId()).getTimeZone());
+        });
     }
 
     private static JDA registerEventListeners(DatabaseRequests databaseRequests, GuildsCache guildsCache,
