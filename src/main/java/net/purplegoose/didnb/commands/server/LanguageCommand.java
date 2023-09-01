@@ -52,7 +52,7 @@ public class LanguageCommand implements IClientCommand {
     }
 
     private void updateLanguage(ClientGuild clientGuild, Language language) {
-        clientGuild.setGuildLanguage(language);
+        clientGuild.setLanguage(language);
         databaseRequests.updateGuild(clientGuild);
     }
 

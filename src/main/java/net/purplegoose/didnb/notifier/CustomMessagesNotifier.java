@@ -60,7 +60,7 @@ public class CustomMessagesNotifier extends NotifierHelper {
                         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID)
                                 .getNotificationChannel(textChannel.getId());
                         StringBuilder sb = new StringBuilder(message);
-                        addMessageMention(sb, notificationChannel, textChannel.getGuild(), clientGuild.getGuildLanguage());
+                        addMessageMention(sb, notificationChannel, textChannel.getGuild(), clientGuild.getLanguage());
                         message = sb.toString();
 
                         if (clientGuild.isAutoDeleteEnabled()) {

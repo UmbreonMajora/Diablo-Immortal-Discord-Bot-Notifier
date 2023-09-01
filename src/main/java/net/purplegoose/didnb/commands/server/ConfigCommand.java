@@ -49,7 +49,7 @@ public class ConfigCommand implements IClientCommand {
         embed.setThumbnail(guild.getIconUrl());
         embed.addField("Owner:", getFullUsernameWithDiscriminator(user), true);
 
-        String languageRawName = clientGuild.getGuildLanguage().rawName;
+        String languageRawName = clientGuild.getLanguage().rawName;
         embed.addField("Language:", languageRawName, true);
 
         String timeZone = clientGuild.getTimeZone();

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.purplegoose.didnb.annotations.GameDataCacheSet;
 import net.purplegoose.didnb.data.EventGameData;
+import net.purplegoose.didnb.data.EventTime;
 
 import java.util.HashSet;
 
@@ -11,6 +12,8 @@ import java.util.HashSet;
 @Getter
 @Setter
 public class GameDataCache {
+
+    private HashSet<EventTime> gameDataCache = new HashSet<>();
 
     @GameDataCacheSet(tableName = "wrathborne_invasion_times", everyday = true)
     private HashSet<EventGameData> wrathborneInvasionDataSet = new HashSet<>();

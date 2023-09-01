@@ -3,18 +3,19 @@ package net.purplegoose.didnb.database;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.cache.CustomMessagesCache;
-import net.purplegoose.didnb.data.ClientGuild;
-import net.purplegoose.didnb.data.CustomNotification;
-import net.purplegoose.didnb.data.EventGameData;
-import net.purplegoose.didnb.data.NotificationChannel;
+import net.purplegoose.didnb.data.*;
+import net.purplegoose.didnb.enums.GameEvent;
 import net.purplegoose.didnb.enums.Language;
+import net.purplegoose.didnb.enums.Weekday;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.DayOfWeek;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @AllArgsConstructor
@@ -44,6 +45,47 @@ public class DatabaseRequests {
             log.error(e.getMessage(), e);
         }
         return listEventTimeTables;
+    }
+
+    public Set<EventTime> loadGameEventData() {
+        Set<EventTime> gameEventData = new HashSet<>();
+
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM game_event_times")
+        ) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String weekdayString = resultSet.getString("weekday");
+                    Weekday weekday = Weekday.findWeekdayByRawName(weekdayString);
+                    String eventName = resultSet.getString("event_name");
+                    GameEvent gameEvent = GameEvent.findGameEventByRawName(eventName);
+                    String warnStartTime = resultSet.getString("warn_start_time");
+                    String warnEndTime = resultSet.getString("warn_end_time");
+                    int startHour = resultSet.getInt("start_hour");
+                    int startMinute = resultSet.getInt("start_minute");
+                    int endHour = resultSet.getInt("end_hour");
+                    int endMinute = resultSet.getInt("end_minute");
+
+                    if (weekday == null) {
+                        log.error("Failed to load a game time from database.");
+                        continue;
+                    }
+
+                    if (weekdayString.equalsIgnoreCase(Weekday.EVERYDAY.rawName)) {
+                        for (DayOfWeek day : DayOfWeek.values()) {
+                            weekday = Weekday.findWeekdayByRawName(day.toString());
+                            gameEventData.add(new EventTime(gameEvent, weekday, warnStartTime, warnEndTime, startHour, startMinute, endHour, endMinute));
+                        }
+                    } else {
+                        gameEventData.add(new EventTime(gameEvent, weekday, warnStartTime, warnEndTime, startHour, startMinute, endHour, endMinute));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        return gameEventData;
     }
 
     public Map<String, ClientGuild> loadDataFromDatabaseToCache() throws SQLException {
@@ -161,7 +203,7 @@ public class DatabaseRequests {
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getCreateNewGuildStatement())
         ) {
             preparedStatement.setString(1, clientGuild.getGuildID());
-            preparedStatement.setString(2, clientGuild.getGuildLanguage().shortName);
+            preparedStatement.setString(2, clientGuild.getLanguage().shortName);
             preparedStatement.setString(3, clientGuild.getTimeZone());
             preparedStatement.setBoolean(4, clientGuild.isWarnMessagesEnabled());
             preparedStatement.setBoolean(5, clientGuild.isEventMessageEnabled());
@@ -180,7 +222,7 @@ public class DatabaseRequests {
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getUpdateGuildStatement())
         ) {
-            preparedStatement.setString(1, clientGuild.getGuildLanguage().shortName);
+            preparedStatement.setString(1, clientGuild.getLanguage().shortName);
             preparedStatement.setString(2, clientGuild.getTimeZone());
             preparedStatement.setBoolean(3, clientGuild.isWarnMessagesEnabled());
             preparedStatement.setBoolean(4, clientGuild.isEventMessageEnabled());

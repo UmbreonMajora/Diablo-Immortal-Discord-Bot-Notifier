@@ -1,48 +1,39 @@
 package net.purplegoose.didnb.gameevents.scheduled;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import net.dv8tion.jda.api.entities.Guild;
-import net.purplegoose.didnb.enums.Weekday;
+import net.purplegoose.didnb.data.ClientGuild;
+import net.purplegoose.didnb.data.EventTime;
+import net.purplegoose.didnb.enums.Language;
+import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.StringUtil;
 
 import java.time.*;
 
 public class ScheduledEventCreator {
 
-    public static void createScheduledEvent(Guild guild, EventTime eventTime, String timeZone) {
-        DayOfWeek weekday = DayOfWeek.valueOf(eventTime.getWeekday().name);
+    public void createScheduledEvent(Guild guild, EventTime eventTime, ClientGuild clientGuild) {
+        DayOfWeek weekday = DayOfWeek.valueOf(String.valueOf(eventTime.getWeekday()));
+        String timeZone = clientGuild.getTimeZone();
+        Language language = clientGuild.getLanguage();
         ZoneOffset offset = getZoneOffsetByTimeZone(timeZone);
         OffsetDateTime nextWeekday = getNextWeekday(weekday, offset);
-        OffsetDateTime startTime = getOffsetDateTimeWithHourAndMinute(eventTime.getStartHour(), eventTime.getStartMinute());
-        OffsetDateTime endTime = getOffsetDateTimeWithHourAndMinute(eventTime.getEndHour(), eventTime.getEndMinute());
+        OffsetDateTime startTime = getOffsetDateTimeWithHourAndMinute(nextWeekday ,eventTime.getStartHour(), eventTime.getStartMinute());
+        OffsetDateTime endTime = getOffsetDateTimeWithHourAndMinute(nextWeekday ,eventTime.getEndHour(), eventTime.getEndMinute());
 
-
-        guild.createScheduledEvent("Event Name", "Diablo4 Location", startTime, endTime)
-                .setDescription("EVENT DESCRIPTION?").queue();
+        guild.createScheduledEvent(LanguageController.getMessage(language, eventTime.getEventName().languageKey),
+                        "EVENT-LOCATION", startTime, endTime).queue();
     }
 
-    public static void main(String[] args) {
-        EventTime eventTime = new EventTime(Weekday.valueOf("monday"), "11:45", "12:00", 12, 0, 12, 30);
-        String timeZone = "GMT-4";
-
-
-
-
-
+    private OffsetDateTime getOffsetDateTimeWithHourAndMinute(OffsetDateTime offsetDateTime, int hour, int minute) {
+        return offsetDateTime.withHour(hour).withMinute(minute).withSecond(0).withNano(0);
     }
 
-    private static OffsetDateTime getOffsetDateTimeWithHourAndMinute(int hour, int minute) {
-        return OffsetDateTime.now()
-                .withHour(hour).withMinute(minute).withSecond(0).withNano(0);
-    }
-
-    private static ZoneOffset getZoneOffsetByTimeZone(String timeZone) {
+    private ZoneOffset getZoneOffsetByTimeZone(String timeZone) {
         String formattedTimeZone = StringUtil.removeAlphabeticCharacters(timeZone);
         return formattedTimeZone.equals(StringUtil.EMPTY_STRING) ? ZoneOffset.UTC : ZoneOffset.of(formattedTimeZone);
     }
 
-    public static OffsetDateTime getNextWeekday(DayOfWeek weekday, ZoneOffset offset) {
+    public OffsetDateTime getNextWeekday(DayOfWeek weekday, ZoneOffset offset) {
         LocalDate today = LocalDate.now();
         DayOfWeek currentDayOfWeek = today.getDayOfWeek();
 
@@ -58,19 +49,4 @@ public class ScheduledEventCreator {
 }
 
 
-@AllArgsConstructor
-@Data
-class EventTime {
 
-    Weekday weekday;
-
-    String warnStartTime;
-    String warnEndTime;
-
-    int startHour;
-    int startMinute;
-
-    int endHour;
-    int endMinute;
-
-}

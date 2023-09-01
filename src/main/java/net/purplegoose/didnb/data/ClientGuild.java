@@ -14,7 +14,7 @@ public class ClientGuild {
     private final String guildID;
     @Getter
     @Setter
-    private Language guildLanguage;
+    private Language language;
     @Getter
     @Setter
     private String TimeZone;
@@ -49,12 +49,12 @@ public class ClientGuild {
     private final Map<String, CustomNotification> customNotifications;
     private final Map<String, NotificationChannel> notificationChannels;
 
-    public ClientGuild(String guildID, Language guildLanguage, String TimeZone, String guildAdminRoleID,
+    public ClientGuild(String guildID, Language language, String TimeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled,
                        boolean isDaylightTimeEnabled, boolean isPremiumServer, int autoDeleteTimeInHours,
                        boolean isAutoDeleteEnabled, long embedLeadTime) {
         this.guildID = guildID;
-        this.guildLanguage = guildLanguage;
+        this.language = language;
         this.TimeZone = TimeZone;
         this.guildAdminRoleID = guildAdminRoleID;
         this.warnTimeInMinutes = warnTimeInMinutes;
@@ -71,7 +71,7 @@ public class ClientGuild {
 
     public ClientGuild(String guildID) {
         this.guildID = guildID;
-        this.guildLanguage = Language.ENGLISH;
+        this.language = Language.ENGLISH;
         this.TimeZone = "GMT";
         this.guildAdminRoleID = null;
         this.warnTimeInMinutes = 15;

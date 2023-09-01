@@ -33,7 +33,7 @@ public class AdminRoleCommand implements IClientCommand {
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
-        Language language = clientGuild.getGuildLanguage();
+        Language language = clientGuild.getLanguage();
         Role newBotAdminRole = getNewBotAdminRole(event);
 
         String oldBotAdminRoleID = clientGuild.getGuildAdminRoleID();

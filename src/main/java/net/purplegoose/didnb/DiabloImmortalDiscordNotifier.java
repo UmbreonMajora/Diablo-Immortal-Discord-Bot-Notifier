@@ -3,12 +3,12 @@ package net.purplegoose.didnb;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.purplegoose.didnb.annotations.GameDataCacheSet;
 import net.purplegoose.didnb.cache.CustomMessagesCache;
 import net.purplegoose.didnb.cache.ErrorCache;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
+import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.database.MySQLDatabaseConnection;
 import net.purplegoose.didnb.enums.Language;
@@ -47,12 +47,12 @@ public class DiabloImmortalDiscordNotifier {
         runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
         logContainingLanguages();
 
-        Guild guild = jda.getGuildById("1146370488826855435");
-        Guild guild1 = jda.getGuildById("1061634554676383775");
+        gameDataCache.getGameDataCache().addAll(databaseRequests.loadGameEventData());
         ScheduledEventCreator scheduledEventCreator = new ScheduledEventCreator();
-        Arrays.asList(guild1, guild).forEach(guild2 -> {
-            System.out.println(guild2.getId());
-            scheduledEventCreator.createScheduledEvent(guild2, guildsCache.getClientGuildByID(guild2.getId()).getTimeZone());
+        ClientGuild clientGuild = guildsCache.getClientGuildByID("1146370488826855435");
+        jda.getGuildById("1146370488826855435").getScheduledEvents().forEach(scheduledEvent -> scheduledEvent.delete().queue());
+        gameDataCache.getGameDataCache().forEach(eventTime -> {
+            scheduledEventCreator.createScheduledEvent(jda.getGuildById("1146370488826855435"), eventTime, clientGuild);
         });
     }
 
@@ -100,6 +100,7 @@ public class DiabloImmortalDiscordNotifier {
 
     private static boolean fillGameDataCache(GameDataCache gameDataCache, DatabaseRequests databaseRequests) {
         for (Field s : GameDataCache.class.getDeclaredFields()) {
+            if (!s.isAnnotationPresent(GameDataCacheSet.class)) continue;
             GameDataCacheSet gameDataCacheSet = s.getAnnotation(GameDataCacheSet.class);
             s.setAccessible(true);
             try {

@@ -111,7 +111,7 @@ public class Notifier extends NotifierHelper {
                             continue;
                         }
 
-                        addMessageMention(notificationMessage, channel, textChannel.getGuild(), clientGuild.getGuildLanguage());
+                        addMessageMention(notificationMessage, channel, textChannel.getGuild(), clientGuild.getLanguage());
 
                         try {
                             if (clientGuild.isAutoDeleteEnabled()) {
