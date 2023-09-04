@@ -103,7 +103,7 @@ public class ScheduledEventCreator {
         guild.createScheduledEvent(displayName, "EVENT-LOCATION", startTime, endTime).queue();
     }
 
-    private static boolean doScheduledEventExists(Guild guild, OffsetDateTime startTime, String displayName) {
+    private boolean doScheduledEventExists(Guild guild, OffsetDateTime startTime, String displayName) {
         for (ScheduledEvent scheduledEvent : guild.getScheduledEvents()) {
             if (scheduledEvent.getName().equalsIgnoreCase(displayName) && scheduledEvent.getStartTime().equals(startTime)) {
                 return true;

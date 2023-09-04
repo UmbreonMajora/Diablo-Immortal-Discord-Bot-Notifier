@@ -49,7 +49,7 @@ public class DatabaseRequests {
         return listEventTimeTables;
     }
 
-    public Set<EventTime> loadGameEventData() {
+    public Set<EventTime> loadGameEventData() throws SQLException {
         Set<EventTime> gameEventData = new HashSet<>();
 
         try (
@@ -84,8 +84,6 @@ public class DatabaseRequests {
                     }
                 }
             }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
         }
         return gameEventData;
     }
@@ -201,18 +199,18 @@ public class DatabaseRequests {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String guildID = resultSet.getString("guildID");
-                    boolean ancientArena = resultSet.getBoolean("ancient_arena");
-                    boolean ancientNightmare = resultSet.getBoolean("ancient_nightmare");
-                    boolean assembly = resultSet.getBoolean("assembly");
-                    boolean battlegrounds = resultSet.getBoolean("battlegrounds");
-                    boolean demonGates = resultSet.getBoolean("demon_gates");
-                    boolean hauntedCarriage = resultSet.getBoolean("haunted_carriage");
-                    boolean stormpoint = resultSet.getBoolean("stormpoint");
-                    boolean shadowLottery = resultSet.getBoolean("shadow_lottery");
-                    boolean shadowWar = resultSet.getBoolean("shadow_war");
-                    boolean accursedTower = resultSet.getBoolean("accursed_tower");
-                    boolean vault = resultSet.getBoolean("vault");
-                    boolean wrathborneInvasion = resultSet.getBoolean("wrathborne_invasion");
+                    boolean ancientArena = (resultSet.getInt("ancient_arena") == 1);
+                    boolean ancientNightmare = (resultSet.getInt("ancient_nightmare") == 1);
+                    boolean assembly = (resultSet.getInt("assembly") == 1);
+                    boolean battlegrounds = (resultSet.getInt("battlegrounds") == 1);
+                    boolean demonGates = (resultSet.getInt("demon_gates") == 1);
+                    boolean hauntedCarriage = (resultSet.getInt("haunted_carriage") == 1);
+                    boolean stormpoint = (resultSet.getInt("stormpoint") == 1);
+                    boolean shadowLottery = (resultSet.getInt("shadow_lottery") == 1);
+                    boolean shadowWar = (resultSet.getInt("shadow_war") == 1);
+                    boolean accursedTower = (resultSet.getInt("accursed_tower") == 1);
+                    boolean vault = (resultSet.getInt("vault") == 1);
+                    boolean wrathborneInvasion = (resultSet.getInt("wrathborne_invasion") == 1);
 
                     ScheduledEventsSetting seSetting = new ScheduledEventsSetting(guildID, ancientArena,
                             ancientNightmare, assembly, battlegrounds, demonGates, hauntedCarriage, stormpoint,

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.purplegoose.didnb.annotations.CommandAnnotation;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.Command;
+import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.data.ScheduledEventsSetting;
 import net.purplegoose.didnb.enums.GameEvent;
@@ -35,7 +36,9 @@ public class ListEvents extends Command {
     public void performCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
         Language language = guildsCache.getLanguageByGuildID(guildID);
-        SelectMenu selectMenu = getSelectMenu(new ScheduledEventsSetting(guildID), language, logInfo);
+        ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
+        ScheduledEventsSetting seSetting = clientGuild.getSeSetting();
+        SelectMenu selectMenu = getSelectMenu(seSetting, language, logInfo);
         ActionRow actionRow = ActionRow.of(selectMenu);
         event.getHook().setEphemeral(true).sendMessage(CLICK_ON_SE_TO_TOGGLE).addComponents(actionRow).queue();
         createUseLogEntry(logInfo, ListEvents.class);
@@ -53,7 +56,7 @@ public class ListEvents extends Command {
 
             if (!fieldName.equalsIgnoreCase("guildID") && !fieldName.contains("embed")) {
                 try {
-                    Object value = field.get(seSetting);
+                    boolean value = (boolean) field.get(seSetting);
                     GameEvent gameEvent = GameEvent.findGameEventByRawName(fieldName.toLowerCase());
                     if (gameEvent == null) {
                         String error = String.format("Failed to get GameEvent enum for %s.", fieldName);
