@@ -206,47 +206,22 @@ public class DatabaseRequests {
                     boolean assembly = resultSet.getBoolean("assembly");
                     boolean battlegrounds = resultSet.getBoolean("battlegrounds");
                     boolean demonGates = resultSet.getBoolean("demon_gates");
+                    boolean hauntedCarriage = resultSet.getBoolean("haunted_carriage");
+                    boolean stormpoint = resultSet.getBoolean("stormpoint");
+                    boolean shadowLottery = resultSet.getBoolean("shadow_lottery");
+                    boolean shadowWar = resultSet.getBoolean("shadow_war");
+                    boolean accursedTower = resultSet.getBoolean("accursed_tower");
+                    boolean vault = resultSet.getBoolean("vault");
+                    boolean wrathborneInvasion = resultSet.getBoolean("wrathborne_invasion");
 
-
-
-
-
-
-
-
-
-                    String textChannelID = resultSet.getString("textChannelID");
-                    String guildID = resultSet.getString("guildID");
-                    String roleID = resultSet.getString("roleID");
-
-                    boolean message = (resultSet.getInt("message") == 1);
-                    boolean headup = (resultSet.getInt("headUp") == 1);
-                    boolean ancientarena = (resultSet.getInt("ancientarena") == 1);
-                    boolean ancientnightmare = (resultSet.getInt("ancientnightmare") == 1);
-                    boolean assembly = (resultSet.getInt("assembly") == 1);
-                    boolean battlegrounds = (resultSet.getInt("battlegrounds") == 1);
-                    boolean vault = (resultSet.getInt("vault") == 1);
-                    boolean demongates = (resultSet.getInt("demongates") == 1);
-                    boolean shadowlottery = (resultSet.getInt("shadowlottery") == 1);
-                    boolean hauntedcarriage = (resultSet.getInt("hauntedcarriage") == 1);
-                    boolean hauntedcarriageembed = (resultSet.getInt("hauntedcarriageembed") == 1);
-                    boolean demongatesembed = (resultSet.getInt("demongatesembed") == 1);
-                    boolean ancientnightmareembed = (resultSet.getInt("ancientnightmareembed") == 1);
-                    boolean ancientarenaembed = (resultSet.getInt("ancientarenaembed") == 1);
-                    boolean wrathborneInvasionEnabled = (resultSet.getInt("wrathborneinvasion") == 1);
-                    boolean isOnSlaughtMessagesEnabled = (resultSet.getInt("onslaught_event_enabled") == 1);
-                    boolean towerOfVictoryMessagesEnabled = (resultSet.getInt("tower_of_victory_enabled") == 1);
-
-                    NotificationChannel notificationChannel = new NotificationChannel(roleID, guildID, textChannelID,
-                            headup, message, assembly, vault, demongates, ancientarena, shadowlottery,
-                            battlegrounds, hauntedcarriage, ancientnightmare, demongatesembed, ancientarenaembed,
-                            hauntedcarriageembed, ancientnightmareembed, wrathborneInvasionEnabled, isOnSlaughtMessagesEnabled,
-                            towerOfVictoryMessagesEnabled, false);
+                    ScheduledEventsSetting seSetting = new ScheduledEventsSetting(guildID, ancientArena,
+                            ancientNightmare, assembly, battlegrounds, demonGates, hauntedCarriage, stormpoint,
+                            shadowLottery, shadowWar, accursedTower, vault, wrathborneInvasion);
 
                     if (clientGuildData.containsKey(guildID)) {
-                        clientGuildData.get(guildID).addNewNotificationChannel(notificationChannel);
+                        clientGuildData.get(guildID).setSeSetting(seSetting);
                     } else {
-                        log.error("Failed to add notification channel with channel id " + textChannelID + " to " + guildID + ".");
+                        log.error("Failed to load ScheduledEventsSettings for guild with id {}.", guildID);
                     }
                 }
             }

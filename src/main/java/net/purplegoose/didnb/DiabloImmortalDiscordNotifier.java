@@ -1,12 +1,10 @@
 package net.purplegoose.didnb;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.purplegoose.didnb.annotations.GameDataCacheSet;
 import net.purplegoose.didnb.cache.*;
-import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.ScheduledEventsSetting;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.database.MySQLDatabaseConnection;
@@ -39,6 +37,7 @@ public class DiabloImmortalDiscordNotifier {
         MySQLDatabaseConnection mySQLDatabaseConnection = new MySQLDatabaseConnection();
         DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
         // Fill caches
+        gameDataCache.getGameDataCache().addAll(databaseRequests.loadGameEventData());
         if (!fillGameDataCache(gameDataCache, databaseRequests)) return;
         if (!fillGuildsCache(guildsCache, databaseRequests)) return;
         // Register events
@@ -47,7 +46,7 @@ public class DiabloImmortalDiscordNotifier {
         runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
         logContainingLanguages();
 
-        gameDataCache.getGameDataCache().addAll(databaseRequests.loadGameEventData());
+
         checkForMissingSESetting(guildsCache, databaseRequests);
     }
 
@@ -87,6 +86,7 @@ public class DiabloImmortalDiscordNotifier {
     private static void checkForMissingSESetting(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
         guildsCache.getAllGuilds().values().forEach(clientGuild -> {
             if (clientGuild.getSeSetting() == null) {
+                System.out.println(clientGuild.getSeSetting());
                 ScheduledEventsSetting seSetting = new ScheduledEventsSetting(clientGuild.getGuildID());
                 clientGuild.setSeSetting(seSetting);
                 databaseRequests.updateScheduledEventsSettings(seSetting);

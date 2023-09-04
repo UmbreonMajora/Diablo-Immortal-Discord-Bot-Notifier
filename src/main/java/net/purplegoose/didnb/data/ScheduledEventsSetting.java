@@ -1,8 +1,10 @@
 package net.purplegoose.didnb.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class ScheduledEventsSetting {
 
     public ScheduledEventsSetting(String guildID) {
