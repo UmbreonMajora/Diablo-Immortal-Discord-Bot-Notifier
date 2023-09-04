@@ -9,9 +9,11 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.purplegoose.didnb.cache.CustomMessagesCache;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
+import net.purplegoose.didnb.cache.ScheduledEventsSettingsCache;
 import net.purplegoose.didnb.commands.channel.*;
 import net.purplegoose.didnb.commands.custom_notifications.*;
 import net.purplegoose.didnb.commands.info.*;
+import net.purplegoose.didnb.commands.scheduled_events.ListEvents;
 import net.purplegoose.didnb.commands.server.*;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.LoggingInformation;
@@ -25,6 +27,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
+    private final ScheduledEventsSettingsCache sesCache;
 
     // Channel commands
     private final NotificationCommand notificationCommand;
@@ -60,12 +63,16 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final WarnTimeCommand warnTimeCommand;
     private final AutoDeleteCommand autoDeleteCommand;
 
+    private final ListEvents listEvents;
+
     public SlashCommandInteraction(GuildsCache guildsCache,
                                    DatabaseRequests databaseRequests,
                                    GameDataCache gameDataCache,
-                                   CustomMessagesCache customMessagesCache) {
+                                   CustomMessagesCache customMessagesCache,
+                                   ScheduledEventsSettingsCache sesCache) {
         this.guildsCache = guildsCache;
         this.databaseRequests = databaseRequests;
+        this.sesCache = sesCache;
 
         this.notificationCommand = new NotificationCommand(guildsCache, databaseRequests);
         this.infoCommand = new InfoCommand(guildsCache);
@@ -96,13 +103,15 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.warnTimeCommand = new WarnTimeCommand(databaseRequests, guildsCache);
         this.messageCommand = new MessageCommand(databaseRequests, guildsCache);
         this.autoDeleteCommand = new AutoDeleteCommand(guildsCache);
+
+        this.listEvents = new ListEvents(guildsCache);
     }
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         Member member = event.getMember();
         Guild guild = event.getGuild();
-        String fullUsername = event.getUser().getName() + "#" + event.getUser().getDiscriminator();
+        String fullUsername = event.getUser().getName();
         if (isEventInPrivateChat(guild, member)) {
             log.error(fullUsername + " used a command in private chat.");
             return;
@@ -138,6 +147,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private void executeCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String command = event.getName().toLowerCase();
         switch (command) {
+            case ListEvents.COMMAND ->  listEvents.performCommand(event, logInfo);
             case COMMAND_TODAY -> todayCommand.runCommand(event, logInfo);
             case COMMAND_UPCOMING -> upComingCommand.runCommand(event, logInfo);
             case COMMAND_CREATE_MESSAGE -> createMessageCommand.runCommand(event, logInfo);

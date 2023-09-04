@@ -25,6 +25,8 @@ public class DatabaseRequests {
     private final IDatabaseConnection databaseConnection;
     private final CustomMessagesCache customMessagesCache;
 
+    private static final String SCHEDULED_EVENTS_SETTINGS_TABLE = "scheduled_events_settings";
+
     public HashSet<EventGameData> getEventTimes(String table, boolean everyDay) {
         HashSet<EventGameData> listEventTimeTables = new HashSet<>();
         try (
@@ -93,7 +95,7 @@ public class DatabaseRequests {
 
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getGetAllGuildsStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_ALL_GUILDS_STATEMENT)
         ) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -126,7 +128,7 @@ public class DatabaseRequests {
 
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getGetAllCustomMessagesStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_ALL_CUSTOM_MESSAGES_STATEMENT)
         ) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -151,10 +153,68 @@ public class DatabaseRequests {
 
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getGetAllChannelsStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_ALL_CHANNELS_STATEMENT)
         ) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
+                    String textChannelID = resultSet.getString("textChannelID");
+                    String guildID = resultSet.getString("guildID");
+                    String roleID = resultSet.getString("roleID");
+
+                    boolean message = (resultSet.getInt("message") == 1);
+                    boolean headup = (resultSet.getInt("headUp") == 1);
+                    boolean ancientarena = (resultSet.getInt("ancientarena") == 1);
+                    boolean ancientnightmare = (resultSet.getInt("ancientnightmare") == 1);
+                    boolean assembly = (resultSet.getInt("assembly") == 1);
+                    boolean battlegrounds = (resultSet.getInt("battlegrounds") == 1);
+                    boolean vault = (resultSet.getInt("vault") == 1);
+                    boolean demongates = (resultSet.getInt("demongates") == 1);
+                    boolean shadowlottery = (resultSet.getInt("shadowlottery") == 1);
+                    boolean hauntedcarriage = (resultSet.getInt("hauntedcarriage") == 1);
+                    boolean hauntedcarriageembed = (resultSet.getInt("hauntedcarriageembed") == 1);
+                    boolean demongatesembed = (resultSet.getInt("demongatesembed") == 1);
+                    boolean ancientnightmareembed = (resultSet.getInt("ancientnightmareembed") == 1);
+                    boolean ancientarenaembed = (resultSet.getInt("ancientarenaembed") == 1);
+                    boolean wrathborneInvasionEnabled = (resultSet.getInt("wrathborneinvasion") == 1);
+                    boolean isOnSlaughtMessagesEnabled = (resultSet.getInt("onslaught_event_enabled") == 1);
+                    boolean towerOfVictoryMessagesEnabled = (resultSet.getInt("tower_of_victory_enabled") == 1);
+
+                    NotificationChannel notificationChannel = new NotificationChannel(roleID, guildID, textChannelID,
+                            headup, message, assembly, vault, demongates, ancientarena, shadowlottery,
+                            battlegrounds, hauntedcarriage, ancientnightmare, demongatesembed, ancientarenaembed,
+                            hauntedcarriageembed, ancientnightmareembed, wrathborneInvasionEnabled, isOnSlaughtMessagesEnabled,
+                            towerOfVictoryMessagesEnabled, false);
+
+                    if (clientGuildData.containsKey(guildID)) {
+                        clientGuildData.get(guildID).addNewNotificationChannel(notificationChannel);
+                    } else {
+                        log.error("Failed to add notification channel with channel id " + textChannelID + " to " + guildID + ".");
+                    }
+                }
+            }
+        }
+
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_ALL_SCHEDULED_EVENTS_SETTINGS_STATEMENT)
+        ) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    String guildID = resultSet.getString("guildID");
+                    boolean ancientArena = resultSet.getBoolean("ancient_arena");
+                    boolean ancientNightmare = resultSet.getBoolean("ancient_nightmare");
+                    boolean assembly = resultSet.getBoolean("assembly");
+                    boolean battlegrounds = resultSet.getBoolean("battlegrounds");
+                    boolean demonGates = resultSet.getBoolean("demon_gates");
+
+
+
+
+
+
+
+
+
                     String textChannelID = resultSet.getString("textChannelID");
                     String guildID = resultSet.getString("guildID");
                     String roleID = resultSet.getString("roleID");
@@ -200,7 +260,7 @@ public class DatabaseRequests {
     public void createGuild(ClientGuild clientGuild) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getCreateNewGuildStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.CREATE_NEW_GUILD_STATEMENT)
         ) {
             preparedStatement.setString(1, clientGuild.getGuildID());
             preparedStatement.setString(2, clientGuild.getLanguage().shortName);
@@ -220,7 +280,7 @@ public class DatabaseRequests {
     public void updateGuild(ClientGuild clientGuild) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getUpdateGuildStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.UPDATE_GUILD_STATEMENT)
         ) {
             preparedStatement.setString(1, clientGuild.getLanguage().shortName);
             preparedStatement.setString(2, clientGuild.getTimeZone());
@@ -244,7 +304,7 @@ public class DatabaseRequests {
     public void deleteGuildByGuildID(String guildID) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteGuildByGuildIdStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.DELETE_GUILD_BY_GUILD_ID_STATEMENT)
         ) {
             preparedStatement.setString(1, guildID);
             preparedStatement.executeUpdate();
@@ -259,7 +319,7 @@ public class DatabaseRequests {
     public void createCustomNotification(CustomNotification customNotification) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getCreateCustomMessageStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.CREATE_CUSTOM_MESSAGE_STATEMENT)
         ) {
             preparedStatement.setString(1, customNotification.getGuildID());
             preparedStatement.setString(2, customNotification.getChannelID());
@@ -278,7 +338,7 @@ public class DatabaseRequests {
     public void updateCustomNotification(CustomNotification customNotification) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getUpdateCustomMessageStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.UPDATE_CUSTOM_MESSAGE_STATEMENT)
         ) {
             preparedStatement.setString(1, customNotification.getMessage());
             preparedStatement.setString(2, customNotification.getWeekday());
@@ -296,7 +356,7 @@ public class DatabaseRequests {
     public void deleteCustomNotificationByID(String customMessageID) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteCustomMessageByIdStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.DELETE_CUSTOM_MESSAGE_BY_ID_STATEMENT)
         ) {
             preparedStatement.setString(1, customMessageID);
             preparedStatement.executeUpdate();
@@ -309,7 +369,7 @@ public class DatabaseRequests {
     public void deleteMessagesByGuildID(String guildID) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteMessageByGuildIdStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.DELETE_MESSAGE_BY_GUILD_ID_STATEMENT)
         ) {
             preparedStatement.setString(1, guildID);
             preparedStatement.executeUpdate();
@@ -324,7 +384,7 @@ public class DatabaseRequests {
     public void createNotificationChannel(NotificationChannel notificationChannel) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getCreateChannelStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.CREATE_CHANNEL_STATEMENT)
         ) {
             preparedStatement.setString(1, notificationChannel.getTextChannelID());
             preparedStatement.setString(2, notificationChannel.getGuildID());
@@ -357,7 +417,7 @@ public class DatabaseRequests {
     public void updateNotificationChannel(NotificationChannel notificationChannel) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getUpdateChannelStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.UPDATE_CHANNEL_STATEMENT)
         ) {
             preparedStatement.setString(1, notificationChannel.getMentionRoleID());
             preparedStatement.setBoolean(2, notificationChannel.isEventMessageEnabled());
@@ -388,7 +448,7 @@ public class DatabaseRequests {
     public void deleteNotificationChannelByID(String textChannelID) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteChannelByIdStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.DELETE_CHANNEL_BY_ID_STATEMENT)
         ) {
             preparedStatement.setString(1, textChannelID);
             preparedStatement.executeUpdate();
@@ -401,11 +461,78 @@ public class DatabaseRequests {
     public void deleteChannelsByGuildID(String guildID) {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.getDeleteChannelByGuildIdStatement())
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.DELETE_CHANNEL_BY_GUILD_ID_STATEMENT)
         ) {
             preparedStatement.setString(1, guildID);
             preparedStatement.executeUpdate();
             log.info("Deleted channels of " + guildID + " from database.");
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public void createScheduledEventsSettings(String guildID) {
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.CREATE_SCHEDULED_EVENTS_SETTINGS_STATEMENT)
+        ) {
+            preparedStatement.setString(1, guildID);
+            preparedStatement.executeUpdate();
+            log.info("Inserted {} into {}.", guildID, SCHEDULED_EVENTS_SETTINGS_TABLE);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public void updateScheduledEventsSettings(ScheduledEventsSetting seSettings) {
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.UPDATE_SCHEDULED_EVENTS_SETTINGS_STATEMENT)
+        ) {
+            preparedStatement.setBoolean(1, seSettings.isAncientArenaEnabled());
+            preparedStatement.setBoolean(2, seSettings.isAncientNightmareEnabled());
+            preparedStatement.setBoolean(3, seSettings.isAssemblyEnabled());
+            preparedStatement.setBoolean(4, seSettings.isBattlegroundsEnabled());
+            preparedStatement.setBoolean(5, seSettings.isDemonGatesEnabled());
+            preparedStatement.setBoolean(6, seSettings.isHauntedCarriageEnabled());
+            preparedStatement.setBoolean(7, seSettings.isStormpointEnabled());
+            preparedStatement.setBoolean(8, seSettings.isShadowLotteryEnabled());
+            preparedStatement.setBoolean(9, seSettings.isShadowWarEnabled());
+            preparedStatement.setBoolean(10, seSettings.isAccursedTowerEnabled());
+            preparedStatement.setBoolean(11, seSettings.isVaultEnabled());
+            preparedStatement.setBoolean(12, seSettings.isWrathborneInvasionEnabled());
+            preparedStatement.setString(13, seSettings.getGuildID());
+            preparedStatement.executeUpdate();
+            log.info("Updated {} in {}," +
+                            "ancient_arena = {}," +
+                            "ancient_nightmare = {}," +
+                            "assembly = {}," +
+                            "battlegrounds = {}," +
+                            "demon_gates = {}," +
+                            "haunted_carriage = {}," +
+                            "stormpoint = {}," +
+                            "shadow_lottery = {}," +
+                            "shadow_war = {}," +
+                            "accursed_tower = {}," +
+                            "vault = {}," +
+                            "wrathborne_invasion = {}.", seSettings.getGuildID(), SCHEDULED_EVENTS_SETTINGS_TABLE,
+                    seSettings.isAncientArenaEnabled(), seSettings.isAncientNightmareEnabled(), seSettings.isAssemblyEnabled(),
+                    seSettings.isBattlegroundsEnabled(), seSettings.isDemonGatesEnabled(), seSettings.isHauntedCarriageEnabled(),
+                    seSettings.isStormpointEnabled(), seSettings.isShadowLotteryEnabled(), seSettings.isShadowWarEnabled(),
+                    seSettings.isAccursedTowerEnabled(), seSettings.isVaultEnabled(), seSettings.isWrathborneInvasionEnabled());
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public void deleteScheduledEventsSettings(String guildID) {
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.DELETE_SCHEDULED_EVENTS_SETTINGS_STATEMENT)
+        ) {
+            preparedStatement.setString(1, guildID);
+            preparedStatement.executeUpdate();
+            log.info("Deleted {} from {}.", guildID, SCHEDULED_EVENTS_SETTINGS_TABLE);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }

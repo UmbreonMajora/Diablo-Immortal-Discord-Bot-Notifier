@@ -8,28 +8,31 @@ import java.nio.charset.StandardCharsets;
 
 public class SQLStatements {
 
-    private SQLStatements() {
-        // static use only
-    }
+    private SQLStatements() { /* static use only */ }
 
     private static final String DEFAULT_PATH = "sql-scripts/";
 
-    private static final String GET_ALL_GUILDS_STATEMENT;
-    private static final String CREATE_NEW_GUILD_STATEMENT;
-    private static final String DELETE_GUILD_BY_GUILD_ID_STATEMENT;
-    private static final String UPDATE_GUILD_STATEMENT;
+    public static final String GET_ALL_GUILDS_STATEMENT;
+    public static final String CREATE_NEW_GUILD_STATEMENT;
+    public static final String DELETE_GUILD_BY_GUILD_ID_STATEMENT;
+    public static final String UPDATE_GUILD_STATEMENT;
 
-    private static final String GET_ALL_CUSTOM_MESSAGES_STATEMENT;
-    private static final String CREATE_CUSTOM_MESSAGE_STATEMENT;
-    private static final String DELETE_CUSTOM_MESSAGE_BY_ID_STATEMENT;
-    private static final String DELETE_MESSAGE_BY_GUILD_ID_STATEMENT;
-    private static final String UPDATE_CUSTOM_MESSAGE_STATEMENT;
+    public static final String GET_ALL_CUSTOM_MESSAGES_STATEMENT;
+    public static final String CREATE_CUSTOM_MESSAGE_STATEMENT;
+    public static final String DELETE_CUSTOM_MESSAGE_BY_ID_STATEMENT;
+    public static final String DELETE_MESSAGE_BY_GUILD_ID_STATEMENT;
+    public static final String UPDATE_CUSTOM_MESSAGE_STATEMENT;
 
-    private static final String GET_ALL_CHANNELS_STATEMENT;
-    private static final String CREATE_CHANNEL_STATEMENT;
-    private static final String DELETE_CHANNEL_BY_ID_STATEMENT;
-    private static final String UPDATE_CHANNEL_STATEMENT;
-    private static final String DELETE_CHANNEL_BY_GUILD_ID_STATEMENT;
+    public static final String GET_ALL_CHANNELS_STATEMENT;
+    public static final String CREATE_CHANNEL_STATEMENT;
+    public static final String DELETE_CHANNEL_BY_ID_STATEMENT;
+    public static final String UPDATE_CHANNEL_STATEMENT;
+    public static final String DELETE_CHANNEL_BY_GUILD_ID_STATEMENT;
+
+    public static final String CREATE_SCHEDULED_EVENTS_SETTINGS_STATEMENT;
+    public static final String UPDATE_SCHEDULED_EVENTS_SETTINGS_STATEMENT;
+    public static final String DELETE_SCHEDULED_EVENTS_SETTINGS_STATEMENT;
+    public static final String GET_ALL_SCHEDULED_EVENTS_SETTINGS_STATEMENT;
 
     static {
         GET_ALL_GUILDS_STATEMENT = loadResourceToString(DEFAULT_PATH + "get-all-guilds.sql");
@@ -48,6 +51,11 @@ public class SQLStatements {
         DELETE_CHANNEL_BY_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-channel-by-id.sql");
         UPDATE_CHANNEL_STATEMENT = loadResourceToString(DEFAULT_PATH + "update-channel.sql");
         DELETE_CHANNEL_BY_GUILD_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-channels-by-guildid.sql");
+
+        CREATE_SCHEDULED_EVENTS_SETTINGS_STATEMENT = loadResourceToString(DEFAULT_PATH + "create-scheduled-events-settings.sql");
+        UPDATE_SCHEDULED_EVENTS_SETTINGS_STATEMENT = loadResourceToString(DEFAULT_PATH + "update-scheduled-events-settings.sql");
+        DELETE_SCHEDULED_EVENTS_SETTINGS_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-scheduled-events-settings.sql");
+        GET_ALL_SCHEDULED_EVENTS_SETTINGS_STATEMENT = loadResourceToString(DEFAULT_PATH + "get-all-scheduled-events-settings.sql");
     }
 
     private static String loadResourceToString(String path) {
@@ -55,80 +63,13 @@ public class SQLStatements {
                 .getContextClassLoader()
                 .getResourceAsStream(path);
         try {
+            assert stream != null : "Stream was null!";
             return IOUtils.toString(stream, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         } finally {
             IOUtils.closeQuietly(stream);
         }
-    }
-
-    /*
-     * Guilds Statements Getter
-     */
-
-    public static String getGetAllGuildsStatement() {
-        return GET_ALL_GUILDS_STATEMENT;
-    }
-
-    public static String getCreateNewGuildStatement() {
-        return CREATE_NEW_GUILD_STATEMENT;
-    }
-
-    public static String getUpdateGuildStatement() {
-        return UPDATE_GUILD_STATEMENT;
-    }
-
-    public static String getDeleteGuildByGuildIdStatement() {
-        return DELETE_GUILD_BY_GUILD_ID_STATEMENT;
-    }
-
-    /*
-     * Custom Message Statements Getter
-     */
-
-    public static String getGetAllCustomMessagesStatement() {
-        return GET_ALL_CUSTOM_MESSAGES_STATEMENT;
-    }
-
-    public static String getCreateCustomMessageStatement() {
-        return CREATE_CUSTOM_MESSAGE_STATEMENT;
-    }
-
-    public static String getDeleteCustomMessageByIdStatement() {
-        return DELETE_CUSTOM_MESSAGE_BY_ID_STATEMENT;
-    }
-
-    public static String getUpdateCustomMessageStatement() {
-        return UPDATE_CUSTOM_MESSAGE_STATEMENT;
-    }
-
-    public static String getDeleteMessageByGuildIdStatement() {
-        return DELETE_MESSAGE_BY_GUILD_ID_STATEMENT;
-    }
-
-    /*
-     * Channel Statements Getter
-     */
-
-    public static String getGetAllChannelsStatement() {
-        return GET_ALL_CHANNELS_STATEMENT;
-    }
-
-    public static String getCreateChannelStatement() {
-        return CREATE_CHANNEL_STATEMENT;
-    }
-
-    public static String getDeleteChannelByIdStatement() {
-        return DELETE_CHANNEL_BY_ID_STATEMENT;
-    }
-
-    public static String getUpdateChannelStatement() {
-        return UPDATE_CHANNEL_STATEMENT;
-    }
-
-    public static String getDeleteChannelByGuildIdStatement() {
-        return DELETE_CHANNEL_BY_GUILD_ID_STATEMENT;
     }
 
 }

@@ -35,7 +35,7 @@ public class DeleteMessageCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         String customMessageID = getCustomMessageID(event);
         if (Objects.equals(customMessageID, StringUtil.FAILED_MESSAGE)) {

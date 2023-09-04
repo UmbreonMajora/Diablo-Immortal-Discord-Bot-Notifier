@@ -30,7 +30,7 @@ public class TimeZonesCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
         log.info("{} used /timezones. Guild: {}({}). Channel: {}({})",
                 logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(), logInfo.getChannelID());
         replyEphemeralToUser(event, buildTimeZonesEmbed(language));

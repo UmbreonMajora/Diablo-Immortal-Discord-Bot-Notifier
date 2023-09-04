@@ -32,7 +32,7 @@ public class ListMessagesCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = Objects.requireNonNull(event.getGuild()).getId();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         Map<String, CustomNotification> customNotifications = guildsCache.getClientGuildByID(guildID).getCustomNotifications();
 

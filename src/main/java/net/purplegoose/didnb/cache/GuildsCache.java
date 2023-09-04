@@ -30,7 +30,7 @@ public class GuildsCache {
         return guilds.get(guildID);
     }
 
-    public Language getGuildLanguage(String guildID) {
+    public Language getLanguageByGuildID(String guildID) {
         return guilds.get(guildID).getLanguage();
     }
 

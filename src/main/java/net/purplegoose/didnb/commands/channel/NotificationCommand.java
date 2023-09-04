@@ -37,7 +37,7 @@ public class NotificationCommand implements IClientCommand {
         String targetTextChannelID = targetTextChannel.getId();
         String targetTextChannelName = targetTextChannel.getName();
 
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
             log.error("{} used /notification. Error: Channel not registered. Guild: {}({}). Channel: {}({})",

@@ -31,7 +31,7 @@ public class RegisterCommand implements IClientCommand {
         TextChannel targetTextChannel = getTargetTextChannel(event);
         String targetTextChannelID = targetTextChannel.getId();
 
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         if (isChannelAlreadyRegistered(guildID, targetTextChannelID)) {
             log.error("{} used /register. Error: Channel already registered. Guild: {}({}). Channel: {}({})",

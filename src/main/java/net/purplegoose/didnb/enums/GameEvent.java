@@ -32,6 +32,8 @@ public enum GameEvent {
     }
 
     public static GameEvent findGameEventByRawName(String rawName) {
+        if (rawName.equalsIgnoreCase("stormpoint")) return ON_SLAUGHT;
+        if (rawName.equalsIgnoreCase("accursedtower")) return TOWER_OF_VICTORY;
         for (GameEvent gameEvent : GameEvent.values()) {
             if (gameEvent.rawName.equalsIgnoreCase(rawName)) {
                 return gameEvent;

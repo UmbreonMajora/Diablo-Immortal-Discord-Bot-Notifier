@@ -33,7 +33,7 @@ public class MessageCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         String messageID = getMessageID(event);
         if (Objects.equals(messageID, StringUtil.FAILED_MESSAGE)) {

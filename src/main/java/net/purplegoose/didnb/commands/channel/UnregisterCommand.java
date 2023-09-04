@@ -28,7 +28,7 @@ public class UnregisterCommand implements IClientCommand {
         String guildID = logInfo.getGuildID();
         TextChannel targetTextChannel = getTargetTextChannel(event);
         String targetTextChannelID = targetTextChannel.getId();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         if (!isChannelRegistered(guildID, targetTextChannelID)) {
             log.error("{} used /unregister. Error: Channel not registered. Guild: {}({}). Channel: {}({})",

@@ -1,5 +1,7 @@
 package net.purplegoose.didnb.data;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.purplegoose.didnb.enums.Language;
@@ -8,54 +10,35 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Getter
+@Setter
 public class ClientGuild {
 
-    @Getter
+    @Setter(value = AccessLevel.NONE)
     private final String guildID;
-    @Getter
-    @Setter
     private Language language;
-    @Getter
-    @Setter
-    private String TimeZone;
-    @Getter
-    @Setter
+    private String timeZone;
     private String guildAdminRoleID;
-    @Getter
-    @Setter
     private int warnTimeInMinutes;
-    @Getter
-    @Setter
     private boolean isWarnMessagesEnabled;
-    @Getter
-    @Setter
     private boolean isEventMessageEnabled;
-    @Getter
-    @Setter
     private boolean isDaylightTimeEnabled;
-    @Getter
-    @Setter
     private boolean isPremiumServer;
-    @Getter
-    @Setter
     private boolean isAutoDeleteEnabled;
-    @Getter
-    @Setter
     private int autoDeleteTimeInHours;
-    @Getter
-    @Setter
     private long embedLeadTime;
+    private ScheduledEventsSetting seSetting;
 
     private final Map<String, CustomNotification> customNotifications;
     private final Map<String, NotificationChannel> notificationChannels;
 
-    public ClientGuild(String guildID, Language language, String TimeZone, String guildAdminRoleID,
+    public ClientGuild(String guildID, Language language, String timeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled,
                        boolean isDaylightTimeEnabled, boolean isPremiumServer, int autoDeleteTimeInHours,
                        boolean isAutoDeleteEnabled, long embedLeadTime) {
         this.guildID = guildID;
         this.language = language;
-        this.TimeZone = TimeZone;
+        this.timeZone = timeZone;
         this.guildAdminRoleID = guildAdminRoleID;
         this.warnTimeInMinutes = warnTimeInMinutes;
         this.isWarnMessagesEnabled = isEventMessageEnabled;
@@ -72,7 +55,7 @@ public class ClientGuild {
     public ClientGuild(String guildID) {
         this.guildID = guildID;
         this.language = Language.ENGLISH;
-        this.TimeZone = "GMT";
+        this.timeZone = "GMT";
         this.guildAdminRoleID = null;
         this.warnTimeInMinutes = 15;
         this.isWarnMessagesEnabled = true;

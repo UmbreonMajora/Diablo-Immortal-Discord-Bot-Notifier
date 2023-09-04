@@ -24,6 +24,7 @@ public class GuildJoin extends ListenerAdapter {
             ClientGuild clientGuild = new ClientGuild(guildID);
             guildsCache.addGuild(clientGuild);
             databaseRequests.createGuild(clientGuild);
+            databaseRequests.createScheduledEventsSettings(guildID);
             log.info("Joined new guild. Registering " + guildID);
         }
 

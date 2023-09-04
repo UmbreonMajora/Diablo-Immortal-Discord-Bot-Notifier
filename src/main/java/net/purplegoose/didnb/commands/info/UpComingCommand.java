@@ -38,7 +38,7 @@ public class UpComingCommand implements IClientCommand {
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
         String timeZone = guildsCache.getGuildTimeZone(guildID);
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         log.info("{} used /upcoming. Guild: {}({}). Channel: {}({})",
                 logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(), logInfo.getChannelID());

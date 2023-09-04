@@ -35,7 +35,7 @@ public class TimeZoneCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         String newTimeZone = getTimeZone(event);
         if (newTimeZone == null)  {
