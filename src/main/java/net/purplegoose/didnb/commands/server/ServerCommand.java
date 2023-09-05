@@ -32,7 +32,7 @@ public class ServerCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         String serverSettingRawName = getServerSetting(event);
         ServerSetting serverSetting = ServerSetting.findServerSettingByRawName(serverSettingRawName);

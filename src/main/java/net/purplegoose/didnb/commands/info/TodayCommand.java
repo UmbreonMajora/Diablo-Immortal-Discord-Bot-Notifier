@@ -38,7 +38,7 @@ public class TodayCommand implements IClientCommand {
         String guildID = logInfo.getGuildID();
         String timeZone = guildsCache.getGuildTimeZone(guildID);
         String weekday = TimeUtil.getCurrentWeekday(timeZone);
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         log.info("{} used /today. Guild: {}({}). Channel: {}({})",
                 logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(), logInfo.getChannelID());

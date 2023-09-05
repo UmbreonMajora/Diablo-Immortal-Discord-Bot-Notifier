@@ -31,7 +31,7 @@ public class LanguageCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         Language newLanguage = getLanguage(event);
         if (newLanguage == null) {
@@ -42,7 +42,7 @@ public class LanguageCommand implements IClientCommand {
         }
 
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
-        Language oldLanguage = guildsCache.getGuildLanguage(guildID);
+        Language oldLanguage = guildsCache.getLanguageByGuildID(guildID);
         updateLanguage(clientGuild, newLanguage);
 
         log.error("{} used /language. Old language: {}. New language {}. Guild: {}({}). Channel: {}({})",
@@ -52,7 +52,7 @@ public class LanguageCommand implements IClientCommand {
     }
 
     private void updateLanguage(ClientGuild clientGuild, Language language) {
-        clientGuild.setGuildLanguage(language);
+        clientGuild.setLanguage(language);
         databaseRequests.updateGuild(clientGuild);
     }
 

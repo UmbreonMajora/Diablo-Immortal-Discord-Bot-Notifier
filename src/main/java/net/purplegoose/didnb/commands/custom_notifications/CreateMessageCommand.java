@@ -35,7 +35,7 @@ public class CreateMessageCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         if (!isWeekdayValid(getWeekday(event), logInfo)) {
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CREATE-CUSTOM-MESSAGE-FAILED-WEEKDAY-INVALID"));

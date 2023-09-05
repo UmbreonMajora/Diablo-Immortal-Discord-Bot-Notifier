@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.purplegoose.didnb.commands.scheduled_events.DeleteAllEvents;
+import net.purplegoose.didnb.commands.scheduled_events.ListEvents;
 import net.purplegoose.didnb.enums.*;
 
 import java.io.IOException;
@@ -283,6 +285,12 @@ public class CommandsUtil {
     static {
         COMMAND_TIMEZONES_DESC = commandsProperties.get(COMMAND_TIMEZONES).toString();
         commandDataList.add(Commands.slash(COMMAND_TIMEZONES, COMMAND_TIMEZONES_DESC));
+    }
+
+
+    static {
+        commandDataList.add(Commands.slash(ListEvents.COMMAND, "This commands creates a dropdown menu where you can toggle the creation of scheduled events."));
+        commandDataList.add(Commands.slash(DeleteAllEvents.COMMAND, "This command deletes all scheduled events from a server."));
     }
 
     // -> /today

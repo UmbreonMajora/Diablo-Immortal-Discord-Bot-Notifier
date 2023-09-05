@@ -44,22 +44,6 @@ CHANNEL-MENTION-ROLE: "Ρόλος Αναφοράς:"
 TEXT-YES: "Ναι"
 APPLIED-PRESET-TO-CHANNEL: "Εφαρμόστηκε η προεπιλογή %s στο %s"
 TEXT-NO: "Όχι"
-EVENT-MESSAGES-ENABLED: "Τα μηνύματα εκδηλώσεων είναι ενεργοποιημένα:"
-WARN-MESSAGES-ENABLED: "Τα μηνύματα προειδοποίησης είναι ενεργοποιημένα:"
-ANCIENT-NIGHTMARE-MESSAGES-ENABLED: "Τα μηνύματα Αρχαίου Εφιάλτη είναι ενεργοποιημένα:"
-ANCIENT-ARENA-MESSAGES-ENABLED: "Τα μηνύματα Αρχαίας Αρένας είναι ενεργοποιημένα:"
-ASSEMBLY-MESSAGES-ENABLED: "Τα μηνύματα Συνέλευσης είναι ενεργοποιημένα:"
-BATTLEGROUND-MESSAGES-ENABLED: "Τα μηνύματα Αναμέτρησης είναι ενεργοποιημένα:"
-VAULT-MESSAGES-ENABLED: "Τα μηνύματα Θησαυροφυλακίου είναι ενεργοποιημένα:"
-DEMON-GATES-MESSAGES-ENABLED: "Τα μηνύματα Πυλών των Δαιμόνων είναι ενεργοποιημένα:"
-SHADOW-LOTTERY-MESSAGES-ENABLED: "Τα μηνύματα Σκοτεινής Λοταρίας είναι ενεργοποιημένα:"
-HAUNTED-CARRIAGE-MESSAGES-ENABLED: "Τα μηνύματα Στοιχισμένης Καροτσέλας είναι ενεργοποιημένα:"
-WRATHBORNE-INVASION-MESSAGES-ENABLED: "Τα μηνύματα Εισβολής Wrathborne είναι ενεργοποιημένα:"
-HAUNTED-CARRIAGE-EMBED-MESSAGES-ENABLED: "Τα ενσωματωμένα μηνύματα Στοιχισμένης Καροτσέλας είναι ενεργοποιημένα:"
-DEMON-GATES-EMBED-MESSAGES-ENABLED: "Τα ενσωματωμένα μηνύματα Πυλών των Δαιμόνων είναι ενεργοποιημένα:"
-ANCIENT-NIGHTMARE-EMBED-MESSAGES-ENABLED: "Τα ενσωματωμένα μηνύματα Αρχαίου Εφιάλτη είναι ενεργοποιημένα:"
-ANCIENT-ARENA-EMBED-MESSAGES-ENABLED: "Τα ενσωματωμένα μηνύματα Αρχαίας Αρένας είναι ενεργοποιημένα:"
-ON-SLAUGHT-ENABLED: "Τα μηνύματα Επιδρομής είναι ενεργοποιημένα:"
 ANCIENT-NIGHTMARE: "Αρχαίος Εφιάλτης"
 ANCIENT-ARENA: "Αρχαία Αρένα"
 ASSEMBLY: "Συνέλευση"
@@ -93,10 +77,6 @@ EVENT-ON-SLAUGHT-WARN: "Η εκδήλωση Επιδρομής ξεκινά σε
 INVALID-ID: "Άκυρο αναγνωριστικό. Ίσως να έχετε κάνει λάθος πληκτρολόγηση;"
 CM-NOT-EXISTS: "Αυτή η προσαρμοσμένη ειδοποίηση δεν υπάρχει."
 CM-ENABLED-DISABLED: "Η προσαρμοσμένη ειδοποίηση με αναγνωριστικό %s είναι τώρα %s"
-DAYLIGHT-TIME-ALREADY-ENABLED: "Η θερινή ώρα είναι ήδη ενεργοποιημένη."
-DAYLIGHT-TIME-ALREADY-DISABLED: "Η θερινή ώρα είναι ήδη απενεργοποιημένη."
-DAYLIGHT-TIME-NOW-ENABLED: "Η θερινή ώρα είναι τώρα ενεργοποιημένη."
-DAYLIGHT-TIME-NOW-DISABLED: "Η θερινή ώρα είναι τώρα απενεργοποιημένη."
 MESSAGE-MAX-REACHED: "Έχετε φτάσει το μέγιστο όριο προσαρμοσμένων ειδοποιήσεων."
 EVENT-TOWER-OF-VICTORY: "Η εκδήλωση Πύργος της Νίκης ξεκινά!"
 EVENT-TOWER-OF-VICTORY-WARN: "Η εκδήλωση Πύργος της Νίκης είναι έτοιμη να ξεκινήσει σε %s λεπτά."
@@ -104,4 +84,33 @@ EVENT-SHADOW-WAR-WARN: "Οι πόρτες για τον Πόλεμο των Σκ
 EVENT-SHADOW-WAR: "Ο Πόλεμος των Σκιών έχει ξεκινήσει."
 INVALID-WARN-TIME: "Ο χρόνος δεν βρίσκεται στον δοσμένο εύρος. (1 - 15)"
 UPDATED-WARN-TIME: "Ο νέος χρόνος προειδοποίησης σας είναι τώρα %s λεπτά."
-FAILED-TO-APPEND-MENTION-ROLE: "Αποτυχία προσάρτησης ρόλου αναφοράς. Παρακαλώ ξανακαθορίστε τον ρόλο αναφοράς."
+TEXT-ENABLED: "Ενεργοποιημένο: "
+CLICK-ON-SE-TO-TOGGLE: "Κάντε κλικ στο γεγονός που θέλετε να εναλλάξετε.\nΠροειδοποίηση: Οι τιμές είναι από τη στιγμή της δημιουργίας. Η αλλαγή μιας τιμής δεν θα ενημερωθεί αυτόματα στη λίστα. Για να έχετε μια λίστα με σωστές τιμές, χρησιμοποιήστε ξανά την ίδια εντολή."
+SE-DISABLED-FOR: "Προγραμματισμένα γεγονότα απενεργοποιημένα για τον %s."
+SE-ENABLED-FOR: "Προγραμματισμένα γεγονότα ενεργοποιημένα για τον %s."
+SHADOW-WAR: "Shadow WAR"
+TOWER-OF-VICTORY: "Tower of victory"
+# Shadow War
+SHADOW-WAR-LOCATION: "Westmarch Battlegrounds PvP area"
+# Shadow Lottery
+SHADOW-LOTTERY-LOCATION: "Westmarch Tavern"
+# Tower of victory
+TOWER-OF-VICTORY-LOCATION: "Savage Frontier"
+# Wrathborne Invasion
+WRATHBORNE-INVASION-LOCATION: "Diablo Immortal"
+# Haunted Carriage
+HAUNTED-CARRIAGE-LOCATION: "Ashwold Cemetery"
+# Demon Gates
+DEMON-GATES-LOCATION: "Realm of Damnation"
+# Assembly
+ASSEMBLY-LOCATION: "Court of Whispers"
+# Vault
+VAULT-LOCATION: "Vault location"
+# Battleground
+BATTLEGROUND-LOCATION: "Westmarch"
+# Ancient Arena
+ANCIENT-ARENA-LOCATION: "Bilefen"
+# Ancient Nightmare
+ANCIENT-NIGHTMARE-LOCATION: "Misty valley"
+# OnSlaught
+ON-SLAUGHT-LOCATION: "Westmarch"

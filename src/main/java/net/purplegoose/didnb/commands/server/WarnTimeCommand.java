@@ -35,7 +35,7 @@ public class WarnTimeCommand implements IClientCommand {
         String guildID = logInfo.getGuildID();
         int newWarnTime = getWarnTime(event);
         ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
-        Language language = clientGuild.getGuildLanguage();
+        Language language = clientGuild.getLanguage();
 
         if (newWarnTime == INVALID_NEW_WARNTIME) {
             log.error("{} used /warntime. Error: Time was not in the given range. Guild: {}({}). Channel: {}({})",

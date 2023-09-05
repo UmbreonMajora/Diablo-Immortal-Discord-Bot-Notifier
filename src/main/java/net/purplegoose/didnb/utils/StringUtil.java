@@ -37,4 +37,8 @@ public class StringUtil {
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append).toString();
     }
 
+    public static String removeAlphabeticCharacters(String input) {
+        return input.replaceAll("[a-zA-Z]", "");
+    }
+
 }

@@ -29,7 +29,7 @@ public class OnSlaughtEvent implements IGameEvent {
 
         Set<EventGameData> eventGameDataSet = gameDataCache.getOnSlaughtDataSet();
         String timeZone = guild.getTimeZone();
-        Language language = guild.getGuildLanguage();
+        Language language = guild.getLanguage();
 
         if (!isTimeInWarnRange(eventGameDataSet, timeZone).equals(EMPTY_STRING)) {
             String startTime = isTimeInWarnRange(eventGameDataSet, timeZone);

@@ -36,7 +36,7 @@ public class InfoCommand implements IClientCommand {
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         TextChannel channel = getTargetTextChannel(event);
-        Language language = guildsCache.getGuildLanguage(logInfo.getGuildID());
+        Language language = guildsCache.getLanguageByGuildID(logInfo.getGuildID());
 
         if (!isTextChannelRegistered(logInfo.getGuildID(), channel.getId())) {
             log.error("{} used /{}. Error: Channel not registered. Guild: {}({}). Channel: {}({})",
