@@ -16,8 +16,7 @@ import static net.purplegoose.didnb.utils.CommandsUtil.AUTO_DELETE_TIME_OPTION_N
  * <p>
  * @Command: /autodelete [Not Required: TimeInHours]
  * <p>
- * @Description
- * Allow's the user to enable or disable the auto-deletion of their notification messages.
+ * @Description Allow's the user to enable or disable the auto-deletion of their notification messages.
  * The command without any following parameters will disable or enable the auto-deletion. If the command is used
  * while auto-deletion deactivated, it will activate and vice versa.
  * The command with a following numeric parameter will set a new value of when the message should get deleted.
@@ -26,10 +25,9 @@ import static net.purplegoose.didnb.utils.CommandsUtil.AUTO_DELETE_TIME_OPTION_N
 @AllArgsConstructor
 public class AutoDeleteCommand implements IClientCommand {
 
-    private final GuildsCache guildsCache;
-
     private static final int MAX_AUTO_DELETE_TIME = 24;
     private static final int AUTO_DELETE_TIME_EMPTY = -59;
+    private final GuildsCache guildsCache;
 
     @Override
     public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
@@ -66,6 +64,7 @@ public class AutoDeleteCommand implements IClientCommand {
     private void toggleAutoDeletion(ClientGuild clientGuild) {
         clientGuild.setAutoDeleteEnabled(!clientGuild.isAutoDeleteEnabled());
     }
+
     private void changeAutoDeleteTime(ClientGuild clientGuild, int autoDeleteTimeInHours) {
         clientGuild.setAutoDeleteTimeInHours(autoDeleteTimeInHours);
     }

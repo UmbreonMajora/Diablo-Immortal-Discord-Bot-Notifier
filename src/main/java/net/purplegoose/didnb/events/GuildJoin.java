@@ -9,6 +9,7 @@ import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.utils.CommandsUtil;
 import org.jetbrains.annotations.NotNull;
+
 @Slf4j
 @AllArgsConstructor
 public class GuildJoin extends ListenerAdapter {

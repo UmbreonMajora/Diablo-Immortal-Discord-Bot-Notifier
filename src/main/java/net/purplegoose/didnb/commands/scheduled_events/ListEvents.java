@@ -25,9 +25,8 @@ import java.lang.reflect.Field;
 )
 public class ListEvents extends Command {
 
-    private final GuildsCache guildsCache;
-
     public static final String COMMAND = "se";
+    private final GuildsCache guildsCache;
 
     @Override
     public void performCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {

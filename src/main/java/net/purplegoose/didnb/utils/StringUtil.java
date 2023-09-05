@@ -4,16 +4,15 @@ import java.util.Random;
 
 public class StringUtil {
 
-    private StringUtil() { /* static use only */ }
-
     public static final String EMPTY_STRING = "";
     public static final String NEW_LINE = "\n";
     public static final String FORMATTED_MESSAGE = "```";
     public static final String FAILED_MESSAGE = "FAILED!";
     public static final String ENABLED_MESSAGE = "Enabled";
     public static final String DISABLE_MESSAGE = "Disabled";
-
     private static final Random RANDOM = new Random();
+
+    private StringUtil() { /* static use only */ }
 
     public static boolean isStringSingleDashWithDigits(String string) {
         return string.matches("-[\\d]+");

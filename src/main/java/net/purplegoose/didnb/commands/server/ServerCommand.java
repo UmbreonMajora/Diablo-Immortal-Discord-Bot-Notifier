@@ -13,7 +13,8 @@ import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.ServerSetting;
 import net.purplegoose.didnb.languages.LanguageController;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.*;
+import static net.purplegoose.didnb.utils.CommandsUtil.SERVER_SETTING_BOOL;
+import static net.purplegoose.didnb.utils.CommandsUtil.SERVER_SETTING_OPTION_NAME;
 
 /**
  * @author Umbreon Majora

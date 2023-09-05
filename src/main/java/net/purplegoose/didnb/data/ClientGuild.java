@@ -1,7 +1,6 @@
 package net.purplegoose.didnb.data;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.purplegoose.didnb.enums.Language;
@@ -16,6 +15,8 @@ public class ClientGuild {
 
     @Setter(value = AccessLevel.NONE)
     private final String guildID;
+    private final Map<String, CustomNotification> customNotifications;
+    private final Map<String, NotificationChannel> notificationChannels;
     private Language language;
     private String timeZone;
     private String guildAdminRoleID;
@@ -28,9 +29,6 @@ public class ClientGuild {
     private int autoDeleteTimeInHours;
     private long embedLeadTime;
     private ScheduledEventsSetting seSetting;
-
-    private final Map<String, CustomNotification> customNotifications;
-    private final Map<String, NotificationChannel> notificationChannels;
 
     public ClientGuild(String guildID, Language language, String timeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled,

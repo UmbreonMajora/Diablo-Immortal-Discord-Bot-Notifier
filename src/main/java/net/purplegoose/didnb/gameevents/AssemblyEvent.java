@@ -13,6 +13,7 @@ import java.util.Set;
 
 import static net.purplegoose.didnb.utils.StringUtil.EMPTY_STRING;
 import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
+
 /**
  * @author Umbreon Majora
  * Class for Diablo Immortal Assembly event.

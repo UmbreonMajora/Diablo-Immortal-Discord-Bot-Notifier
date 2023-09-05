@@ -4,7 +4,8 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LanguagesConsistencyTest {
 

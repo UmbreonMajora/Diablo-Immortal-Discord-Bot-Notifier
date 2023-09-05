@@ -84,11 +84,13 @@ Important: If you have Administrator-Permissions you do not need to have the Bot
 | `/editmessage [ID] [ValueToChange] [NewValue]`          | Allows you to edit your notification message.                                                                                                                                                                                                                                                                                      |
 | `/message [ID] [True/False]`                            | Allows you to enable or disable each of your own notification message.                                                                                                                                                                                                                                                             |
 
-
 ## Languages
-We're using Crowndin to translate the bot in other languages. Head to our discord server or check this out: https://crowdin.com/project/di_notifier
 
-We're currently supporting: German, French, Indonesian, Italian, Polish, Portuguese/Brazilian, Russian, Spanish & Ukrainian
+We're using Crowndin to translate the bot in other languages. Head to our discord server or check this
+out: https://crowdin.com/project/di_notifier
+
+We're currently supporting: German, French, Indonesian, Italian, Polish, Portuguese/Brazilian, Russian, Spanish &
+Ukrainian
 
 ---
 
@@ -110,10 +112,13 @@ Thanks! <3
 
 ---
 Runtime Information:
+
 - Written in Java 17
 
 Running the bot with registering every command to every guild:
+
 - screen java -jar Diablo-Immortal-Discord-Notifier-Bot-X.X.X.jar true
 
 Running the bot without registering every command to every guild:
+
 - screen java -jar Diablo-Immortal-Discord-Notifier-Bot-X.X.X.jar false

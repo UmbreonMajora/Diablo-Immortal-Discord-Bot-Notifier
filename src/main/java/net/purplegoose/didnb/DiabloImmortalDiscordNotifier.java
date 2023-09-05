@@ -3,7 +3,6 @@ package net.purplegoose.didnb;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.purplegoose.didnb.annotations.GameDataCacheSet;
 import net.purplegoose.didnb.cache.*;
 import net.purplegoose.didnb.data.ScheduledEventsSetting;
@@ -12,10 +11,10 @@ import net.purplegoose.didnb.database.MySQLDatabaseConnection;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.events.*;
 import net.purplegoose.didnb.exeption.StartFailureException;
-import net.purplegoose.didnb.notifier.ScheduledEventCreator;
 import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
+import net.purplegoose.didnb.notifier.ScheduledEventCreator;
 import net.purplegoose.didnb.utils.ConfigUtil;
 
 import java.lang.reflect.Field;
@@ -24,6 +23,8 @@ import java.util.Arrays;
 
 @Slf4j
 public class DiabloImmortalDiscordNotifier {
+
+    public static final String botId = "527511535309029407";
 
     private static boolean registerCommands = true;
 

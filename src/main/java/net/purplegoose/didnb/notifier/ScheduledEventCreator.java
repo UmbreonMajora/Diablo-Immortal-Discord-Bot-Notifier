@@ -3,9 +3,7 @@ package net.purplegoose.didnb.notifier;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
@@ -19,7 +17,10 @@ import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.StringUtil;
 import net.purplegoose.didnb.utils.TimeUtil;
 
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -88,7 +89,8 @@ public class ScheduledEventCreator {
             case WRATHBORNE_INVASION -> {
                 return seSetting.isWrathborneInvasionEnabled();
             }
-            default -> throw new ScheduledEventCreationException(String.format("Failed to find boolean for %s.", gameEvent.rawName), null);
+            default ->
+                    throw new ScheduledEventCreationException(String.format("Failed to find boolean for %s.", gameEvent.rawName), null);
         }
     }
 

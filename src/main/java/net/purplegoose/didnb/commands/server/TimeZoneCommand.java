@@ -21,7 +21,7 @@ import java.time.zone.ZoneRulesException;
 /**
  * @author Umbreon Majora
  * <p>
- * @Description:  Allow's user to change the timezone for their server.
+ * @Description: Allow's user to change the timezone for their server.
  * <p>
  * @Command: /timezone [Required: timezone]
  */
@@ -38,7 +38,7 @@ public class TimeZoneCommand implements IClientCommand {
         Language language = guildsCache.getLanguageByGuildID(guildID);
 
         String newTimeZone = getTimeZone(event);
-        if (newTimeZone == null)  {
+        if (newTimeZone == null) {
             log.error("{} used /timezone. Error: Timezone is null. Guild: {}({}). Channel: {}({})",
                     logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(),
                     logInfo.getChannelID());

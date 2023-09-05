@@ -23,6 +23,7 @@ import net.purplegoose.didnb.utils.PermissionUtil;
 import org.jetbrains.annotations.NotNull;
 
 import static net.purplegoose.didnb.utils.CommandsUtil.*;
+
 @Slf4j
 public class SlashCommandInteraction extends ListenerAdapter {
 
@@ -150,7 +151,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private void executeCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String command = event.getName().toLowerCase();
         switch (command) {
-            case ListEvents.COMMAND ->  listEvents.performCommand(event, logInfo);
+            case ListEvents.COMMAND -> listEvents.performCommand(event, logInfo);
             case DeleteAllEvents.COMMAND -> deleteAllEvents.performCommand(event, logInfo);
 
             case COMMAND_TODAY -> todayCommand.runCommand(event, logInfo);
