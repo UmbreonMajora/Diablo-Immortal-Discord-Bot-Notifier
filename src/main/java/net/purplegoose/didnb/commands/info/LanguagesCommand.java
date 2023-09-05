@@ -6,8 +6,6 @@ import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.enums.Language;
 
-import java.util.Arrays;
-
 import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
 
 /**

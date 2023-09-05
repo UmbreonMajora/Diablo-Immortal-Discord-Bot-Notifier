@@ -10,5 +10,6 @@ import java.lang.annotation.Target;
 public @interface GameDataCacheSet {
 
     String tableName() default "";
+
     boolean everyday() default false;
 }

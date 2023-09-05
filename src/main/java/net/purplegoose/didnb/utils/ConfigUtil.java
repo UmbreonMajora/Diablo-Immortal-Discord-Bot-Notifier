@@ -5,19 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
 @Slf4j
 public class ConfigUtil {
 
-    private ConfigUtil() {
-        // static use only
-    }
-
     private static final Properties CLIENT_PROPERTIES = new Properties();
-
     private static final int DEFAULT_WARN_TIME;
     private static final String CLIENT_TOKEN;
     private static final int CUSTOM_NOTIFICATION_MAX;
-
     private static final String DATABASE_HOST;
     private static final String DATABASE_DATABASE;
     private static final String DATABASE_USERNAME;
@@ -43,6 +38,10 @@ public class ConfigUtil {
         DATABASE_USERNAME = CLIENT_PROPERTIES.getProperty("DATABASE_USERNAME");
         DATABASE_PASSWORD = CLIENT_PROPERTIES.getProperty("DATABASE_PASSWORD");
         DATABASE_PORT = Integer.parseInt(CLIENT_PROPERTIES.getProperty("DATABASE_PORT"));
+    }
+
+    private ConfigUtil() {
+        // static use only
     }
 
     public static int getDefaultWarnTime() {

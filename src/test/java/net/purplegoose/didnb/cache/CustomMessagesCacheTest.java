@@ -1,10 +1,10 @@
 package net.purplegoose.didnb.cache;
 
-import net.purplegoose.didnb.cache.CustomMessagesCache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CustomMessagesCacheTest {
 
@@ -40,7 +40,7 @@ class CustomMessagesCacheTest {
     }
 
     @Test
-        void testAddDuplicateIdentifier() {
+    void testAddDuplicateIdentifier() {
         cache.addIdentifier("identifier");
         cache.addIdentifier("identifier"); // Adding the same identifier again
         assertTrue(cache.isIdentifierInUse("identifier"));

@@ -10,17 +10,15 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.zone.ZoneRulesException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 @Slf4j
 public class TimeUtil {
 
+    public static final int HOURS_IN_SECONDS = 3600;
     private static final String HOURS_MINUTE_FORMAT = "H:mm";
     private static final String WEEKDAY_FORMAT = "EEEE";
-    public static final int HOURS_IN_SECONDS = 3600;
 
     private TimeUtil() { /* static use only */ }
 

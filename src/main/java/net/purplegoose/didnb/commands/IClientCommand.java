@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.utils.CommandsUtil;
+
 public interface IClientCommand {
 
     void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo);

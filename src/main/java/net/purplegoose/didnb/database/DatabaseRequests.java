@@ -22,10 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class DatabaseRequests {
 
+    private static final String SCHEDULED_EVENTS_SETTINGS_TABLE = "scheduled_events_settings";
     private final IDatabaseConnection databaseConnection;
     private final CustomMessagesCache customMessagesCache;
-
-    private static final String SCHEDULED_EVENTS_SETTINGS_TABLE = "scheduled_events_settings";
 
     public HashSet<EventGameData> getEventTimes(String table, boolean everyDay) {
         HashSet<EventGameData> listEventTimeTables = new HashSet<>();

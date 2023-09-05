@@ -77,5 +77,5 @@ public class ConfigCommand implements IClientCommand {
         Role adminRole = guild.getRoleById(roleID);
         return adminRole == null ? FAILED_MESSAGE : adminRole.getName();
     }
-    
+
 }

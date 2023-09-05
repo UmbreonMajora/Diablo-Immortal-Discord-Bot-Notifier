@@ -14,7 +14,7 @@ public class LoggingInformation {
     String channelID;
 
     public String[] get() {
-        return new String[] {executor, guildName, guildID, channelName, channelID};
+        return new String[]{executor, guildName, guildID, channelName, channelID};
     }
 
 }

@@ -7,10 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class ScheduledEventsSetting {
 
-    public ScheduledEventsSetting(String guildID) {
-        this.guildID = guildID;
-    }
-
     private String guildID;
     private boolean ancientArenaEnabled;
     private boolean ancientNightmareEnabled;
@@ -24,5 +20,8 @@ public class ScheduledEventsSetting {
     private boolean accursedTowerEnabled;
     private boolean vaultEnabled;
     private boolean wrathborneInvasionEnabled;
+    public ScheduledEventsSetting(String guildID) {
+        this.guildID = guildID;
+    }
 
 }
