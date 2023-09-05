@@ -1,6 +1,7 @@
 package net.purplegoose.didnb.notifier;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,6 +23,7 @@ import java.time.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
+@Slf4j
 @AllArgsConstructor
 public class ScheduledEventCreator {
 
@@ -100,7 +102,9 @@ public class ScheduledEventCreator {
         OffsetDateTime endTime = getOffsetDateTimeWithHourAndMinute(nextWeekday, eventTime.getEndHour(), eventTime.getEndMinute());
         String displayName = LanguageController.getMessage(language, eventTime.getEventName().languageKey);
         if (doScheduledEventExists(guild, startTime, displayName)) return;
-        guild.createScheduledEvent(displayName, "EVENT-LOCATION", startTime, endTime).queue();
+        String eventLocation = LanguageController.getMessage(language, eventTime.getEventName().languageKey + "-LOCATION");
+        guild.createScheduledEvent(displayName, eventLocation, startTime, endTime).queue();
+        log.info("Created scheduled events for {} in {}.", displayName, guild.getId());
     }
 
     private boolean doScheduledEventExists(Guild guild, OffsetDateTime startTime, String displayName) {

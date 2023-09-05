@@ -29,9 +29,6 @@ public class ListEvents extends Command {
 
     public static final String COMMAND = "se";
 
-    private static final String ENABLED_MESSAGE = "Enabled: "; // todo: add this to languages file.
-    private static final String CLICK_ON_SE_TO_TOGGLE = "Click on the event you want to toggle."; // todo: add this to languages file.
-
     @Override
     public void performCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
@@ -40,7 +37,7 @@ public class ListEvents extends Command {
         ScheduledEventsSetting seSetting = clientGuild.getSeSetting();
         SelectMenu selectMenu = getSelectMenu(seSetting, language, logInfo);
         ActionRow actionRow = ActionRow.of(selectMenu);
-        event.getHook().setEphemeral(true).sendMessage(CLICK_ON_SE_TO_TOGGLE).addComponents(actionRow).queue();
+        event.getHook().setEphemeral(true).sendMessage(LanguageController.getMessage(language, "CLICK-ON-SE-TO-TOGGLE")).addComponents(actionRow).queue();
         createUseLogEntry(logInfo, ListEvents.class);
     }
 
@@ -62,7 +59,9 @@ public class ListEvents extends Command {
                         String error = String.format("Failed to get GameEvent enum for %s.", fieldName);
                         createErrorLogEntry(logInfo, ListEvents.class, error);
                     } else {
-                        builder.addOption(LanguageController.getMessage(language, gameEvent.languageKey) + "  -  " + ENABLED_MESSAGE + value, fieldName);
+                        String gameEventDisplayName = LanguageController.getMessage(language, gameEvent.languageKey);
+                        String enabledText = LanguageController.getMessage(language, "TEXT-ENABLED");
+                        builder.addOption(gameEventDisplayName + "  -  " + enabledText + value, fieldName);
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();

@@ -44,22 +44,6 @@ CHANNEL-MENTION-ROLE: "Роль для упоминания:"
 TEXT-YES: "Да"
 APPLIED-PRESET-TO-CHANNEL: "Применено предустановленное значение %s на %s"
 TEXT-NO: "Нет"
-EVENT-MESSAGES-ENABLED: "Уведомления о событиях включены:"
-WARN-MESSAGES-ENABLED: "Уведомления о предупреждениях включены:"
-ANCIENT-NIGHTMARE-MESSAGES-ENABLED: "Уведомления для события 'Древний Ужас' включены:"
-ANCIENT-ARENA-MESSAGES-ENABLED: "Уведомления  для события 'Древняя Арена' включены:"
-ASSEMBLY-MESSAGES-ENABLED: "Уведомления для события 'Собрание теней' включены:"
-BATTLEGROUND-MESSAGES-ENABLED: "Уведомления для события 'Поле Боя' включены:"
-VAULT-MESSAGES-ENABLED: "Уведомления  для события 'Сокровищница' включены:"
-DEMON-GATES-MESSAGES-ENABLED: "Уведомления  для события 'Демонические врата' включены:"
-SHADOW-LOTTERY-MESSAGES-ENABLED: "Уведомления  для события 'Лотерея Теней' включены:"
-HAUNTED-CARRIAGE-MESSAGES-ENABLED: "Уведомления  для события 'Призрачный дилижанс' включены:"
-WRATHBORNE-INVASION-MESSAGES-ENABLED: "Уведомления  для события 'Вторжение Демонов Гнева' включены:"
-HAUNTED-CARRIAGE-EMBED-MESSAGES-ENABLED: "Встроенные уведомления  для события 'Призрачный дилижанс' включены:"
-DEMON-GATES-EMBED-MESSAGES-ENABLED: "Встроенные уведомления  для события 'Демонические врата' включены:"
-ANCIENT-NIGHTMARE-EMBED-MESSAGES-ENABLED: "Встроенные уведомления  для события 'Древний Ужас' включены:"
-ANCIENT-ARENA-EMBED-MESSAGES-ENABLED: "Встроенные уведомления  для события 'Древняя Арена' включены:"
-ON-SLAUGHT-ENABLED: "Уведомления о Натиск включены:"
 ANCIENT-NIGHTMARE: "Древний Ужас"
 ANCIENT-ARENA: "Древняя Арена"
 ASSEMBLY: "Собрание теней"
@@ -93,10 +77,6 @@ EVENT-ON-SLAUGHT-WARN: "Событие Натиск начнется через 
 INVALID-ID: "Недопустимый ID. Возможно, ошибка при вводе?"
 CM-NOT-EXISTS: "Это пользовательское уведомление не существует."
 CM-ENABLED-DISABLED: "Пользовательское уведомление с ID %s теперь %s"
-DAYLIGHT-TIME-ALREADY-ENABLED: "Летнее время успешно включено."
-DAYLIGHT-TIME-ALREADY-DISABLED: "Летнее время успешно выключено."
-DAYLIGHT-TIME-NOW-ENABLED: "Летнее время успешно включено."
-DAYLIGHT-TIME-NOW-DISABLED: "Летнее время успешно выключено."
 MESSAGE-MAX-REACHED: "Вы достигли максимального количества пользовательских уведомлений."
 EVENT-TOWER-OF-VICTORY: "Событие 'Борьба за Проклятые башни' началось!"
 EVENT-TOWER-OF-VICTORY-WARN: "Событие 'Борьба за Проклятые башни' начнется через %s минут."
@@ -104,4 +84,33 @@ EVENT-SHADOW-WAR-WARN: "Двери для Битвы Теней открыты!"
 EVENT-SHADOW-WAR: "Битва Теней началась."
 INVALID-WARN-TIME: "Время не входит в заданный диапазон. (1 - 15)"
 UPDATED-WARN-TIME: "Ваше новое время предупреждения теперь составляет %s минут."
-FAILED-TO-APPEND-MENTION-ROLE: "Не удалось добавить роль упоминания. Пожалуйста, установите вашу роль упоминания заново."
+TEXT-ENABLED: "Включено: "
+CLICK-ON-SE-TO-TOGGLE: "Кликните на событие, которое вы хотите переключить.\nПредупреждение: Значения берутся с момента создания. Изменение значения не обновит его автоматически в списке. Чтобы получить список с правильными значениями, используйте ту же команду снова."
+SE-DISABLED-FOR: "Запланированные события отключены для %s."
+SE-ENABLED-FOR: "Запланированные события включены для %s."
+SHADOW-WAR: "Shadow WAR"
+TOWER-OF-VICTORY: "Tower of victory"
+# Shadow War
+SHADOW-WAR-LOCATION: "Westmarch Battlegrounds PvP area"
+# Shadow Lottery
+SHADOW-LOTTERY-LOCATION: "Westmarch Tavern"
+# Tower of victory
+TOWER-OF-VICTORY-LOCATION: "Savage Frontier"
+# Wrathborne Invasion
+WRATHBORNE-INVASION-LOCATION: "Diablo Immortal"
+# Haunted Carriage
+HAUNTED-CARRIAGE-LOCATION: "Ashwold Cemetery"
+# Demon Gates
+DEMON-GATES-LOCATION: "Realm of Damnation"
+# Assembly
+ASSEMBLY-LOCATION: "Court of Whispers"
+# Vault
+VAULT-LOCATION: "Vault location"
+# Battleground
+BATTLEGROUND-LOCATION: "Westmarch"
+# Ancient Arena
+ANCIENT-ARENA-LOCATION: "Bilefen"
+# Ancient Nightmare
+ANCIENT-NIGHTMARE-LOCATION: "Misty valley"
+# OnSlaught
+ON-SLAUGHT-LOCATION: "Westmarch"

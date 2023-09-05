@@ -13,6 +13,7 @@ import net.purplegoose.didnb.cache.ScheduledEventsSettingsCache;
 import net.purplegoose.didnb.commands.channel.*;
 import net.purplegoose.didnb.commands.custom_notifications.*;
 import net.purplegoose.didnb.commands.info.*;
+import net.purplegoose.didnb.commands.scheduled_events.DeleteAllEvents;
 import net.purplegoose.didnb.commands.scheduled_events.ListEvents;
 import net.purplegoose.didnb.commands.server.*;
 import net.purplegoose.didnb.data.ClientGuild;
@@ -64,6 +65,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final AutoDeleteCommand autoDeleteCommand;
 
     private final ListEvents listEvents;
+    private final DeleteAllEvents deleteAllEvents;
 
     public SlashCommandInteraction(GuildsCache guildsCache,
                                    DatabaseRequests databaseRequests,
@@ -105,6 +107,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.autoDeleteCommand = new AutoDeleteCommand(guildsCache);
 
         this.listEvents = new ListEvents(guildsCache);
+        this.deleteAllEvents = new DeleteAllEvents();
     }
 
     @Override
@@ -148,6 +151,8 @@ public class SlashCommandInteraction extends ListenerAdapter {
         String command = event.getName().toLowerCase();
         switch (command) {
             case ListEvents.COMMAND ->  listEvents.performCommand(event, logInfo);
+            case DeleteAllEvents.COMMAND -> deleteAllEvents.performCommand(event, logInfo);
+
             case COMMAND_TODAY -> todayCommand.runCommand(event, logInfo);
             case COMMAND_UPCOMING -> upComingCommand.runCommand(event, logInfo);
             case COMMAND_CREATE_MESSAGE -> createMessageCommand.runCommand(event, logInfo);

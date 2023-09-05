@@ -22,9 +22,6 @@ public class StringSelectInteraction extends ListenerAdapter {
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
 
-    private static final String SE_DISABLED_FOR = "Scheduled events disabled for %s.";
-    private static final String SE_ENABLED_FOR = "Scheduled events enabled for %s.";
-
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         Guild guild = event.getGuild();
@@ -36,13 +33,12 @@ public class StringSelectInteraction extends ListenerAdapter {
         for (SelectOption selectedOption : event.getSelectedOptions()) {
             String fieldName = selectedOption.getValue() + "Enabled";
             boolean currentValue = updateSettingsValueAndGetCurrentValue(fieldName, seSetting);
-
             String selectedEvent = selectedOption.getValue();
             GameEvent gameEvent = getGameEvent(selectedEvent);
-
-            String respondMessage = currentValue ? SE_DISABLED_FOR : SE_ENABLED_FOR;
-            event.reply(String.format(respondMessage, LanguageController.getMessage(language, gameEvent.languageKey))).setEphemeral(true).queue();
-
+            String responseLanguageKey = currentValue ? "SE-DISABLED-FOR" : "SE-ENABLED-FOR";
+            String responseMessage = LanguageController.getMessage(language, responseLanguageKey);
+            String gameEventDisplayName = LanguageController.getMessage(language, gameEvent.languageKey);
+            event.reply(String.format(responseMessage, gameEventDisplayName)).setEphemeral(true).queue();
             updateData(seSetting);
         }
     }

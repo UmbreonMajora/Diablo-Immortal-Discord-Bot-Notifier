@@ -13,7 +13,7 @@ public interface IClientCommand {
     void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo);
 
     default String getFullUsernameWithDiscriminator(User user) {
-        return user.getName() + "#" + user.getDiscriminator();
+        return user.getName();
     }
 
     default void replyEphemeralToUser(SlashCommandInteractionEvent event, String message) {

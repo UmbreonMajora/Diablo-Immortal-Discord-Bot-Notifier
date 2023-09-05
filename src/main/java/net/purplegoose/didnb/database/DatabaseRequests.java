@@ -118,7 +118,7 @@ public class DatabaseRequests {
 
                     ClientGuild clientGuild = new ClientGuild(guildID, guildLanguage, timeZone, adminRoleID, warnTime,
                             isWarnMessagesEnabled, isEventMessagesEnabled, isDaylightTimeEnabled, isPremiumServer,
-                            autoDeleteTimeInHours, isAutoDeleteEnabled, embedLeadTime);
+                            autoDeleteTimeInHours, isAutoDeleteEnabled, embedLeadTime, null);
                     clientGuildData.put(guildID, clientGuild);
                 }
             }
@@ -223,6 +223,8 @@ public class DatabaseRequests {
                     }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return clientGuildData;

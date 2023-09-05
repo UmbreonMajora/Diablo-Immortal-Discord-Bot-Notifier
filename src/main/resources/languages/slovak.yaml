@@ -44,22 +44,6 @@ CHANNEL-MENTION-ROLE: "Роля за споменаване в канала:"
 TEXT-YES: "Да"
 APPLIED-PRESET-TO-CHANNEL: "Приложено предварително зададеното настройки %s върху %s."
 TEXT-NO: "Не"
-EVENT-MESSAGES-ENABLED: "Съобщенията за събитията са активирани:"
-WARN-MESSAGES-ENABLED: "Съобщенията за предупрежденията са активирани:"
-ANCIENT-NIGHTMARE-MESSAGES-ENABLED: "Съобщенията за Древен Кошмар са активирани:"
-ANCIENT-ARENA-MESSAGES-ENABLED: "Съобщенията за Древно Оръжеено поле са активирани:"
-ASSEMBLY-MESSAGES-ENABLED: "Съобщенията за Събрание са активирани:"
-BATTLEGROUND-MESSAGES-ENABLED: "Съобщенията за Бойно поле са активирани:"
-VAULT-MESSAGES-ENABLED: "Съобщенията за Скривалище са активирани:"
-DEMON-GATES-MESSAGES-ENABLED: "Съобщенията за Демонски портали са активирани:"
-SHADOW-LOTTERY-MESSAGES-ENABLED: "Съобщенията за Сенчестата лотария са активирани:"
-HAUNTED-CARRIAGE-MESSAGES-ENABLED: "Съобщенията за Замаяната каруца са активирани:"
-WRATHBORNE-INVASION-MESSAGES-ENABLED: "Съобщенията за Нашествие на Гневните са активирани:"
-HAUNTED-CARRIAGE-EMBED-MESSAGES-ENABLED: "Вградените съобщения за Замаяната каруца са активирани:"
-DEMON-GATES-EMBED-MESSAGES-ENABLED: "Вградените съобщения за Демонски портали са активирани:"
-ANCIENT-NIGHTMARE-EMBED-MESSAGES-ENABLED: "Вградените съобщения за Древен Кошмар са активирани:"
-ANCIENT-ARENA-EMBED-MESSAGES-ENABLED: "Вградените съобщения за Древно Оръжеено поле са активирани:"
-ON-SLAUGHT-ENABLED: "Съобщенията за Нападение са активирани:"
 ANCIENT-NIGHTMARE: "Древен Кошмар"
 ANCIENT-ARENA: "Древно Оръжеено поле"
 ASSEMBLY: "Събрание"
@@ -93,10 +77,6 @@ EVENT-ON-SLAUGHT-WARN: "Нападението започва след %s мин
 INVALID-ID: "Невалидно ИД. Възможно е да сте написали го грешно?"
 CM-NOT-EXISTS: "Това персонализирано уведомление не съществува."
 CM-ENABLED-DISABLED: "Персонализираното уведомление с ИД %s сега е %s"
-DAYLIGHT-TIME-ALREADY-ENABLED: "Лятното часово време вече е активирано."
-DAYLIGHT-TIME-ALREADY-DISABLED: "Лятното часово време вече е деактивирано."
-DAYLIGHT-TIME-NOW-ENABLED: "Лятното часово време сега е активирано."
-DAYLIGHT-TIME-NOW-DISABLED: "Лятното часово време сега е деактивирано."
 MESSAGE-MAX-REACHED: "Достигнахте максималния брой на персонализираните уведомления."
 EVENT-TOWER-OF-VICTORY: "Събитието Кулата на Победата започва!"
 EVENT-TOWER-OF-VICTORY-WARN: "Събитието Кулата на Победата ще започне след %s минути."
@@ -104,4 +84,33 @@ EVENT-SHADOW-WAR-WARN: "Вратите към Сенчестата война с
 EVENT-SHADOW-WAR: "Сенчестата война започва."
 INVALID-WARN-TIME: "Времето не беше в посочения интервал. (1 - 15)"
 UPDATED-WARN-TIME: "Вашето ново време за предупреждение е %s минути."
-FAILED-TO-APPEND-MENTION-ROLE: "Неуспешно добавяне на ролята за споменаване. Моля, задайте отново вашата роля за споменаване."
+TEXT-ENABLED: "Povolené: "
+CLICK-ON-SE-TO-TOGGLE: "Kliknite na udalosť, ktorú chcete prepínať.\nUpozornenie: Hodnoty sú z času vytvorenia. Zmena hodnoty sa automaticky neaktualizuje v zozname. Pre získanie zoznamu s správnymi hodnotami použite tú istú príkazovú znakovú postupnosť znova."
+SE-DISABLED-FOR: "Plánované udalosti sú vypnuté pre %s."
+SE-ENABLED-FOR: "Plánované udalosti sú povolené pre %s."
+SHADOW-WAR: "Shadow WAR"
+TOWER-OF-VICTORY: "Tower of victory"
+# Shadow War
+SHADOW-WAR-LOCATION: "Westmarch Battlegrounds PvP area"
+# Shadow Lottery
+SHADOW-LOTTERY-LOCATION: "Westmarch Tavern"
+# Tower of victory
+TOWER-OF-VICTORY-LOCATION: "Savage Frontier"
+# Wrathborne Invasion
+WRATHBORNE-INVASION-LOCATION: "Diablo Immortal"
+# Haunted Carriage
+HAUNTED-CARRIAGE-LOCATION: "Ashwold Cemetery"
+# Demon Gates
+DEMON-GATES-LOCATION: "Realm of Damnation"
+# Assembly
+ASSEMBLY-LOCATION: "Court of Whispers"
+# Vault
+VAULT-LOCATION: "Vault location"
+# Battleground
+BATTLEGROUND-LOCATION: "Westmarch"
+# Ancient Arena
+ANCIENT-ARENA-LOCATION: "Bilefen"
+# Ancient Nightmare
+ANCIENT-NIGHTMARE-LOCATION: "Misty valley"
+# OnSlaught
+ON-SLAUGHT-LOCATION: "Westmarch"

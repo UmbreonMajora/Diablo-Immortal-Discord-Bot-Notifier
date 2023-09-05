@@ -35,7 +35,7 @@ public class ClientGuild {
     public ClientGuild(String guildID, Language language, String timeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled,
                        boolean isDaylightTimeEnabled, boolean isPremiumServer, int autoDeleteTimeInHours,
-                       boolean isAutoDeleteEnabled, long embedLeadTime) {
+                       boolean isAutoDeleteEnabled, long embedLeadTime, ScheduledEventsSetting seSetting) {
         this.guildID = guildID;
         this.language = language;
         this.timeZone = timeZone;
@@ -50,6 +50,7 @@ public class ClientGuild {
         this.autoDeleteTimeInHours = autoDeleteTimeInHours;
         this.isAutoDeleteEnabled = isAutoDeleteEnabled;
         this.embedLeadTime = embedLeadTime;
+        this.seSetting = seSetting;
     }
 
     public ClientGuild(String guildID) {
@@ -67,6 +68,7 @@ public class ClientGuild {
         this.autoDeleteTimeInHours = 1;
         this.isAutoDeleteEnabled = false;
         this.embedLeadTime = 1;
+        this.seSetting = new ScheduledEventsSetting(guildID);
     }
 
     public Map<String, CustomNotification> getCustomNotifications() {

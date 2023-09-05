@@ -25,7 +25,7 @@ import java.util.Arrays;
 @Slf4j
 public class DiabloImmortalDiscordNotifier {
 
-    private static boolean registerCommands = false;
+    private static boolean registerCommands = true;
 
     private static GameDataCache gameDataCache = new GameDataCache();
     private static GuildsCache guildsCache = new GuildsCache();
@@ -122,10 +122,9 @@ public class DiabloImmortalDiscordNotifier {
     private static void checkForMissingSESetting(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
         guildsCache.getAllGuilds().values().forEach(clientGuild -> {
             if (clientGuild.getSeSetting() == null) {
-                System.out.println(clientGuild.getSeSetting());
                 ScheduledEventsSetting seSetting = new ScheduledEventsSetting(clientGuild.getGuildID());
                 clientGuild.setSeSetting(seSetting);
-                databaseRequests.updateScheduledEventsSettings(seSetting);
+                databaseRequests.createScheduledEventsSettings(seSetting.getGuildID());
             }
         });
     }
