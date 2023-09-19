@@ -47,7 +47,7 @@ public class ScheduledEventCreator {
                     }
                 });
             }
-        }, TimeUtil.getNextFullMinute(), 300 * 1000);
+        }, TimeUtil.getNextFullMinute(), 300L * 1000L);
     }
 
     private boolean isScheduledEventEnabled(ClientGuild clientGuild, GameEvent gameEvent) {

@@ -8,6 +8,7 @@ import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.CustomNotification;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
+import net.purplegoose.didnb.exeption.InvalidMentionException;
 import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
@@ -58,7 +59,12 @@ public class CustomMessagesNotifier extends NotifierHelper {
                         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID)
                                 .getNotificationChannel(textChannel.getId());
                         StringBuilder sb = new StringBuilder(message);
-                        addMessageMention(sb, notificationChannel, textChannel.getGuild(), clientGuild.getLanguage());
+                        try {
+                            addMessageMention(sb, notificationChannel, textChannel.getGuild(), clientGuild.getLanguage());
+                        } catch (InvalidMentionException e) {
+                            log.error(e.getMessage(), e);
+                            continue;
+                        }
                         message = sb.toString();
 
                         if (clientGuild.isAutoDeleteEnabled()) {
