@@ -9,11 +9,13 @@ import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.NotificationChannel;
+import net.purplegoose.didnb.exeption.InvalidMentionException;
 import net.purplegoose.didnb.gameevents.*;
 import net.purplegoose.didnb.gameevents.embedded.AncientArenaEmbed;
 import net.purplegoose.didnb.gameevents.embedded.AncientNightmareEmbed;
 import net.purplegoose.didnb.gameevents.embedded.DemonGatesEmbed;
 import net.purplegoose.didnb.gameevents.embedded.HauntedCarriageEmbed;
+import net.purplegoose.didnb.utils.ChannelLogger;
 import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
@@ -22,6 +24,8 @@ import java.util.TimerTask;
 @Slf4j
 public class Notifier extends NotifierHelper {
 
+    private ChannelLogger channelLogger;
+    // Cache
     private final GuildsCache guildsCache;
     private final ErrorCache errorCache;
     // Notification Messages
@@ -42,6 +46,8 @@ public class Notifier extends NotifierHelper {
     private final DemonGatesEmbed demonGatesEmbed;
     private final AncientNightmareEmbed ancientNightmareEmbed;
     private final AncientArenaEmbed ancientArenaEmbed;
+
+    private int count = 0;
 
     public Notifier(GuildsCache guildsCache, GameDataCache gameDataCache, ErrorCache errorCache) {
         this.guildsCache = guildsCache;
@@ -67,17 +73,22 @@ public class Notifier extends NotifierHelper {
     }
 
     public void runNotificationScheduler(JDA client) {
+        channelLogger = new ChannelLogger(client.getTextChannelById(1150798272886227087L)); //todo: remove this
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
 
-                for (ClientGuild clientGuild : guildsCache.getAllGuilds().values()) {
+                int guildCount = 0;
+                int channelCount = 0;
 
+                for (ClientGuild clientGuild : guildsCache.getAllGuilds().values()) {
+                    guildCount++;
                     if (isChannelCountZero(clientGuild)) {
                         continue;
                     }
 
                     for (NotificationChannel channel : clientGuild.getAllNotificationChannels()) {
+                        channelCount++;
                         StringBuilder notificationMessage = new StringBuilder();
                         notificationMessage.append(vaultEvent.appendVaultNotificationIfHappening(clientGuild, channel));
                         notificationMessage.append(battlegroundEvent.appendBattlegroundsNotificationIfHappening(clientGuild, channel));
@@ -111,7 +122,12 @@ public class Notifier extends NotifierHelper {
                             continue;
                         }
 
-                        addMessageMention(notificationMessage, channel, textChannel.getGuild(), clientGuild.getLanguage());
+                        try {
+                            addMessageMention(notificationMessage, channel, textChannel.getGuild(), clientGuild.getLanguage());
+                        } catch (InvalidMentionException e) {
+                            log.error(e.getMessage(), e);
+                            continue;
+                        }
 
                         try {
                             if (clientGuild.isAutoDeleteEnabled()) {
@@ -129,6 +145,14 @@ public class Notifier extends NotifierHelper {
                         log.info("Sended notification message to channel: " + channel.getTextChannelID() + ", GuildID: " +
                                 clientGuild.getGuildID());
                     }
+                }
+                String msg = String.format("Ran scheduler with %s guilds and %s channels.", guildCount, channelCount);
+                log.info(msg);
+
+                count++;
+                if (count == 5) {
+                    channelLogger.sendChannelLog(msg);
+                    count = 0;
                 }
             }
         }, TimeUtil.getNextFullMinute(), 60L * 1000L);
