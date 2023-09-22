@@ -11,6 +11,7 @@ import net.purplegoose.didnb.database.MySQLDatabaseConnection;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.events.*;
 import net.purplegoose.didnb.exeption.StartFailureException;
+import net.purplegoose.didnb.news.NewsReader;
 import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
@@ -24,9 +25,9 @@ import java.util.Arrays;
 @Slf4j
 public class DiabloImmortalDiscordNotifier {
 
-    public static final String botId = "527511535309029407";
+    public static final String BOT_ID = "527511535309029407";
 
-    private static boolean registerCommands = true;
+    private static boolean registerCommands = false;
 
     private static GameDataCache gameDataCache = new GameDataCache();
     private static GuildsCache guildsCache = new GuildsCache();
@@ -37,6 +38,10 @@ public class DiabloImmortalDiscordNotifier {
     private static DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
 
     public static void main(String[] args) {
+        NewsReader ns = new NewsReader();
+        ns.read();
+        if (true) return;
+
 
         // Init caches
         gameDataCache = new GameDataCache();

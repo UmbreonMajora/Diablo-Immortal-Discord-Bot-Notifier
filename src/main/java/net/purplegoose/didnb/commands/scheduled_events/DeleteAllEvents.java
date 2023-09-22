@@ -29,7 +29,7 @@ public class DeleteAllEvents extends Command {
         }
         for (ScheduledEvent scheduledEvent : guild.getScheduledEvents()) {
             User creator = scheduledEvent.getCreator();
-            if (creator != null && creator.getId().equalsIgnoreCase(DiabloImmortalDiscordNotifier.botId)) {
+            if (creator != null && creator.getId().equalsIgnoreCase(DiabloImmortalDiscordNotifier.BOT_ID)) {
                 scheduledEvent.delete().queue();
             }
         }
