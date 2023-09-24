@@ -1,6 +1,8 @@
 package net.purplegoose.didnb.commands;
 
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.purplegoose.didnb.annotations.CommandAnnotation;
 import net.purplegoose.didnb.data.LoggingInformation;
 
@@ -23,6 +25,18 @@ public abstract class Command implements ICommand {
         log.error("{} used /{} and a error occurred! Error: {} Guild: {}({}). Channel: {}({})",
                 logInfo.getExecutor(), clazz.getAnnotation(CommandAnnotation.class).name(), error,
                 logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
+    }
+
+    public void replyToUser(SlashCommandInteractionEvent event, String message, boolean ephermeral) {
+        event.reply(message).setEphemeral(ephermeral).queue();
+    }
+
+    public boolean isExecutedInTextChannel(SlashCommandInteractionEvent event, LoggingInformation logInfo, Class<?> clazz) {
+        if (event.getChannel() instanceof TextChannel && event.getGuild() != null) {
+            return true;
+        }
+        createErrorLogEntry(logInfo, clazz, "Command wasn't executed in a text channel or in a guild.");
+        return false;
     }
 
 }

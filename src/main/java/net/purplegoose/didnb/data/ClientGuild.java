@@ -4,8 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import net.purplegoose.didnb.enums.Language;
+import net.purplegoose.didnb.news.dto.NewsChannelDTO;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +32,7 @@ public class ClientGuild {
     private int autoDeleteTimeInHours;
     private long embedLeadTime;
     private ScheduledEventsSetting seSetting;
+    private Map<String, NewsChannelDTO> newsChannels;
 
     public ClientGuild(String guildID, Language language, String timeZone, String guildAdminRoleID,
                        int warnTimeInMinutes, boolean isEventMessageEnabled, boolean isWarnMessagesEnabled,
@@ -43,6 +47,7 @@ public class ClientGuild {
         this.isEventMessageEnabled = isWarnMessagesEnabled;
         this.customNotifications = new ConcurrentHashMap<>();
         this.notificationChannels = new ConcurrentHashMap<>();
+        this.newsChannels = new ConcurrentHashMap<>();
         this.isDaylightTimeEnabled = isDaylightTimeEnabled;
         this.isPremiumServer = isPremiumServer;
         this.autoDeleteTimeInHours = autoDeleteTimeInHours;
@@ -61,6 +66,7 @@ public class ClientGuild {
         this.isEventMessageEnabled = true;
         this.customNotifications = new ConcurrentHashMap<>();
         this.notificationChannels = new ConcurrentHashMap<>();
+        this.newsChannels = new ConcurrentHashMap<>();
         this.isDaylightTimeEnabled = false;
         this.isPremiumServer = false;
         this.autoDeleteTimeInHours = 1;
@@ -121,5 +127,9 @@ public class ClientGuild {
 
     public boolean doCustomMessageExists(String customMessageID) {
         return customNotifications.containsKey(customMessageID);
+    }
+
+    public void addNewsChannel(NewsChannelDTO newsChannelDTO) {
+        newsChannels.put(newsChannelDTO.getChannelID(), newsChannelDTO);
     }
 }

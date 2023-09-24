@@ -7,15 +7,15 @@ import net.purplegoose.didnb.data.*;
 import net.purplegoose.didnb.enums.GameEvent;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.Weekday;
+import net.purplegoose.didnb.news.dto.ArticleDTO;
+import net.purplegoose.didnb.news.dto.NewsChannelDTO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @AllArgsConstructor
@@ -85,6 +85,15 @@ public class DatabaseRequests {
             }
         }
         return gameEventData;
+    }
+
+    /**
+     * Get all news channels from database.
+     *
+     * @return list with all news channels in database.
+     */
+    public List<NewsChannelDTO> getAllNewsChannels() {
+
     }
 
     public Map<String, ClientGuild> loadDataFromDatabaseToCache() throws SQLException {
@@ -225,6 +234,31 @@ public class DatabaseRequests {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        //todo:
+        List<NewsChannelDTO> list = new ArrayList<>();
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement ps = connection.prepareStatement(SQLStatements.GET_ALL_ARTICLES_STATEMENT)
+        ) {
+            try (ResultSet resultSet = ps.executeQuery()) {
+                while (resultSet.next()) {
+                    String id = resultSet.getString("channelid");
+                    String guildID = resultSet.getString("guildid");
+                    boolean isDiabloImmortalNewsEnabled = (resultSet.getInt("di_enabled") == 1);
+                    boolean isHeartstoneEnabled = (resultSet.getInt("heartstone_enabled") == 1);
+
+                    if (clientGuildData.containsKey(guildID)) {
+                        clientGuildData.get(guildID).addNewNotificationChannel();
+                    }
+
+
+                }
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        return list;
 
         return clientGuildData;
     }
@@ -512,4 +546,132 @@ public class DatabaseRequests {
         }
     }
 
+    /**
+     * Get all articles from the database.
+     *
+     * @return all articles as list.
+     */
+    public List<ArticleDTO> getArticles() {
+        List<ArticleDTO> list = new ArrayList<>();
+        try (
+                Connection connection = databaseConnection.getConnection();
+                PreparedStatement ps = connection.prepareStatement(SQLStatements.GET_ALL_ARTICLES_STATEMENT)
+        ) {
+            try (ResultSet resultSet = ps.executeQuery()) {
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String url = resultSet.getString("url");
+                    String category = resultSet.getString("category");
+                    list.add(new ArticleDTO(id, url, category));
+                }
+            }
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+        }
+        return list;
+    }
+
+    /**
+     * Deletes an article from the database.
+     *
+     * @param id the article-id
+     * @return true if successful, false if failure.
+     */
+    public boolean deleteArticleWithID(int id) {
+        try (
+                Connection conn = databaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SQLStatements.DELETE_ARTICLE_WITH_ID_STATEMENT)
+        ) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Inserts a new article to the database.
+     *
+     * @param articleDTO the article object.
+     * @return true if successful, false if failure.
+     */
+    public boolean insertNewArticle(ArticleDTO articleDTO) {
+        try (
+                Connection conn = databaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SQLStatements.INSERT_ARTICLE_STATEMENT)
+        ) {
+            ps.setInt(1, articleDTO.getId());
+            ps.setString(2, articleDTO.getUrl());
+            ps.setString(3, articleDTO.getCategory());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+
+    /**
+     * Add new news channel
+     *
+     * @param newsChannelDTO the news channel object
+     * @return true if successful, false if failure.
+     */
+    public boolean insertNewsChannel(NewsChannelDTO newsChannelDTO) {
+        try (
+                Connection conn = databaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SQLStatements.INSERT_NEWS_CHANNEL_STATEMENT)
+        ) {
+            ps.setString(1, newsChannelDTO.getChannelID());
+            ps.setString(2, newsChannelDTO.getGuildID());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Deletes a news channel from the database
+     *
+     * @param id the news channel id
+     * @return true if successful, false if failure.
+     */
+    public boolean deleteNewsChannelByID(String id) {
+        try (
+                Connection conn = databaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SQLStatements.DELETE_NEWS_CHANNEL_BY_ID_STATEMENT)
+        ) {
+            ps.setString(1, id);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Updates the news channel in the database
+     * @param newsChannelDTO the to update news channel object
+     * @return true if successful, false if failure
+     */
+    public boolean updateNewsChannel(NewsChannelDTO newsChannelDTO) {
+        try (
+                Connection conn = databaseConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SQLStatements.UPDATE_CHANNEL_STATEMENT)
+        ) {
+            ps.setBoolean(1, newsChannelDTO.isDiabloImmortalNewsEnabled());
+            ps.setBoolean(2, newsChannelDTO.isHearthStoneNewsEnabled());
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
 }

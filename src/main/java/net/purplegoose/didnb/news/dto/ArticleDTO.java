@@ -1,4 +1,4 @@
-package net.purplegoose.didnb.news;
+package net.purplegoose.didnb.news.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class ArticleDTO {
 
-    private final String id;
+    private final int id;
     private final String url;
     private final String category;
 }
