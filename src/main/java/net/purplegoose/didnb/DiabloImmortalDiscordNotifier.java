@@ -27,7 +27,7 @@ public class DiabloImmortalDiscordNotifier {
 
     public static final String BOT_ID = "527511535309029407";
 
-    private static boolean registerCommands = false;
+    private static boolean registerCommands = true;
 
     private static GameDataCache gameDataCache = new GameDataCache();
     private static GuildsCache guildsCache = new GuildsCache();
@@ -38,11 +38,6 @@ public class DiabloImmortalDiscordNotifier {
     private static DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
 
     public static void main(String[] args) {
-        NewsReader ns = new NewsReader();
-        ns.read();
-        if (true) return;
-
-
         // Init caches
         gameDataCache = new GameDataCache();
         guildsCache = new GuildsCache();
@@ -147,6 +142,9 @@ public class DiabloImmortalDiscordNotifier {
 
         ScheduledEventCreator seCreator = new ScheduledEventCreator(guildsCache, gameDataCache);
         seCreator.scheduler(jda);
+
+        NewsReader newsReader = new NewsReader(databaseRequests, guildsCache, jda);
+        newsReader.runScheduler();
     }
 
     private static boolean fillGameDataCache(GameDataCache gameDataCache, DatabaseRequests databaseRequests) {

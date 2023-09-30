@@ -23,8 +23,8 @@ public class GuildLeave extends ListenerAdapter {
 
     private void deleteDataFromDatabase(String guildID) {
         databaseRequests.deleteGuildByGuildID(guildID);
-        databaseRequests.deleteMessagesByGuildID(guildID);
-        databaseRequests.deleteChannelsByGuildID(guildID);
+        databaseRequests.deleteCustomMessagesByGuildID(guildID);
+        databaseRequests.deleteNotificationChannelsByGuildID(guildID);
         databaseRequests.deleteScheduledEventsSettings(guildID);
     }
 }

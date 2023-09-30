@@ -27,11 +27,13 @@ public class ToggleNewsCommand extends Command {
     public static final String COMMAND = "togglenews";
     private static final String COMMAND_OPTION = "news_category";
 
-    public static SlashCommandData commandData;
+    public static final SlashCommandData commandData;
     private static final OptionData commandOptionData = new OptionData(OptionType.STRING, COMMAND_OPTION, "Select the category of the news you want to receive.", true);
 
     private static final String FAILURE_LOG_MESSAGE = "%s tried to enable or disable in the receiving of news in " +
             "channel with id %s and guild with id %s but it failed the channel ist not registered";
+    private static final String TOGGLE_FAILURE_CHANNEL_NOT_REGISTERD =
+            "Failed to toggle news, channel is not registered.";
 
     static {
         commandData = Commands.slash(COMMAND, "desc");
@@ -41,16 +43,11 @@ public class ToggleNewsCommand extends Command {
         commandData.addOptions(commandOptionData);
     }
 
-    private static final String TOGGLE_FAILURE_CHANNEL_NOT_REGISTERD =
-            "Failed to toggle news, channel is not registered.";
-
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
 
     @Override
     public void performCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
-        if (!isExecutedInTextChannel(event, logInfo, this.getClass())) return;
-
         String guildID = logInfo.getGuildID();
         String channelID = logInfo.getChannelID();
         if (!isChannelRegistered(guildID, channelID)) {
@@ -67,7 +64,7 @@ public class ToggleNewsCommand extends Command {
             replyToUser(event, "Successfully toggled " + selectedNews, true);
             createUseLogEntry(logInfo, this.getClass());
         } else {
-            replyToUser(event, "Successfully toggled " + selectedNews, true);
+            replyToUser(event, "Failed to toggle " + selectedNews, true);
             createUseLogEntry(logInfo, this.getClass());
         }
     }

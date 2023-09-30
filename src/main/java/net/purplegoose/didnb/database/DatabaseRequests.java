@@ -21,12 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @AllArgsConstructor
 @Slf4j
 public class DatabaseRequests {
-
     private static final String SCHEDULED_EVENTS_SETTINGS_TABLE = "scheduled_events_settings";
+    private static final String GUILD_ID = "guildid";
     private final IDatabaseConnection databaseConnection;
     private final CustomMessagesCache customMessagesCache;
 
-    public HashSet<EventGameData> getEventTimes(String table, boolean everyDay) {
+    public Set<EventGameData> getEventTimes(String table, boolean everyDay) {
         HashSet<EventGameData> listEventTimeTables = new HashSet<>();
         try (
                 Connection connection = databaseConnection.getConnection();
@@ -87,25 +87,24 @@ public class DatabaseRequests {
         return gameEventData;
     }
 
-    /**
-     * Get all news channels from database.
-     *
-     * @return list with all news channels in database.
-     */
-    public List<NewsChannelDTO> getAllNewsChannels() {
-
+    public Map<String, ClientGuild> loadDataFromDatabaseToCache() throws SQLException {
+        Map<String, ClientGuild> clientGuildData = new HashMap<>();
+        addGuildsData(clientGuildData);
+        addCustomMessagesData(clientGuildData);
+        addNotificationChannelData(clientGuildData);
+        addScheduledEventsSettingsData(clientGuildData);
+        addNewsChannelData(clientGuildData);
+        return clientGuildData;
     }
 
-    public Map<String, ClientGuild> loadDataFromDatabaseToCache() throws SQLException {
-        Map<String, ClientGuild> clientGuildData = new ConcurrentHashMap<>();
-
+    private void addGuildsData(Map<String, ClientGuild> clientGuildData) throws SQLException {
         try (
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_ALL_GUILDS_STATEMENT)
         ) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    String guildID = resultSet.getString("guildID");
+                    String guildID = resultSet.getString(GUILD_ID);
 
                     String languageShortFormAsString = resultSet.getString("language");
                     Language guildLanguage = Language.findLanguageByShortName(languageShortFormAsString);
@@ -131,14 +130,16 @@ public class DatabaseRequests {
                 }
             }
         }
+    }
 
+    private void addCustomMessagesData(Map<String, ClientGuild> clientGuildData) throws SQLException {
         try (
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_ALL_CUSTOM_MESSAGES_STATEMENT)
         ) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    String guildID = resultSet.getString("guildID");
+                    String guildID = resultSet.getString(GUILD_ID);
                     String channelID = resultSet.getString("channelID");
                     String message = resultSet.getString("message");
                     String day = resultSet.getString("day");
@@ -156,7 +157,9 @@ public class DatabaseRequests {
                 }
             }
         }
+    }
 
+    private void addNotificationChannelData(Map<String, ClientGuild> clientGuildData) throws SQLException {
         try (
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_ALL_CHANNELS_STATEMENT)
@@ -164,7 +167,7 @@ public class DatabaseRequests {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String textChannelID = resultSet.getString("textChannelID");
-                    String guildID = resultSet.getString("guildID");
+                    String guildID = resultSet.getString(GUILD_ID);
                     String roleID = resultSet.getString("roleID");
 
                     boolean message = (resultSet.getInt("message") == 1);
@@ -199,14 +202,16 @@ public class DatabaseRequests {
                 }
             }
         }
+    }
 
+    private void addScheduledEventsSettingsData(Map<String, ClientGuild> clientGuildData) throws SQLException {
         try (
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.GET_ALL_SCHEDULED_EVENTS_SETTINGS_STATEMENT)
         ) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    String guildID = resultSet.getString("guildID");
+                    String guildID = resultSet.getString(GUILD_ID);
                     boolean ancientArena = (resultSet.getInt("ancient_arena") == 1);
                     boolean ancientNightmare = (resultSet.getInt("ancient_nightmare") == 1);
                     boolean assembly = (resultSet.getInt("assembly") == 1);
@@ -231,36 +236,30 @@ public class DatabaseRequests {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+    }
 
-        //todo:
-        List<NewsChannelDTO> list = new ArrayList<>();
+    private void addNewsChannelData(Map<String, ClientGuild> clientGuildData) throws SQLException {
         try (
                 Connection connection = databaseConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(SQLStatements.GET_ALL_ARTICLES_STATEMENT)
+                PreparedStatement ps = connection.prepareStatement(SQLStatements.GET_ALL_NEWS_CHANNELS_STATEMENT)
         ) {
             try (ResultSet resultSet = ps.executeQuery()) {
                 while (resultSet.next()) {
                     String id = resultSet.getString("channelid");
-                    String guildID = resultSet.getString("guildid");
+                    String guildID = resultSet.getString(GUILD_ID);
                     boolean isDiabloImmortalNewsEnabled = (resultSet.getInt("di_enabled") == 1);
                     boolean isHeartstoneEnabled = (resultSet.getInt("heartstone_enabled") == 1);
-
+                    NewsChannelDTO newsChannelDTO = new NewsChannelDTO(id, guildID, isDiabloImmortalNewsEnabled,
+                            isHeartstoneEnabled);
                     if (clientGuildData.containsKey(guildID)) {
-                        clientGuildData.get(guildID).addNewNotificationChannel();
+                        clientGuildData.get(guildID).addNewsChannel(newsChannelDTO);
+                    } else {
+                        log.error("Failed to load news channel for guild with id {}.", guildID);
                     }
-
-
                 }
             }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
         }
-        return list;
-
-        return clientGuildData;
     }
 
     // Client Guild
@@ -374,7 +373,7 @@ public class DatabaseRequests {
         }
     }
 
-    public void deleteMessagesByGuildID(String guildID) {
+    public void deleteCustomMessagesByGuildID(String guildID) {
         try (
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.DELETE_MESSAGE_BY_GUILD_ID_STATEMENT)
@@ -387,7 +386,9 @@ public class DatabaseRequests {
         }
     }
 
-    // Notification Channel
+    /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - *
+    - THIS IS THE NOTIFICATION CHANNEL DATABASE REQUESTS PART -
+     * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
 
     public void createNotificationChannel(NotificationChannel notificationChannel) {
         try (
@@ -466,7 +467,7 @@ public class DatabaseRequests {
         }
     }
 
-    public void deleteChannelsByGuildID(String guildID) {
+    public void deleteNotificationChannelsByGuildID(String guildID) {
         try (
                 Connection connection = databaseConnection.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQLStatements.DELETE_CHANNEL_BY_GUILD_ID_STATEMENT)
@@ -478,6 +479,10 @@ public class DatabaseRequests {
             log.error(e.getMessage(), e);
         }
     }
+
+    /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - *
+    -THIS IS THE SCHEDULED EVENTS SETTINGS DATABASE REQUESTS PART-
+     * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
 
     public void createScheduledEventsSettings(String guildID) {
         try (
@@ -546,6 +551,10 @@ public class DatabaseRequests {
         }
     }
 
+    /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - *
+    - THIS IS THE ARTICLES DATABASE REQUESTS PART -
+     * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
+
     /**
      * Get all articles from the database.
      *
@@ -572,26 +581,6 @@ public class DatabaseRequests {
     }
 
     /**
-     * Deletes an article from the database.
-     *
-     * @param id the article-id
-     * @return true if successful, false if failure.
-     */
-    public boolean deleteArticleWithID(int id) {
-        try (
-                Connection conn = databaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(SQLStatements.DELETE_ARTICLE_WITH_ID_STATEMENT)
-        ) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
      * Inserts a new article to the database.
      *
      * @param articleDTO the article object.
@@ -613,14 +602,16 @@ public class DatabaseRequests {
         }
     }
 
+    /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - *
+    - THIS IS THE NEWS CHANNEL DATABASE REQUESTS PART -
+     * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
 
     /**
      * Add new news channel
      *
      * @param newsChannelDTO the news channel object
-     * @return true if successful, false if failure.
      */
-    public boolean insertNewsChannel(NewsChannelDTO newsChannelDTO) {
+    public void addNewsChannel(NewsChannelDTO newsChannelDTO) {
         try (
                 Connection conn = databaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQLStatements.INSERT_NEWS_CHANNEL_STATEMENT)
@@ -628,10 +619,8 @@ public class DatabaseRequests {
             ps.setString(1, newsChannelDTO.getChannelID());
             ps.setString(2, newsChannelDTO.getGuildID());
             ps.executeUpdate();
-            return true;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-            return false;
         }
     }
 
@@ -639,28 +628,25 @@ public class DatabaseRequests {
      * Deletes a news channel from the database
      *
      * @param id the news channel id
-     * @return true if successful, false if failure.
      */
-    public boolean deleteNewsChannelByID(String id) {
+    public void deleteNewsChannelByID(String id) {
         try (
                 Connection conn = databaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQLStatements.DELETE_NEWS_CHANNEL_BY_ID_STATEMENT)
         ) {
             ps.setString(1, id);
             ps.executeUpdate();
-            return true;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-            return false;
         }
     }
 
     /**
      * Updates the news channel in the database
+     *
      * @param newsChannelDTO the to update news channel object
-     * @return true if successful, false if failure
      */
-    public boolean updateNewsChannel(NewsChannelDTO newsChannelDTO) {
+    public void updateNewsChannel(NewsChannelDTO newsChannelDTO) {
         try (
                 Connection conn = databaseConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SQLStatements.UPDATE_CHANNEL_STATEMENT)
@@ -668,10 +654,8 @@ public class DatabaseRequests {
             ps.setBoolean(1, newsChannelDTO.isDiabloImmortalNewsEnabled());
             ps.setBoolean(2, newsChannelDTO.isHearthStoneNewsEnabled());
             ps.executeUpdate();
-            return true;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
-            return false;
         }
     }
 }

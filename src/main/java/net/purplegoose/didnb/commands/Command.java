@@ -31,12 +31,4 @@ public abstract class Command implements ICommand {
         event.reply(message).setEphemeral(ephermeral).queue();
     }
 
-    public boolean isExecutedInTextChannel(SlashCommandInteractionEvent event, LoggingInformation logInfo, Class<?> clazz) {
-        if (event.getChannel() instanceof TextChannel && event.getGuild() != null) {
-            return true;
-        }
-        createErrorLogEntry(logInfo, clazz, "Command wasn't executed in a text channel or in a guild.");
-        return false;
-    }
-
 }

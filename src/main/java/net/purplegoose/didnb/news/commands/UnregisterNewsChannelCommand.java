@@ -1,8 +1,9 @@
 package net.purplegoose.didnb.news.commands;
 
 import lombok.AllArgsConstructor;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.purplegoose.didnb.annotations.CommandAnnotation;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.Command;
@@ -21,11 +22,17 @@ import java.util.Map;
 public class UnregisterNewsChannelCommand extends Command {
     public static final String COMMAND = "unregisternews";
 
+    public static final SlashCommandData commandData;
+
     private static final String FAILURE_LOG_MESSAGE = "%s tried to unregister channel with id %s in " +
             "guild with id %s as news channel, but it failed because the channel is not registered.";
 
     private static final String UNREGISTER_FAILURE = "Failed to unregister %s, this channel is not registered.";
     private static final String UNREGISTER_SUCCESS = "Successfully unregistered %s. Channel will no longer receive any news.";
+
+    static {
+        commandData = Commands.slash(COMMAND, "Unregisters channel this command is sent in as news channel.");
+    }
 
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
@@ -50,7 +57,7 @@ public class UnregisterNewsChannelCommand extends Command {
     private void registerNewNewsChannel(String textChannelID, String guildID) {
         NewsChannelDTO newsChannelDTO = new NewsChannelDTO(textChannelID, guildID);
         guildsCache.getClientGuildByID(guildID).addNewsChannel(newsChannelDTO);
-        databaseRequests.insertNewsChannel(newsChannelDTO);
+        databaseRequests.addNewsChannel(newsChannelDTO);
     }
 
     private boolean isChannelNotRegistered(String guildID, String channelID) {

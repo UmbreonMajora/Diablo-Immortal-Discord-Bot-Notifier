@@ -75,7 +75,7 @@ public class SQLStatements {
 
         GET_ALL_NEWS_CHANNELS_STATEMENT = loadResourceToString(DEFAULT_PATH + "get-all-news-channels.sql");
         DELETE_NEWS_CHANNEL_BY_ID_STATEMENT = loadResourceToString(DEFAULT_PATH + "delete-news-channel-by-id.sql");
-        INSERT_NEWS_CHANNEL_STATEMENT = loadResourceToString(DEFAULT_PATH + "insert-into-news-channel.sql");
+        INSERT_NEWS_CHANNEL_STATEMENT = loadResourceToString(DEFAULT_PATH + "insert-into-news-channels.sql");
         UPDATE_NEWS_CHANNEL_STATEMENT = loadResourceToString(DEFAULT_PATH + "update-news-channel.sql");
     }
 
