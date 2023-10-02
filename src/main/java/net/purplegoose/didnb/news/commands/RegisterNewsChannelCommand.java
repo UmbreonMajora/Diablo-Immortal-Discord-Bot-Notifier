@@ -24,14 +24,15 @@ public class RegisterNewsChannelCommand extends Command {
 
     public static final SlashCommandData commandData;
 
+    static {
+        commandData = Commands.slash(COMMAND, "Registers channel this command is sent in as news channel.");
+    }
+
+    //todo: add to localization
     private static final String FAILURE_LOG_MESSAGE = "%s tried to register channel with id %s in " +
             "guild with id %s as news channel, but it failed because the channel is already registered";
     private static final String REGISTER_FAILURE = "Failed to register %s as news channel, it is already registered.";
     private static final String REGISTER_SUCCESS = "Successfully registered %s as a news channel.";
-
-    static {
-        commandData = Commands.slash(COMMAND, "Registers channel this command is sent in as news channel.");
-    }
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
@@ -40,16 +41,35 @@ public class RegisterNewsChannelCommand extends Command {
     public void performCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
         String channelID = logInfo.getChannelID();
+        String textChannelName = event.getChannel().getName();
+
         if (isChannelAlreadyRegistered(guildID, channelID)) {
-            replyToUser(event, REGISTER_FAILURE, true);
-            String user = logInfo.getExecutor();
-            createErrorLogEntry(logInfo, this.getClass(), String.format(FAILURE_LOG_MESSAGE, user, channelID, guildID));
+            replyFailureToUser(textChannelName, event);
+            logFailure(logInfo);
             return;
         }
 
         registerNewNewsChannel(channelID, guildID);
-        replyToUser(event, REGISTER_SUCCESS, true);
+        replySuccessToUser(textChannelName, event);
         createUseLogEntry(logInfo, this.getClass());
+    }
+
+    private void logFailure(LoggingInformation logInfo) {
+        String user = logInfo.getExecutor();
+        String channelID = logInfo.getChannelID();
+        String guildID = logInfo.getGuildID();
+        String replyMessage = String.format(FAILURE_LOG_MESSAGE, user, channelID, guildID);
+        createErrorLogEntry(logInfo, this.getClass(), replyMessage);
+    }
+
+    private void replySuccessToUser(String textChannelName, SlashCommandInteractionEvent event) {
+        String replyMessage = String.format(REGISTER_SUCCESS, textChannelName);
+        replyWithMessageToUser(event, replyMessage, true);
+    }
+
+    private void replyFailureToUser(String textChannelName, SlashCommandInteractionEvent event) {
+        String replyMessage = String.format(REGISTER_FAILURE, textChannelName);
+        replyWithMessageToUser(event, replyMessage, true);
     }
 
     private void registerNewNewsChannel(String textChannelID, String guildID) {

@@ -249,9 +249,19 @@ public class DatabaseRequests {
                     String id = resultSet.getString("channelid");
                     String guildID = resultSet.getString(GUILD_ID);
                     boolean isDiabloImmortalNewsEnabled = (resultSet.getInt("di_enabled") == 1);
-                    boolean isHeartstoneEnabled = (resultSet.getInt("heartstone_enabled") == 1);
+                    boolean isHearthstoneEnabled = (resultSet.getInt("hearthstone_enabled") == 1);
+                    boolean isOverwatchEnabled = (resultSet.getInt("overwatch_enabled") == 1);
+                    boolean isWowWebEnabled = (resultSet.getInt("wow_web_enabled") == 1);
+                    boolean isBnetEnabled = (resultSet.getInt("bnet_enabled") == 1);
+                    boolean isCortezEnabled = (resultSet.getInt("cortez_enabled") == 1);
+                    boolean isD4Enabled = (resultSet.getInt("d4_enabled") == 1);
+                    boolean isHeroesEnabled = (resultSet.getInt("heroes_enabled") == 1);
+                    boolean isNewsEnabled = (resultSet.getInt("news_enabled") == 1);
+
                     NewsChannelDTO newsChannelDTO = new NewsChannelDTO(id, guildID, isDiabloImmortalNewsEnabled,
-                            isHeartstoneEnabled);
+                            isHearthstoneEnabled, isOverwatchEnabled, isWowWebEnabled, isBnetEnabled, isCortezEnabled,
+                            isD4Enabled, isHeroesEnabled, isNewsEnabled);
+
                     if (clientGuildData.containsKey(guildID)) {
                         clientGuildData.get(guildID).addNewsChannel(newsChannelDTO);
                     } else {
@@ -557,7 +567,6 @@ public class DatabaseRequests {
 
     /**
      * Get all articles from the database.
-     *
      * @return all articles as list.
      */
     public List<ArticleDTO> getArticles() {
@@ -582,7 +591,6 @@ public class DatabaseRequests {
 
     /**
      * Inserts a new article to the database.
-     *
      * @param articleDTO the article object.
      * @return true if successful, false if failure.
      */
@@ -608,7 +616,6 @@ public class DatabaseRequests {
 
     /**
      * Add new news channel
-     *
      * @param newsChannelDTO the news channel object
      */
     public void addNewsChannel(NewsChannelDTO newsChannelDTO) {
@@ -626,7 +633,6 @@ public class DatabaseRequests {
 
     /**
      * Deletes a news channel from the database
-     *
      * @param id the news channel id
      */
     public void deleteNewsChannelByID(String id) {
@@ -643,16 +649,23 @@ public class DatabaseRequests {
 
     /**
      * Updates the news channel in the database
-     *
      * @param newsChannelDTO the to update news channel object
      */
     public void updateNewsChannel(NewsChannelDTO newsChannelDTO) {
         try (
                 Connection conn = databaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(SQLStatements.UPDATE_CHANNEL_STATEMENT)
+                PreparedStatement ps = conn.prepareStatement(SQLStatements.UPDATE_NEWS_CHANNEL_STATEMENT)
         ) {
             ps.setBoolean(1, newsChannelDTO.isDiabloImmortalNewsEnabled());
             ps.setBoolean(2, newsChannelDTO.isHearthStoneNewsEnabled());
+            ps.setBoolean(3, newsChannelDTO.isOverwatchEnabled());
+            ps.setBoolean(4, newsChannelDTO.isWowWebEnabled());
+            ps.setBoolean(5, newsChannelDTO.isBnetEnabled());
+            ps.setBoolean(6, newsChannelDTO.isCortezEnabled());
+            ps.setBoolean(7, newsChannelDTO.isD4Enabled());
+            ps.setBoolean(8, newsChannelDTO.isHeroesEnabled());
+            ps.setBoolean(9, newsChannelDTO.isNewsEnabled());
+            ps.setString(10, newsChannelDTO.getChannelID());
             ps.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage(), e);

@@ -11,6 +11,7 @@ import net.purplegoose.didnb.commands.channel.UnregisterCommand;
 import net.purplegoose.didnb.commands.scheduled_events.DeleteAllEvents;
 import net.purplegoose.didnb.commands.scheduled_events.ListEvents;
 import net.purplegoose.didnb.enums.*;
+import net.purplegoose.didnb.news.commands.ListNewsCategoriesCommand;
 import net.purplegoose.didnb.news.commands.RegisterNewsChannelCommand;
 import net.purplegoose.didnb.news.commands.ToggleNewsCommand;
 import net.purplegoose.didnb.news.commands.UnregisterNewsChannelCommand;
@@ -206,6 +207,7 @@ public class CommandsUtil {
         commandDataList.add(ToggleNewsCommand.commandData);
         commandDataList.add(RegisterNewsChannelCommand.commandData);
         commandDataList.add(UnregisterNewsChannelCommand.commandData);
+        commandDataList.add(ListNewsCategoriesCommand.commandData);
     }
 
     static {

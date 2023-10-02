@@ -1,7 +1,7 @@
 package net.purplegoose.didnb.commands;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.purplegoose.didnb.annotations.CommandAnnotation;
 import net.purplegoose.didnb.data.LoggingInformation;
@@ -27,8 +27,12 @@ public abstract class Command implements ICommand {
                 logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
     }
 
-    public void replyToUser(SlashCommandInteractionEvent event, String message, boolean ephermeral) {
-        event.reply(message).setEphemeral(ephermeral).queue();
+    public void replyWithMessageToUser(SlashCommandInteractionEvent event, String message, boolean ephemeral) {
+        event.getHook().sendMessage(message).setEphemeral(ephemeral).queue();
+    }
+
+    public void replyWithEmbedToUser(SlashCommandInteractionEvent event, MessageEmbed embed, boolean ephemeral) {
+        event.getHook().sendMessageEmbeds(embed).setEphemeral(ephemeral).queue();
     }
 
 }

@@ -14,6 +14,7 @@ import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.news.dto.NewsChannelDTO;
 import net.purplegoose.didnb.news.enums.Categories;
+import net.purplegoose.didnb.news.exceptions.ToggleFailureException;
 
 import java.util.Map;
 
@@ -30,11 +31,6 @@ public class ToggleNewsCommand extends Command {
     public static final SlashCommandData commandData;
     private static final OptionData commandOptionData = new OptionData(OptionType.STRING, COMMAND_OPTION, "Select the category of the news you want to receive.", true);
 
-    private static final String FAILURE_LOG_MESSAGE = "%s tried to enable or disable in the receiving of news in " +
-            "channel with id %s and guild with id %s but it failed the channel ist not registered";
-    private static final String TOGGLE_FAILURE_CHANNEL_NOT_REGISTERD =
-            "Failed to toggle news, channel is not registered.";
-
     static {
         commandData = Commands.slash(COMMAND, "desc");
         for (Categories category : Categories.values()) {
@@ -43,29 +39,94 @@ public class ToggleNewsCommand extends Command {
         commandData.addOptions(commandOptionData);
     }
 
-    private final DatabaseRequests databaseRequests;
+    //todo: add to localization
+    private static final String CHANNEL_NOT_REGISTERED_FAILURE_LOG_MESSAGE = "%s tried to enable or disable in the " +
+            "receiving of news in channel with id %s and guild with id %s but it failed the channel is not registered.";
+    private static final String FAILED_TO_TOGGLE_NEWS_CHANNEL_IS_NOT_REGISTERED =
+            "Failed to toggle news, channel is not registered.";
+    private static final String TOGGLE_SUCCESS_MESSAGE = "Successfully set 'receive %s news' to '%s'.";
+    private static final String TOGGLE_FAILED_MESSAGE = "Failed to toggle 'receive %s news'. Please try again.";
+
     private final GuildsCache guildsCache;
+    private final DatabaseRequests databaseRequests;
 
     @Override
     public void performCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String guildID = logInfo.getGuildID();
         String channelID = logInfo.getChannelID();
+
         if (!isChannelRegistered(guildID, channelID)) {
-            replyToUser(event, TOGGLE_FAILURE_CHANNEL_NOT_REGISTERD, true);
-            String user = logInfo.getExecutor();
-            createErrorLogEntry(logInfo, this.getClass(), String.format(FAILURE_LOG_MESSAGE, user, channelID, guildID));
+            replyWithMessageToUser(event, FAILED_TO_TOGGLE_NEWS_CHANNEL_IS_NOT_REGISTERED, true);
+            logChannelNotRegisteredFailure(logInfo);
             return;
         }
 
-        NewsChannelDTO newsChannelDTO = guildsCache.getClientGuildByID(guildID).getNewsChannels().get(channelID);
+        NewsChannelDTO newsChannelDTO = guildsCache.getClientGuildByID(guildID).getNewsChannelByChannelID(channelID);
         String selectedNews = getSelectedNews(event);
-        if (toggleSelectedNews(selectedNews, newsChannelDTO)) {
-            databaseRequests.updateNewsChannel(newsChannelDTO);
-            replyToUser(event, "Successfully toggled " + selectedNews, true);
-            createUseLogEntry(logInfo, this.getClass());
-        } else {
-            replyToUser(event, "Failed to toggle " + selectedNews, true);
-            createUseLogEntry(logInfo, this.getClass());
+        createUseLogEntry(logInfo, this.getClass());
+
+        try {
+            toggleSelectedNews(selectedNews, newsChannelDTO);
+            replySuccessToUser(event, newsChannelDTO, selectedNews);
+        } catch (ToggleFailureException e) {
+            replyFailureToUser(event, selectedNews);
+        }
+    }
+
+    private void replySuccessToUser(SlashCommandInteractionEvent event, NewsChannelDTO newsChannelDTO,
+                                    String selectedNews) throws ToggleFailureException {
+        boolean value = getCurrentValue(selectedNews, newsChannelDTO);
+        String replyMessage = String.format(TOGGLE_SUCCESS_MESSAGE, selectedNews, value);
+        replyWithMessageToUser(event, replyMessage, true);
+    }
+
+    private void replyFailureToUser(SlashCommandInteractionEvent event, String selectedNews) {
+        String replyMessage = String.format(TOGGLE_FAILED_MESSAGE, selectedNews);
+        replyWithMessageToUser(event, replyMessage, true);
+    }
+
+    private void logChannelNotRegisteredFailure(LoggingInformation logInfo) {
+        String user = logInfo.getExecutor();
+        String channelID = logInfo.getChannelID();
+        String guildID = logInfo.getGuildID();
+        String replyMessage = String.format(CHANNEL_NOT_REGISTERED_FAILURE_LOG_MESSAGE, user, channelID, guildID);
+        createErrorLogEntry(logInfo, this.getClass(), replyMessage);
+    }
+
+    private boolean getCurrentValue(String selectedNews, NewsChannelDTO newsChannelDTO) throws ToggleFailureException {
+        Categories cat = Categories.getCategoriesByRawName(selectedNews);
+        if (cat == null)
+            throw new ToggleFailureException("Failed to toggle news setting. The category was null.");
+        switch (cat) {
+            case DI -> {
+                return newsChannelDTO.isDiabloImmortalNewsEnabled();
+            }
+            case HEARTHSTONE -> {
+                return newsChannelDTO.isHearthStoneNewsEnabled();
+            }
+            case OVERWATCH -> {
+                return newsChannelDTO.isOverwatchEnabled();
+            }
+            case BNET -> {
+                return newsChannelDTO.isBnetEnabled();
+            }
+            case D4 -> {
+                return newsChannelDTO.isD4Enabled();
+            }
+            case CORTEZ -> {
+                return newsChannelDTO.isCortezEnabled();
+            }
+            case HEROES -> {
+                return newsChannelDTO.isHeroesEnabled();
+            }
+            case WOW_WEB -> {
+                return newsChannelDTO.isWowWebEnabled();
+            }
+            case NEWS -> {
+                return newsChannelDTO.isNewsEnabled();
+            }
+            default -> throw new ToggleFailureException("Failed to toggle news setting. The category " + selectedNews +
+                    " couldn't be found.");
         }
     }
 
@@ -79,23 +140,50 @@ public class ToggleNewsCommand extends Command {
         return optionMapping != null ? optionMapping.getAsString() : null;
     }
 
-    private boolean toggleSelectedNews(String selectedNews, NewsChannelDTO newsChannelDTO) {
+    private void toggleSelectedNews(String selectedNews, NewsChannelDTO newsChannelDTO) throws ToggleFailureException {
         Categories cat = Categories.getCategoriesByRawName(selectedNews);
         if (cat == null)
-            return false;
+            throw new ToggleFailureException("Failed to toggle news setting. The category was null.");
         switch (cat) {
             case DI -> {
                 boolean currentValue = newsChannelDTO.isDiabloImmortalNewsEnabled();
                 newsChannelDTO.setDiabloImmortalNewsEnabled(!currentValue);
             }
-            case HEARTSTONE -> {
+            case HEARTHSTONE -> {
                 boolean currentValue = newsChannelDTO.isHearthStoneNewsEnabled();
                 newsChannelDTO.setHearthStoneNewsEnabled(!currentValue);
             }
-            default -> {
-                return false;
+            case OVERWATCH -> {
+                boolean currentValue = newsChannelDTO.isOverwatchEnabled();
+                newsChannelDTO.setOverwatchEnabled(!currentValue);
             }
+            case BNET -> {
+                boolean currentValue = newsChannelDTO.isBnetEnabled();
+                newsChannelDTO.setBnetEnabled(!currentValue);
+            }
+            case D4 -> {
+                boolean currentValue = newsChannelDTO.isD4Enabled();
+                newsChannelDTO.setD4Enabled(!currentValue);
+            }
+            case CORTEZ -> {
+                boolean currentValue = newsChannelDTO.isCortezEnabled();
+                newsChannelDTO.setCortezEnabled(!currentValue);
+            }
+            case HEROES -> {
+                boolean currentValue = newsChannelDTO.isHeroesEnabled();
+                newsChannelDTO.setHeroesEnabled(!currentValue);
+            }
+            case WOW_WEB -> {
+                boolean currentValue = newsChannelDTO.isWowWebEnabled();
+                newsChannelDTO.setWowWebEnabled(!currentValue);
+            }
+            case NEWS -> {
+                boolean currentValue = newsChannelDTO.isNewsEnabled();
+                newsChannelDTO.setNewsEnabled(!currentValue);
+            }
+            default -> throw new ToggleFailureException("Failed to toggle news setting. The category " + selectedNews +
+                    " couldn't be found.");
         }
-        return true;
+        databaseRequests.updateNewsChannel(newsChannelDTO);
     }
 }

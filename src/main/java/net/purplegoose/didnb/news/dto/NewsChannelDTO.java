@@ -13,6 +13,13 @@ public class NewsChannelDTO {
     private final String guildID;
     private boolean diabloImmortalNewsEnabled = false;
     private boolean hearthStoneNewsEnabled = false;
+    private boolean overwatchEnabled = false;
+    private boolean wowWebEnabled = false;
+    private boolean bnetEnabled = false;
+    private boolean cortezEnabled = false;
+    private boolean d4Enabled = false;
+    private boolean heroesEnabled = false;
+    private boolean newsEnabled = false;
 
     public NewsChannelDTO(String channelID, String guildID) {
         this.channelID = channelID;

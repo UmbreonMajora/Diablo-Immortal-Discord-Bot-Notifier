@@ -140,8 +140,8 @@ public class DiabloImmortalDiscordNotifier {
         InformationNotifier informationNotifier = new InformationNotifier();
         informationNotifier.runInformationNotifier(jda);
 
-        ScheduledEventCreator seCreator = new ScheduledEventCreator(guildsCache, gameDataCache);
-        seCreator.scheduler(jda);
+        //ScheduledEventCreator seCreator = new ScheduledEventCreator(guildsCache, gameDataCache);
+        //seCreator.scheduler(jda);
 
         NewsReader newsReader = new NewsReader(databaseRequests, guildsCache, jda);
         newsReader.runScheduler();

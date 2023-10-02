@@ -45,9 +45,9 @@ public class NewsReader {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                //read();
+                read();
             }
-        }, TimeUtil.getNextFullMinute(), 60L * 15000L);
+        }, TimeUtil.getNextFullMinute(), 60L * 5000L);
     }
 
     private void read() {
@@ -65,24 +65,16 @@ public class NewsReader {
                 Elements anchorElement = element.select("a");
                 String dataAnalyticsPlacement = anchorElement.attr("data-analytics-placement");
                 int id = getBlogID(dataAnalyticsPlacement);
+                String categoryRawName = getArticlesCategory(dataAnalyticsPlacement);
+                Categories category = Categories.getCategoriesByRawName(categoryRawName);
 
-                if (id == 0) {
-                    throw new IOException("Failed to get blog id.");
-                }
-
-                if (isArticleKnown(id)) {
+                if (!isArticleValid(id, category, categoryRawName)) {
                     continue;
                 }
 
                 String url = BASE_BLIZZARD_NEWS_PAGE + "/" + anchorElement.attr("href");
-                String categoryRawName = getArticlesCategory(dataAnalyticsPlacement);
-                Categories category = Categories.getCategoriesByRawName(categoryRawName);
-
-                if (category == null) {
-                    throw new IOException("Failed to get category, might be a new one? (" + categoryRawName + ")");
-                }
-
                 ArticleDTO article = new ArticleDTO(id, url, category.rawName);
+
                 if (databaseRequests.insertNewArticle(article)) {
                     sendNewsNotification(category, url);
                 }
@@ -90,6 +82,25 @@ public class NewsReader {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
+        log.info("Rode news from blizzard news page.");
+    }
+
+    private boolean isArticleValid(int id, Categories category, String categoryRawName) {
+        if (id == 0) {
+            log.error("Failed to get blog id.");
+            return false;
+        }
+
+        if (isArticleKnown(id)) {
+            return false;
+        }
+
+        if (category == null) {
+            log.error("Failed to get category, might be a new one? ({})", categoryRawName);
+            return false;
+        }
+
+        return true;
     }
 
     private void sendNewsNotification(Categories category, String url) {
@@ -102,7 +113,7 @@ public class NewsReader {
                         handleNullChannel(channelID, clientGuild);
                         continue;
                     }
-                    String message = String.format("New post in category %s!\n%s", category.rawName, url);
+                    String message = "New post in category " + category.rawName + "!\n" + url;
                     textChannel.sendMessage(message).queue();
                 }
             }
@@ -147,11 +158,32 @@ public class NewsReader {
 
     private boolean isNewsEnabledInChannel(NewsChannelDTO newsChannel, Categories category) {
         switch (category) {
-            case HEARTSTONE -> {
+            case HEARTHSTONE -> {
                 return newsChannel.isHearthStoneNewsEnabled();
             }
             case DI -> {
                 return newsChannel.isDiabloImmortalNewsEnabled();
+            }
+            case OVERWATCH -> {
+                return newsChannel.isOverwatchEnabled();
+            }
+            case BNET -> {
+                return newsChannel.isBnetEnabled();
+            }
+            case D4 -> {
+                return newsChannel.isD4Enabled();
+            }
+            case CORTEZ -> {
+                return newsChannel.isCortezEnabled();
+            }
+            case HEROES -> {
+                return newsChannel.isHeroesEnabled();
+            }
+            case WOW_WEB -> {
+                return newsChannel.isWowWebEnabled();
+            }
+            case NEWS -> {
+                return newsChannel.isNewsEnabled();
             }
             default -> {
                 log.error("isNewsEnabledInChannel(NewsChannelDTO, Categories) was called with an unknown category {}.",

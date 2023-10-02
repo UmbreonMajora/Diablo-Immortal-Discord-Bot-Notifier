@@ -129,7 +129,36 @@ public class ClientGuild {
         return customNotifications.containsKey(customMessageID);
     }
 
+    /**
+     * Adds a news channel to a client guild.
+     * @param newsChannelDTO news channel object with information about the discord channel.
+     */
     public void addNewsChannel(NewsChannelDTO newsChannelDTO) {
         newsChannels.put(newsChannelDTO.getChannelID(), newsChannelDTO);
+    }
+
+    /**
+     * Removed a news channel from a client guild.
+     * @param channelID The discord channel id of the registered news channel.
+     */
+    public void deleteNewsChannel(String channelID) {
+        newsChannels.remove(channelID);
+    }
+
+    /**
+     * Gets a news channel by the discord channel id.
+     * @param channelID The discord channel id of the registered news channel.
+     * @return the news channel with the associated channel id or throws NullPointerException.
+     */
+    public NewsChannelDTO getNewsChannelByChannelID(String channelID) {
+        return newsChannels.get(channelID);
+    }
+
+    /**
+     * Updates a news channel of a client guild.
+     * @param newsChannelDTO The updated news channel object.
+     */
+    public void replaceNewsChannel(NewsChannelDTO newsChannelDTO) {
+        newsChannels.replace(newsChannelDTO.getChannelID(), newsChannelDTO);
     }
 }

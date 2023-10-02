@@ -1,1 +1,1 @@
-DELETE FROM news_channels WHERE id = ?;
+DELETE FROM news_channels WHERE channelid = ?;
