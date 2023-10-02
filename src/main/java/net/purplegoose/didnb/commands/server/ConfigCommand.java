@@ -1,15 +1,17 @@
 package net.purplegoose.didnb.commands.server;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.jetbrains.annotations.Nullable;
+import net.purplegoose.didnb.data.LoggingInformation;
+import net.purplegoose.didnb.utils.PermissionUtil;
 
-import static net.purplegoose.didnb.utils.StringUtil.*;
+import static net.purplegoose.didnb.utils.StringUtil.FAILED_MESSAGE;
 
 /**
  * @author Umbreon Majora
@@ -19,28 +21,19 @@ import static net.purplegoose.didnb.utils.StringUtil.*;
  * @Command: /config
  */
 @Slf4j
+@AllArgsConstructor
 public class ConfigCommand implements IClientCommand {
 
     private final GuildsCache guildsCache;
 
-    public ConfigCommand(GuildsCache guildsCache) {
-        this.guildsCache = guildsCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         Guild guild = event.getGuild();
         Member member = event.getMember();
-        User user = member.getUser();
+        User user = event.getUser();
 
-        String guildID = guild.getId();
-        String guildName = guild.getName();
-
-        String channelID = event.getChannel().getId();
-        String channelName = event.getChannel().getName();
-
-        log.info("{} used /config. Guild: {}({}) Channel: {}({})",
-                getFullUsernameWithDiscriminator(user), guildName, guildID, channelName, channelID);
+        log.info("{} used /config. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
 
         replyEphemeralToUser(event, buildConfigEmbed(guild, member, user));
     }
@@ -56,20 +49,23 @@ public class ConfigCommand implements IClientCommand {
         embed.setThumbnail(guild.getIconUrl());
         embed.addField("Owner:", getFullUsernameWithDiscriminator(user), true);
 
-        String languageRawName = clientGuild.getGuildLanguage().rawName;
+        String languageRawName = clientGuild.getLanguage().rawName;
         embed.addField("Language:", languageRawName, true);
 
-        String timeZone = clientGuild.getGuildTimeZone();
+        String timeZone = clientGuild.getTimeZone();
         embed.addField("TimeZone:", timeZone, true);
 
         String adminRoleID = clientGuild.getGuildAdminRoleID();
         embed.addField("Admin Role:", getAdminRole(guild, adminRoleID), true);
-        embed.addField("Is user admin?", isUserPermitted(member, adminRoleID) ? "Yes" : "No", true);
+        embed.addField("Is user admin?", PermissionUtil.isUserPermitted(member, adminRoleID) ? "Yes" : "No", true);
         embed.addField("Event-Messages:", clientGuild.isEventMessageEnabled() ? "Enabled" : "Disabled", true);
         embed.addField("Warn-Messages:", clientGuild.isWarnMessagesEnabled() ? "Enabled" : "Disabled", true);
         embed.addField("Warn-Time:", String.valueOf(clientGuild.getWarnTimeInMinutes()), true);
         embed.addField("Custom messages count:", String.valueOf(clientGuild.getCustomNotificationSize()), true);
         embed.addField("Registered channels:", String.valueOf(clientGuild.getNotificationChannelCount()), true);
+        embed.addField("Auto Delete:", clientGuild.isAutoDeleteEnabled() ? "Enabled" : "Disabled", true);
+        embed.addField("Auto Delete Time:", String.valueOf(clientGuild.getAutoDeleteTimeInHours()), true);
+        embed.addField("Embed Lead Time:", String.valueOf(clientGuild.getEmbedLeadTime()), true);
         return embed.build();
     }
 
@@ -81,5 +77,5 @@ public class ConfigCommand implements IClientCommand {
         Role adminRole = guild.getRoleById(roleID);
         return adminRole == null ? FAILED_MESSAGE : adminRole.getName();
     }
-    
+
 }

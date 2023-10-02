@@ -1,31 +1,30 @@
 package net.purplegoose.didnb.events;
 
-import net.purplegoose.didnb.cache.GuildsCache;
-import net.purplegoose.didnb.database.DatabaseRequests;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.purplegoose.didnb.cache.GuildsCache;
+import net.purplegoose.didnb.database.DatabaseRequests;
 
+@Slf4j
+@AllArgsConstructor
 public class GuildLeave extends ListenerAdapter {
-
-    private final Logger logger = LoggerFactory.getLogger(GuildLeave.class);
-
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
-
-    public GuildLeave(DatabaseRequests databaseRequests, GuildsCache guildsCache) {
-        this.databaseRequests = databaseRequests;
-        this.guildsCache = guildsCache;
-    }
 
     @Override
     public void onGuildLeave(GuildLeaveEvent event) {
         String guildID = event.getGuild().getId();
-        databaseRequests.deleteGuildByGuildID(guildID);
-        databaseRequests.deleteMessagesByGuildID(guildID);
-        databaseRequests.deleteChannelsByGuildID(guildID);
+        deleteDataFromDatabase(guildID);
         guildsCache.getAllGuilds().remove(guildID);
-        logger.info(event.getGuild().getId() + " where removed from guilds.");
+        log.info(event.getGuild().getId() + " where removed from guilds.");
+    }
+
+    private void deleteDataFromDatabase(String guildID) {
+        databaseRequests.deleteGuildByGuildID(guildID);
+        databaseRequests.deleteCustomMessagesByGuildID(guildID);
+        databaseRequests.deleteNotificationChannelsByGuildID(guildID);
+        databaseRequests.deleteScheduledEventsSettings(guildID);
     }
 }

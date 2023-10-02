@@ -1,66 +1,67 @@
 package net.purplegoose.didnb.commands.channel;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.purplegoose.didnb.cache.GuildsCache;
-import net.purplegoose.didnb.commands.IClientCommand;
-import net.purplegoose.didnb.data.NotificationChannel;
-import net.purplegoose.didnb.enums.Language;
-import net.purplegoose.didnb.languages.LanguageController;
-import net.purplegoose.didnb.utils.StringUtil;
-import net.purplegoose.didnb.utils.TimeUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.purplegoose.didnb.annotations.CommandAnnotation;
+import net.purplegoose.didnb.annotations.GameEvent;
+import net.purplegoose.didnb.cache.GuildsCache;
+import net.purplegoose.didnb.commands.IClientCommand;
+import net.purplegoose.didnb.data.LoggingInformation;
+import net.purplegoose.didnb.data.NotificationChannel;
+import net.purplegoose.didnb.enums.Language;
+import net.purplegoose.didnb.languages.LanguageController;
+import net.purplegoose.didnb.utils.StringUtil;
+import net.purplegoose.didnb.utils.TimeUtil;
 
-import java.util.Objects;
+import java.lang.reflect.Field;
 
-/**
- * @author Umbreon Majora
- * This command show's a user all infos about a registered channel.
- * Command: /info [Not required: targetchannel]
- */
+import static net.purplegoose.didnb.utils.StringUtil.*;
+
 @Slf4j
+@AllArgsConstructor
+@CommandAnnotation(
+        name = "info",
+        usage = "/info [Not Required: channel]",
+        description = "This command show's a user all information about a registered channel."
+)
 public class InfoCommand implements IClientCommand {
 
     private final GuildsCache guildsCache;
 
-    public InfoCommand(GuildsCache guildsCache) {
-        this.guildsCache = guildsCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        TextChannel channel = getTargetTextChannel(event);
+        Language language = guildsCache.getLanguageByGuildID(logInfo.getGuildID());
 
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
-        String guildName = event.getGuild().getName();
-
-        TextChannel targetTextChannel = getTargetTextChannel(event);
-        String targetTextChannelName = targetTextChannel.getName();
-        String targetTextChannelID = targetTextChannel.getId();
-
-        Language language = guildsCache.getGuildLanguage(guildID);
-        if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
-            log.info("{} executed /info in an unregistered channel. Guild: {}({}), Channel: {}({})",
-                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
+        if (!isTextChannelRegistered(logInfo.getGuildID(), channel.getId())) {
+            log.error("{} used /{}. Error: Channel not registered. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), getClass().getAnnotation(CommandAnnotation.class).name(),
+                    logInfo.getGuildName(), logInfo.getGuildID(), channel.getName(), channel.getId());
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANNEL-NOT-REGISTERED"));
             return;
         }
 
-        log.info("{} executed /info. Guild: {}({}), Channel: {}({})",
-                executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
-        String mentionRoleID = getMentionRoleID(guildID, targetTextChannelID);
-        replyEphemeralToUser(event, buildInfoEmbed(targetTextChannel, mentionRoleID, guildID));
+        log.info("{} used /{}. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), getClass().getAnnotation(CommandAnnotation.class).name(),
+                logInfo.getGuildName(), logInfo.getGuildID(), channel.getName(), channel.getId());
+        String mentionRoleID = getMentionRoleID(logInfo.getGuildID(), channel.getId());
+        replyEphemeralToUser(event, buildInfoEmbed(channel, mentionRoleID, logInfo.getGuildID()));
     }
 
     private String getMentionRoleID(String guildID, String targetTextChannelID) {
-        return guildsCache.getClientGuildByID(guildID).getNotificationChannel(targetTextChannelID).getMentionRoleID();
+        return guildsCache.getClientGuildByID(guildID)
+                .getNotificationChannel(targetTextChannelID)
+                .getMentionRoleID();
     }
 
     private boolean isTextChannelRegistered(String guildID, String textChannelID) {
-        return guildsCache.getClientGuildByID(guildID).isChannelRegistered(textChannelID);
+        return guildsCache.getClientGuildByID(guildID)
+                .isChannelRegistered(textChannelID);
     }
 
     private MessageEmbed buildInfoEmbed(TextChannel textChannel, String mentionRoleID, String guildID) {
@@ -79,42 +80,61 @@ public class InfoCommand implements IClientCommand {
         embedBuilder.setDescription(description);
         embedBuilder.addField(getGeneralField(notificationChannel));
         embedBuilder.addField(getNotificationsField(notificationChannel));
+        embedBuilder.addField(getEmbedNotificationsField(notificationChannel));
         embedBuilder.setFooter("purplegoose.net");
 
         return embedBuilder.build();
     }
 
     private MessageEmbed.Field getGeneralField(NotificationChannel channel) {
-        String context = "Event Messages Enabled: " + (channel.isEventMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Warn Messages Enabled: " + (channel.isEventWarnMessage() ? "Enabled" : "Disabled");
+        String context = "Event Messages Enabled: " +
+                (channel.isEventMessageEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) + StringUtil.NEW_LINE +
+                "Warn Messages Enabled: " + (channel.isEventWarnMessage() ? ENABLED_MESSAGE : DISABLE_MESSAGE);
         return new MessageEmbed.Field("General", context, false);
     }
 
     private String getMentionRoleContext(TextChannel textChannel, String mentionRoleID) {
+        if (mentionRoleID == null) {
+            return "None" + StringUtil.NEW_LINE;
+        }
         if (StringUtil.isStringOnlyContainingNumbers(mentionRoleID)) {
             Role mentionRole = textChannel.getGuild().getRoleById(mentionRoleID);
             if (mentionRole == null) {
                 return "None" + StringUtil.NEW_LINE;
-            } else {
-                return mentionRole.getName() + " - " + mentionRoleID + StringUtil.NEW_LINE;
             }
+            return mentionRole.getName() + " - " + mentionRoleID + StringUtil.NEW_LINE;
         }
         return mentionRoleID + StringUtil.NEW_LINE;
     }
 
     private MessageEmbed.Field getNotificationsField(NotificationChannel channel) {
-        String content = "Ancient Arena: " + (channel.isAncientArenaMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Ancient Nigtmare: " + (channel.isAncientNightmareMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Assembly: " + (channel.isAssemblyMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Battleground: " + (channel.isBattlegroundsMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Vault: " + (channel.isVaultMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Demon Gates: " + (channel.isDemonGatesMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Shadow Lottery: " + (channel.isShadowLotteryMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Haunted Carriage: " + (channel.isHauntedCarriageMessageEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Wrathborne Invasion: " + (channel.isWrathborneInvasionEnabled() ? "Enabled" : "Disabled") + StringUtil.NEW_LINE +
-                "Onslaught: " + (channel.isOnSlaughtMessagesEnabled() ? "Enabled" : "Disabled");
-        return new MessageEmbed.Field("Events", content, false);
+        StringBuilder sb = new StringBuilder(100);
+        for (Field f : channel.getClass().getDeclaredFields()) {
+            if (f.isAnnotationPresent(GameEvent.class)) {
+                GameEvent gameEvent = f.getAnnotation(GameEvent.class);
+                f.setAccessible(true);
+                try {
+                    sb.append(gameEvent.eventName()).append(": ");
+                    sb.append(f.getBoolean(channel) ? ENABLED_MESSAGE : DISABLE_MESSAGE);
+                    sb.append(StringUtil.NEW_LINE);
+                } catch (IllegalAccessException e) {
+                    log.error("Failed to generate content for info command.", e);
+                    return new MessageEmbed.Field("Events", "Failed to generate! Please report.", false);
+                }
+            }
+        }
+        return new MessageEmbed.Field("Events", sb.toString(), false);
     }
 
+    private MessageEmbed.Field getEmbedNotificationsField(NotificationChannel channel) {
+        String string = "Ancient Arena: " + (channel.isAncientArenaMessageEmbedEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
+                NEW_LINE +
+                "Demon Gates: " + (channel.isDemonGatesMessageEmbedEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
+                NEW_LINE +
+                "Ancient Nightmare: " + (channel.isAncientNightmareMessageEmbedEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE) +
+                NEW_LINE +
+                "Haunted Carriage:" + (channel.isHauntedCarriageMessageEmbedEnabled() ? ENABLED_MESSAGE : DISABLE_MESSAGE);
+        return new MessageEmbed.Field("Embeds", string, false);
+    }
 
 }

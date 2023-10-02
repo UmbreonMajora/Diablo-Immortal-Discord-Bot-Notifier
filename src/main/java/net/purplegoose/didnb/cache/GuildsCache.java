@@ -15,7 +15,7 @@ public class GuildsCache {
     }
 
     public String getGuildTimeZone(String guildID) {
-        return guilds.get(guildID).getGuildTimeZone();
+        return guilds.get(guildID).getTimeZone();
     }
 
     public String getGuildAdminRoleID(String guildID) {
@@ -30,8 +30,8 @@ public class GuildsCache {
         return guilds.get(guildID);
     }
 
-    public Language getGuildLanguage(String guildID) {
-        return guilds.get(guildID).getGuildLanguage();
+    public Language getLanguageByGuildID(String guildID) {
+        return guilds.get(guildID).getLanguage();
     }
 
     public Map<String, ClientGuild> getAllGuilds() {

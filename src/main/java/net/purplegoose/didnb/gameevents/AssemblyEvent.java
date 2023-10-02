@@ -13,6 +13,7 @@ import java.util.Set;
 
 import static net.purplegoose.didnb.utils.StringUtil.EMPTY_STRING;
 import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
+
 /**
  * @author Umbreon Majora
  * Class for Diablo Immortal Assembly event.
@@ -31,8 +32,8 @@ public class AssemblyEvent implements IGameEvent {
         }
 
         Set<EventGameData> eventGameDataSet = gameDataCache.getAssemblyDataSet();
-        String timeZone = guild.getGuildTimeZone();
-        Language language = guild.getGuildLanguage();
+        String timeZone = guild.getTimeZone();
+        Language language = guild.getLanguage();
 
         if (!isTimeInWarnRange(eventGameDataSet, timeZone).equals(EMPTY_STRING)) {
             String startTime = isTimeInWarnRange(eventGameDataSet, timeZone);

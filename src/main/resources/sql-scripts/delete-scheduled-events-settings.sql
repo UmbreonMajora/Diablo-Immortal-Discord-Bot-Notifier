@@ -1,0 +1,1 @@
+DELETE FROM scheduled_events_settings WHERE guildID = ?;

@@ -1,8 +1,8 @@
 package net.purplegoose.didnb.notifier;
 
-import net.purplegoose.didnb.utils.TimeUtil;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Activity;
+import net.purplegoose.didnb.utils.TimeUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;

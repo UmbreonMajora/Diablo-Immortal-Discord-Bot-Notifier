@@ -1,12 +1,12 @@
 package net.purplegoose.didnb.events;
 
 import lombok.extern.slf4j.Slf4j;
-import net.purplegoose.didnb.cache.GuildsCache;
-import net.purplegoose.didnb.data.ClientGuild;
-import net.purplegoose.didnb.database.DatabaseRequests;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.purplegoose.didnb.cache.GuildsCache;
+import net.purplegoose.didnb.data.ClientGuild;
+import net.purplegoose.didnb.database.DatabaseRequests;
 
 @Slf4j
 public class ChannelDelete extends ListenerAdapter {

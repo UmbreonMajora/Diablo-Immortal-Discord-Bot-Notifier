@@ -69,6 +69,17 @@ public interface IGameEvent {
         return false;
     }
 
+    default boolean isEventAboutToStart(Set<EventGameData> eventGameDataSet, String time, String weekday) {
+        for (EventGameData data : eventGameDataSet) {
+            if (data.getWeekday() == null ||
+                    data.getWeekday().equalsIgnoreCase(weekday) &&
+                            (time.equals(data.getEventStartTime()))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     default boolean isWarnMessageEnabled(ClientGuild clientGuild, NotificationChannel notificationChannel) {
         return clientGuild.isWarnMessagesEnabled() && notificationChannel.isEventWarnMessage();
     }

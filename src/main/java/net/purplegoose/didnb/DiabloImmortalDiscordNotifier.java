@@ -1,57 +1,133 @@
 package net.purplegoose.didnb;
 
-import net.purplegoose.didnb.cache.ErrorCache;
-import net.purplegoose.didnb.cache.GameDataCache;
-import net.purplegoose.didnb.cache.GuildsCache;
-import net.purplegoose.didnb.data.ClientGuild;
-import net.purplegoose.didnb.data.NotificationChannel;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.purplegoose.didnb.annotations.GameDataCacheSet;
+import net.purplegoose.didnb.cache.*;
+import net.purplegoose.didnb.data.ScheduledEventsSetting;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.database.MySQLDatabaseConnection;
+import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.events.*;
+import net.purplegoose.didnb.exeption.StartFailureException;
+import net.purplegoose.didnb.news.NewsReader;
 import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
+import net.purplegoose.didnb.notifier.ScheduledEventCreator;
 import net.purplegoose.didnb.utils.ConfigUtil;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.Arrays;
 
+@Slf4j
 public class DiabloImmortalDiscordNotifier {
 
+    public static final String BOT_ID = "527511535309029407";
+
+    private static boolean registerCommands = true;
+
+    private static GameDataCache gameDataCache = new GameDataCache();
+    private static GuildsCache guildsCache = new GuildsCache();
+    private static CustomMessagesCache customMessagesCache = new CustomMessagesCache();
+    private static ScheduledEventsSettingsCache sesCache = new ScheduledEventsSettingsCache();
+
+    private static MySQLDatabaseConnection mySQLDatabaseConnection = new MySQLDatabaseConnection();
+    private static DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
+
     public static void main(String[] args) {
-        GameDataCache gameDataCache = new GameDataCache();
-        GuildsCache guildsCache = new GuildsCache();
+        // Init caches
+        gameDataCache = new GameDataCache();
+        guildsCache = new GuildsCache();
+        customMessagesCache = new CustomMessagesCache();
+        sesCache = new ScheduledEventsSettingsCache();
 
-        MySQLDatabaseConnection mySQLDatabaseConnection = new MySQLDatabaseConnection();
-        DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection);
-        try {
-            guildsCache.setGuilds(databaseRequests.loadDataFromDatabaseToCache());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.exit(0);
-            return;
-        }
+        // Init database
+        mySQLDatabaseConnection = new MySQLDatabaseConnection();
+        databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
 
-        fillGameDataCache(gameDataCache, databaseRequests);
+        fillCaches();
+        setCommandRegistrationValue(args);
 
-        JDA jda;
-        try {
-            jda = JDABuilder.createDefault(ConfigUtil.getClientToken())
+        JDA jda = getJdaClient();
 
-                    .addEventListeners(new ChannelDelete(databaseRequests, guildsCache))
-                    .addEventListeners(new GuildJoin(databaseRequests, guildsCache))
-                    .addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache))
-                    .addEventListeners(new GuildLeave(databaseRequests, guildsCache))
-                    .addEventListeners(new GuildReady())
-                    .build().awaitReady();
-
-        } catch (InterruptedException e) {
-            System.exit(0);
-            return;
-        }
-
+        // Run scheduler
         runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
+        logContainingLanguages();
+
+        checkForMissingSESetting(guildsCache, databaseRequests);
+    }
+
+    private static void setCommandRegistrationValue(String[] args) {
+        if (isArgumentsPresent(args)) {
+            registerCommands = Boolean.parseBoolean(args[0]);
+        }
+    }
+
+    private static void fillCaches() {
+        try {
+            loadGameDataCache(gameDataCache, databaseRequests);
+            fillGuildsCache(guildsCache, databaseRequests);
+            fillGameDataCache(gameDataCache, databaseRequests);
+        } catch (SQLException e) {
+            throw new StartFailureException("Failed to load caches.", e);
+        }
+    }
+
+    private static boolean isArgumentsPresent(String[] args) {
+        return args.length > 0;
+    }
+
+    private static JDA getJdaClient() {
+        try {
+            JDABuilder jdaBuilder = JDABuilder.createDefault(ConfigUtil.getClientToken());
+            addEventListeners(jdaBuilder);
+            addEventInteractions(jdaBuilder);
+            return jdaBuilder.build().awaitReady();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new StartFailureException("Failed to build jda client.", e);
+        }
+    }
+
+    private static void addEventListeners(JDABuilder jdaBuilder) {
+        jdaBuilder.addEventListeners(new ChannelDelete(databaseRequests, guildsCache),
+                new GuildJoin(databaseRequests, guildsCache),
+                new GuildLeave(databaseRequests, guildsCache));
+
+        if (registerCommands) {
+            jdaBuilder.addEventListeners(new GuildReady());
+        }
+
+    }
+
+    private static void addEventInteractions(JDABuilder jdaBuilder) {
+        jdaBuilder.addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache, customMessagesCache, sesCache),
+                new StringSelectInteraction(guildsCache, databaseRequests));
+    }
+
+
+    private static boolean loadGameDataCache(GameDataCache gameDataCache, DatabaseRequests databaseRequests) throws SQLException {
+        gameDataCache.getGameDataCache().addAll(databaseRequests.loadGameEventData());
+        return true;
+    }
+
+    private static boolean fillGuildsCache(GuildsCache guildsCache, DatabaseRequests databaseRequests) throws SQLException {
+        guildsCache.setGuilds(databaseRequests.loadDataFromDatabaseToCache());
+        return true;
+    }
+
+    //todo: remove
+    private static void checkForMissingSESetting(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
+        guildsCache.getAllGuilds().values().forEach(clientGuild -> {
+            if (clientGuild.getSeSetting() == null) {
+                ScheduledEventsSetting seSetting = new ScheduledEventsSetting(clientGuild.getGuildID());
+                clientGuild.setSeSetting(seSetting);
+                databaseRequests.createScheduledEventsSettings(seSetting.getGuildID());
+            }
+        });
     }
 
     private static void runScheduler(GameDataCache gameDataCache, GuildsCache guildsCache, DatabaseRequests databaseRequests, JDA jda) {
@@ -63,19 +139,33 @@ public class DiabloImmortalDiscordNotifier {
 
         InformationNotifier informationNotifier = new InformationNotifier();
         informationNotifier.runInformationNotifier(jda);
+
+        //ScheduledEventCreator seCreator = new ScheduledEventCreator(guildsCache, gameDataCache);
+        //seCreator.scheduler(jda);
+
+        NewsReader newsReader = new NewsReader(databaseRequests, guildsCache, jda);
+        newsReader.runScheduler();
     }
 
-    private static void fillGameDataCache(GameDataCache gameDataCache, DatabaseRequests databaseRequests) {
-        gameDataCache.setShadowLotteryDataSet(databaseRequests.getEventTimes("shadow_lottery_times", true));
-        gameDataCache.setVaultGameDataSet(databaseRequests.getEventTimes("vault_times", true));
-        gameDataCache.setHauntedCarriageDataSet(databaseRequests.getEventTimes("haunted_carriage_times", false));
-        gameDataCache.setDemonGatesDataSet(databaseRequests.getEventTimes("demon_gates_times", false));
-        gameDataCache.setBattlegroundDataSet(databaseRequests.getEventTimes("battleground_times", true));
-        gameDataCache.setAncientArenaDataSet(databaseRequests.getEventTimes("ancient_arena_times", false));
-        gameDataCache.setAncientNightmareDataSet(databaseRequests.getEventTimes("ancient_nightmare_times", false));
-        gameDataCache.setAssemblyDataSet(databaseRequests.getEventTimes("assembly_times", false));
-        gameDataCache.setWrathborneInvasionDataSet(databaseRequests.getEventTimes("wrathborne_invasion_times", true));
-        gameDataCache.setOnSlaughtDataSet(databaseRequests.getEventTimes("onslaught_times", false));
+    private static boolean fillGameDataCache(GameDataCache gameDataCache, DatabaseRequests databaseRequests) {
+        for (Field s : GameDataCache.class.getDeclaredFields()) {
+            if (!s.isAnnotationPresent(GameDataCacheSet.class)) continue;
+            GameDataCacheSet gameDataCacheSet = s.getAnnotation(GameDataCacheSet.class);
+            s.setAccessible(true);
+            try {
+                String tableName = gameDataCacheSet.tableName();
+                boolean everyday = gameDataCacheSet.everyday();
+                s.set(gameDataCache, databaseRequests.getEventTimes(tableName, everyday));
+            } catch (IllegalAccessException e) {
+                log.error("Failed to load event game data cache.", e);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static void logContainingLanguages() {
+        log.info("Loaded with these languages: " + Arrays.toString(Language.values()));
     }
 
 }

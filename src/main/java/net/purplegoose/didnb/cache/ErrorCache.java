@@ -1,27 +1,24 @@
 package net.purplegoose.didnb.cache;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
+@Slf4j
+@AllArgsConstructor
 public class ErrorCache {
 
     private final DatabaseRequests databaseRequests;
 
-    private final Logger logger = LoggerFactory.getLogger(ErrorCache.class);
     /**
      * Key is the channel ID.
      * Value is how many errors occurred.
      */
     private final HashMap<String, Integer> channelErrorCountMap = new HashMap<>();
     private final int maximumErrors = 50;
-
-    public ErrorCache(DatabaseRequests databaseRequests) {
-        this.databaseRequests = databaseRequests;
-    }
 
     public void addChannelError(NotificationChannel channel) {
         String channelID = channel.getTextChannelID();
@@ -33,7 +30,7 @@ public class ErrorCache {
 
         if (isMaximumAnErrorsReachedForChannel(channelID)) {
             databaseRequests.deleteNotificationChannelByID(channelID);
-            logger.info(channelID + " reached the maximum of errors occurred an was removed from the system.");
+            log.info("{} reached the maximum of errors occurred an was removed from the system.", channelID);
         }
     }
 

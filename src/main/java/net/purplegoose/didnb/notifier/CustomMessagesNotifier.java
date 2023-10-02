@@ -1,19 +1,21 @@
 package net.purplegoose.didnb.notifier;
 
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.CustomNotification;
+import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
+import net.purplegoose.didnb.exeption.InvalidMentionException;
 import net.purplegoose.didnb.utils.TimeUtil;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class CustomMessagesNotifier {
+@Slf4j
+public class CustomMessagesNotifier extends NotifierHelper {
 
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
@@ -47,8 +49,29 @@ public class CustomMessagesNotifier {
                         TextChannel textChannel = jda.getTextChannelById(channel);
                         String message = customNotification.getMessage();
 
-                        if (textChannel != null) {
-                            textChannel.sendMessage(message).queue();
+                        if (textChannel == null) {
+                            log.info("{} has a custom notification with an non existent text channel, skipping...",
+                                    clientGuild.getGuildID());
+                            continue;
+                        }
+
+                        // mention
+                        NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID)
+                                .getNotificationChannel(textChannel.getId());
+                        StringBuilder sb = new StringBuilder(message);
+                        try {
+                            addMessageMention(sb, notificationChannel, textChannel.getGuild(), clientGuild.getLanguage());
+                        } catch (InvalidMentionException e) {
+                            log.error(e.getMessage(), e);
+                            continue;
+                        }
+                        message = sb.toString();
+
+                        if (clientGuild.isAutoDeleteEnabled()) {
+                            int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
+                            sendTimedMessage(textChannel, message, autoDeleteTimeInHours);
+                        } else {
+                            sendMessage(textChannel, message);
                         }
 
                         if (!customNotification.isRepeating()) {
@@ -58,7 +81,7 @@ public class CustomMessagesNotifier {
                     }
                 }
             }
-        }, TimeUtil.getNextFullMinute(), 60 * 1000);
+        }, TimeUtil.getNextFullMinute(), 60L * 1000L);
     }
 
     private boolean isTimeValid(String timezone, String day, String time, String fullTime) {

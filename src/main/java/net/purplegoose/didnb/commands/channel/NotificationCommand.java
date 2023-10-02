@@ -1,21 +1,21 @@
 package net.purplegoose.didnb.commands.channel;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.GameEvent;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-
-import java.util.Objects;
 
 import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_NAME_OPTION_NAME;
-import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_VALUE_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_TOGGLE_OPTION_NAME;
 
 /**
  * @author Umbreon Majora
@@ -23,32 +23,25 @@ import static net.purplegoose.didnb.utils.CommandsUtil.EVENT_VALUE_OPTION_NAME;
  * Command: /notification [Required: event] [Required: eventvalue]
  */
 @Slf4j
+@AllArgsConstructor
 public class NotificationCommand implements IClientCommand {
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
 
-    public NotificationCommand(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
-        this.guildsCache = guildsCache;
-        this.databaseRequests = databaseRequests;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
-
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
-        String guildName = event.getGuild().getName();
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
 
         TextChannel targetTextChannel = getTargetTextChannel(event);
         String targetTextChannelID = targetTextChannel.getId();
         String targetTextChannelName = targetTextChannel.getName();
 
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
         if (!isTextChannelRegistered(guildID, targetTextChannelID)) {
-            log.info("{} executed /info in an unregistered channel. Guild: {}({}), Channel: {}({})",
-                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
+            log.error("{} used /notification. Error: Channel not registered. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANNEL-NOT-REGISTERED"));
             return;
         }
@@ -56,16 +49,17 @@ public class NotificationCommand implements IClientCommand {
         String selectedEvent = getSelectedEvent(event);
         GameEvent gameEvent = GameEvent.findGameEventByRawName(selectedEvent);
         if (gameEvent == null) {
-            log.info("{} executed /notification with invalid gameevent. Guild: {}({}), Channel: {}({})",
-                    executingUser, guildName, guildID, targetTextChannelName, targetTextChannelID);
+            log.error("{} used /notification. Error: GameEvent invalid. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), guildID, targetTextChannelName, targetTextChannelID);
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INVALID-EVENT"));
             return;
         }
 
         boolean eventValue = getEventValue(event);
         updateNotificationChannel(gameEvent, eventValue, guildID, targetTextChannelID);
-        log.info("{} executed /notification. Changed {} to {}. Guild: {}({}), Channel: {}({})",
-                executingUser, gameEvent.rawName, eventValue, guildName, guildID, targetTextChannelName, targetTextChannelID);
+        log.error("{} used /notification. {} is now {}. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), gameEvent.rawName, eventValue, logInfo.getGuildName(), guildID,
+                targetTextChannelName, targetTextChannelID);
         String replyMessage = getReplyMessage(gameEvent, eventValue, language);
         replyEphemeralToUser(event, replyMessage);
     }
@@ -81,42 +75,20 @@ public class NotificationCommand implements IClientCommand {
     private void updateNotificationChannel(GameEvent gameEvent, boolean gameEventValue, String guildID, String textChannelID) {
         NotificationChannel notificationChannel = guildsCache.getClientGuildByID(guildID).getNotificationChannel(textChannelID);
         switch (gameEvent) {
-            case ANCIENT_ARENA:
-                notificationChannel.setAncientArenaMessageEnabled(gameEventValue);
-                break;
-            case VAULT:
-                notificationChannel.setVaultMessageEnabled(gameEventValue);
-                break;
-            case HEAD_UP:
-                notificationChannel.setEventWarnMessage(gameEventValue);
-                break;
-            case MESSAGE:
-                notificationChannel.setEventMessageEnabled(gameEventValue);
-                break;
-            case ASSEMBLY:
-                notificationChannel.setAssemblyMessageEnabled(gameEventValue);
-                break;
-            case DEMON_GATES:
-                notificationChannel.setDemonGatesMessageEnabled(gameEventValue);
-                break;
-            case BATTLEGROUNDS:
-                notificationChannel.setBattlegroundsMessageEnabled(gameEventValue);
-                break;
-            case SHADOW_LOTTERY:
-                notificationChannel.setShadowLotteryMessageEnabled(gameEventValue);
-                break;
-            case HAUNTED_CARRIAGE:
-                notificationChannel.setHauntedCarriageMessageEnabled(gameEventValue);
-                break;
-            case ANCIENT_NIGHTMARE:
-                notificationChannel.setAncientNightmareMessageEnabled(gameEventValue);
-                break;
-            case WRATHBORNE_INVASION:
-                notificationChannel.setWrathborneInvasionEnabled(gameEventValue);
-                break;
-            case ON_SLAUGHT:
-                notificationChannel.setOnSlaughtMessagesEnabled(gameEventValue);
-                break;
+            case ANCIENT_ARENA -> notificationChannel.setAncientArenaMessageEnabled(gameEventValue);
+            case VAULT -> notificationChannel.setVaultMessageEnabled(gameEventValue);
+            case HEAD_UP -> notificationChannel.setEventWarnMessage(gameEventValue);
+            case MESSAGE -> notificationChannel.setEventMessageEnabled(gameEventValue);
+            case ASSEMBLY -> notificationChannel.setAssemblyMessageEnabled(gameEventValue);
+            case DEMON_GATES -> notificationChannel.setDemonGatesMessageEnabled(gameEventValue);
+            case BATTLEGROUNDS -> notificationChannel.setBattlegroundsMessageEnabled(gameEventValue);
+            case SHADOW_LOTTERY -> notificationChannel.setShadowLotteryMessageEnabled(gameEventValue);
+            case HAUNTED_CARRIAGE -> notificationChannel.setHauntedCarriageMessageEnabled(gameEventValue);
+            case ANCIENT_NIGHTMARE -> notificationChannel.setAncientNightmareMessageEnabled(gameEventValue);
+            case WRATHBORNE_INVASION -> notificationChannel.setWrathborneInvasionEnabled(gameEventValue);
+            case ON_SLAUGHT -> notificationChannel.setOnSlaughtMessagesEnabled(gameEventValue);
+            case TOWER_OF_VICTORY -> notificationChannel.setTowerOfVictoryMessagesEnabled(gameEventValue);
+            case SHADOW_WAR -> notificationChannel.setShadowWarMessagesEnabled(gameEventValue);
         }
         databaseRequests.updateNotificationChannel(notificationChannel);
     }
@@ -131,7 +103,7 @@ public class NotificationCommand implements IClientCommand {
     }
 
     private boolean getEventValue(SlashCommandInteractionEvent event) {
-        OptionMapping eventValueOption = event.getOption(EVENT_VALUE_OPTION_NAME);
+        OptionMapping eventValueOption = event.getOption(EVENT_TOGGLE_OPTION_NAME);
         return eventValueOption != null && eventValueOption.getAsBoolean();
     }
 }

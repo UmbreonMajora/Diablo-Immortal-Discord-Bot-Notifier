@@ -1,34 +1,40 @@
 package net.purplegoose.didnb.events;
 
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.purplegoose.didnb.cache.CustomMessagesCache;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
+import net.purplegoose.didnb.cache.ScheduledEventsSettingsCache;
 import net.purplegoose.didnb.commands.channel.*;
 import net.purplegoose.didnb.commands.custom_notifications.*;
 import net.purplegoose.didnb.commands.info.*;
+import net.purplegoose.didnb.commands.scheduled_events.DeleteAllEvents;
+import net.purplegoose.didnb.commands.scheduled_events.ListEvents;
 import net.purplegoose.didnb.commands.server.*;
 import net.purplegoose.didnb.data.ClientGuild;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.purplegoose.didnb.news.commands.ListNewsCategoriesCommand;
+import net.purplegoose.didnb.news.commands.RegisterNewsChannelCommand;
+import net.purplegoose.didnb.news.commands.ToggleNewsCommand;
+import net.purplegoose.didnb.news.commands.UnregisterNewsChannelCommand;
+import net.purplegoose.didnb.utils.PermissionUtil;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 import static net.purplegoose.didnb.utils.CommandsUtil.*;
 
+@Slf4j
 public class SlashCommandInteraction extends ListenerAdapter {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(SlashCommandInteraction.class);
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
+    private final ScheduledEventsSettingsCache sesCache;
 
     // Channel commands
     private final NotificationCommand notificationCommand;
@@ -62,11 +68,24 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final ServerCommand serverCommand;
     private final TimeZoneCommand timeZoneCommand;
     private final WarnTimeCommand warnTimeCommand;
-    private final DaylightTimeCommand daylightTimeCommand;
+    private final AutoDeleteCommand autoDeleteCommand;
 
-    public SlashCommandInteraction(GuildsCache guildsCache, DatabaseRequests databaseRequests, GameDataCache gameDataCache) {
+    private final ListEvents listEvents;
+    private final DeleteAllEvents deleteAllEvents;
+
+    private final RegisterNewsChannelCommand registerNewsChannelCommand;
+    private final UnregisterNewsChannelCommand unregisterNewsChannelCommand;
+    private final ToggleNewsCommand toggleNewsCommand;
+    private final ListNewsCategoriesCommand listNewsCategoriesCommand;
+
+    public SlashCommandInteraction(GuildsCache guildsCache,
+                                   DatabaseRequests databaseRequests,
+                                   GameDataCache gameDataCache,
+                                   CustomMessagesCache customMessagesCache,
+                                   ScheduledEventsSettingsCache sesCache) {
         this.guildsCache = guildsCache;
         this.databaseRequests = databaseRequests;
+        this.sesCache = sesCache;
 
         this.notificationCommand = new NotificationCommand(guildsCache, databaseRequests);
         this.infoCommand = new InfoCommand(guildsCache);
@@ -76,9 +95,9 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.registerCommand = new RegisterCommand(guildsCache, databaseRequests);
         this.unregisterCommand = new UnregisterCommand(guildsCache, databaseRequests);
 
-        this.createMessageCommand = new CreateMessageCommand(guildsCache, databaseRequests);
+        this.createMessageCommand = new CreateMessageCommand(guildsCache, databaseRequests, customMessagesCache);
         this.messageInfoCommand = new MessageInfoCommand(guildsCache);
-        this.deleteMessageCommand = new DeleteMessageCommand(databaseRequests, guildsCache);
+        this.deleteMessageCommand = new DeleteMessageCommand(databaseRequests, guildsCache, customMessagesCache);
         this.listMessagesCommand = new ListMessagesCommand(guildsCache);
         this.editMessageCommand = new EditMessageCommand(databaseRequests, guildsCache);
 
@@ -95,124 +114,96 @@ public class SlashCommandInteraction extends ListenerAdapter {
         this.serverCommand = new ServerCommand(guildsCache, databaseRequests);
         this.timeZoneCommand = new TimeZoneCommand(guildsCache, databaseRequests);
         this.warnTimeCommand = new WarnTimeCommand(databaseRequests, guildsCache);
-
-        this.daylightTimeCommand = new DaylightTimeCommand(databaseRequests, guildsCache);
         this.messageCommand = new MessageCommand(databaseRequests, guildsCache);
+        this.autoDeleteCommand = new AutoDeleteCommand(guildsCache);
+
+        this.listEvents = new ListEvents(guildsCache);
+        this.deleteAllEvents = new DeleteAllEvents();
+
+        this.registerNewsChannelCommand = new RegisterNewsChannelCommand(guildsCache, databaseRequests);
+        this.unregisterNewsChannelCommand = new UnregisterNewsChannelCommand(guildsCache, databaseRequests);
+        this.toggleNewsCommand = new ToggleNewsCommand(guildsCache, databaseRequests);
+        this.listNewsCategoriesCommand = new ListNewsCategoriesCommand();
     }
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         Member member = event.getMember();
         Guild guild = event.getGuild();
-        String fullUsername = event.getUser().getName() + "#" + event.getUser().getDiscriminator();
-        if (isEventInPrivatChat(guild, member)) {
-            LOGGER.info(fullUsername + " executed a command in privat chat.");
+        String fullUsername = event.getUser().getName();
+
+        if (!isExecutedInTextChannel(event)) {
+            log.error("Command wasn't executed in a text channel or in a guild.");
+            return;
+        }
+
+        if (isEventInPrivateChat(guild, member)) {
+            log.error(fullUsername + " used a command in private chat.");
             return;
         }
 
         if (!isChannelTypeTextChannelType(event.getChannelType())) {
-            LOGGER.info(fullUsername + " executed a command in a non text channel.");
+            log.error(fullUsername + " used a command in a non text channel.");
             return;
         }
 
         String guildID = guild.getId();
 
         if (!guildsCache.isGuildRegistered(guildID)) {
-            LOGGER.info(guild + " is not registered. Registering...");
+            log.info(guild.getName() + " is not registered. Registering...");
             ClientGuild clientGuild = new ClientGuild(guildID);
             guildsCache.addGuild(clientGuild);
             databaseRequests.createGuild(clientGuild);
         }
 
+        LoggingInformation logInfo = new LoggingInformation(fullUsername, guild.getName(), guildID,
+                event.getChannel().getName(), event.getChannel().getId());
+
         String guildAdminRoleID = guildsCache.getGuildAdminRoleID(guildID);
-        if (!isUserPermitted(member, guildAdminRoleID)) return;
+        if (!PermissionUtil.isUserPermitted(member, guildAdminRoleID)) {
+            log.info("{} tried to use a command without permissions.", logInfo.getExecutor());
+            return;
+        }
 
-        event.deferReply().queue();
-
-        executeCommand(event);
+        event.deferReply().setEphemeral(true).queue();
+        executeCommand(event, logInfo);
     }
 
-    private void executeCommand(SlashCommandInteractionEvent event) {
+    private void executeCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
         String command = event.getName().toLowerCase();
         switch (command) {
-            case COMMAND_TODAY:
-                todayCommand.runCommand(event);
-                break;
-            case COMMAND_UPCOMING:
-                upComingCommand.runCommand(event);
-                break;
-            case COMMAND_CREATE_MESSAGE:
-                createMessageCommand.runCommand(event);
-                break;
-            case COMMAND_DELETE_CUSTOM_MESSAGE:
-                deleteMessageCommand.runCommand(event);
-                break;
-            case COMMAND_CUSTOM_MESSAGE_INFO:
-                messageInfoCommand.runCommand(event);
-                break;
-            case COMMAND_LIST_MESSAGES:
-                listMessagesCommand.runCommand(event);
-                break;
-            case COMMAND_REGISTER:
-                registerCommand.runCommand(event);
-                break;
-            case COMMAND_UNREGISTER:
-                unregisterCommand.runCommand(event);
-                break;
-            case COMMAND_MENTION_ROLE:
-                mentionRoleCommand.runCommand(event);
-                break;
-            case COMMAND_INFO:
-                infoCommand.runCommand(event);
-                break;
-            case COMMAND_INSTALL:
-                instructionsCommand.runCommand(event);
-                break;
-            case COMMAND_LANGUAGES:
-                languagesCommand.runCommand(event);
-                break;
-            case COMMAND_TIMEZONES:
-                timeZonesCommand.runCommand(event);
-                break;
-            case COMMAND_NOTIFICATION:
-                notificationCommand.runCommand(event);
-                break;
-            case COMMAND_LIST_NOTIFICATIONS:
-                listNotificationsCommand.runCommand(event);
-                break;
-            case COMMAND_TIMEZONE:
-                timeZoneCommand.runCommand(event);
-                break;
-            case COMMAND_LANGUAGE:
-                languageCommand.runCommand(event);
-                break;
-            case COMMAND_SERVER:
-                serverCommand.runCommand(event);
-                break;
-            case COMMAND_CONFIG:
-                configCommand.runCommand(event);
-                break;
-            case COMMAND_ADMIN_ROLE:
-                adminRoleCommand.runCommand(event);
-                break;
-            case COMMAND_HELP:
-                helpCommand.runCommand(event);
-                break;
-            case COMMAND_PRESET:
-                presetCommand.runCommand(event);
-                break;
-            case COMMAND_WARN_TIME:
-                warnTimeCommand.runCommand(event);
-                break;
-            case COMMAND_MESSAGE:
-                messageCommand.runCommand(event);
-                break;
-            case COMMAND_EDIT_MESSAGE:
-                editMessageCommand.runCommand(event);
-                break;
-            case COMMAND_DAYLIGHTTIME:
-                daylightTimeCommand.runCommand(event);
-                break;
+            case ListEvents.COMMAND -> listEvents.performCommand(event, logInfo);
+            case DeleteAllEvents.COMMAND -> deleteAllEvents.performCommand(event, logInfo);
+            case COMMAND_TODAY -> todayCommand.runCommand(event, logInfo);
+            case COMMAND_UPCOMING -> upComingCommand.runCommand(event, logInfo);
+            case COMMAND_CREATE_MESSAGE -> createMessageCommand.runCommand(event, logInfo);
+            case COMMAND_DELETE_CUSTOM_MESSAGE -> deleteMessageCommand.runCommand(event, logInfo);
+            case COMMAND_CUSTOM_MESSAGE_INFO -> messageInfoCommand.runCommand(event, logInfo);
+            case COMMAND_LIST_MESSAGES -> listMessagesCommand.runCommand(event, logInfo);
+            case COMMAND_REGISTER -> registerCommand.runCommand(event, logInfo);
+            case COMMAND_UNREGISTER -> unregisterCommand.runCommand(event, logInfo);
+            case COMMAND_MENTION_ROLE -> mentionRoleCommand.runCommand(event, logInfo);
+            case COMMAND_INFO -> infoCommand.runCommand(event, logInfo);
+            case COMMAND_INSTALL -> instructionsCommand.runCommand(event, logInfo);
+            case COMMAND_LANGUAGES -> languagesCommand.runCommand(event, logInfo);
+            case COMMAND_TIMEZONES -> timeZonesCommand.runCommand(event, logInfo);
+            case COMMAND_NOTIFICATION -> notificationCommand.runCommand(event, logInfo);
+            case COMMAND_LIST_NOTIFICATIONS -> listNotificationsCommand.runCommand(event, logInfo);
+            case COMMAND_TIMEZONE -> timeZoneCommand.runCommand(event, logInfo);
+            case COMMAND_LANGUAGE -> languageCommand.runCommand(event, logInfo);
+            case COMMAND_SERVER -> serverCommand.runCommand(event, logInfo);
+            case COMMAND_CONFIG -> configCommand.runCommand(event, logInfo);
+            case COMMAND_ADMIN_ROLE -> adminRoleCommand.runCommand(event, logInfo);
+            case COMMAND_PRESET -> presetCommand.runCommand(event, logInfo);
+            case COMMAND_WARN_TIME -> warnTimeCommand.runCommand(event, logInfo);
+            case COMMAND_MESSAGE -> messageCommand.runCommand(event, logInfo);
+            case COMMAND_EDIT_MESSAGE -> editMessageCommand.runCommand(event, logInfo);
+            case COMMAND_AUTODELETE -> autoDeleteCommand.runCommand(event, logInfo);
+            case RegisterNewsChannelCommand.COMMAND -> registerNewsChannelCommand.performCommand(event, logInfo);
+            case UnregisterNewsChannelCommand.COMMAND -> unregisterNewsChannelCommand.performCommand(event, logInfo);
+            case ToggleNewsCommand.COMMAND ->  toggleNewsCommand.performCommand(event, logInfo);
+            case ListNewsCategoriesCommand.COMMAND -> listNewsCategoriesCommand.performCommand(event, logInfo);
+            default -> helpCommand.runCommand(event, logInfo);
         }
     }
 
@@ -221,8 +212,11 @@ public class SlashCommandInteraction extends ListenerAdapter {
     }
 
     //javadoc says: This is null if the interaction is not from a guild.
-    private boolean isEventInPrivatChat(Guild guild, Member member) {
+    private boolean isEventInPrivateChat(Guild guild, Member member) {
         return guild == null || member == null;
     }
 
+    public boolean isExecutedInTextChannel(SlashCommandInteractionEvent event) {
+        return event.getChannel() instanceof TextChannel && event.getGuild() != null;
+    }
 }

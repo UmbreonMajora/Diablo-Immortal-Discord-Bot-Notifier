@@ -1,63 +1,62 @@
 package net.purplegoose.didnb.commands.server;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.ClientGuild;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static net.purplegoose.didnb.utils.CommandsUtil.ROLE_OPTION_NAME;
+import static net.purplegoose.didnb.utils.CommandsUtil.ADMIN_ROLE_OPTION_NAME;
 
 /**
  * @author Umbreon Majora
- * Allow's user to change the bot admin role for their server.
- * Command: /adminrole [Required: role]
+ * <p>
+ * @Description: Allow's user to change the bot admin role for their server.
+ * <p>
+ * @Command: /adminrole [Not Required: role]
  */
+@Slf4j
+@AllArgsConstructor
 public class AdminRoleCommand implements IClientCommand {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(AdminRoleCommand.class);
 
     private final GuildsCache guildsCache;
     private final DatabaseRequests databaseRequests;
 
-    public AdminRoleCommand(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
-        this.guildsCache = guildsCache;
-        this.databaseRequests = databaseRequests;
+    @Override
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
+        ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
+        Language language = clientGuild.getLanguage();
+        Role newBotAdminRole = getNewBotAdminRole(event);
+
+        String oldBotAdminRoleID = clientGuild.getGuildAdminRoleID();
+        String newBotAdminRoleID = newBotAdminRole != null ? newBotAdminRole.getId() : null;
+
+        updateAdminRoleID(clientGuild, newBotAdminRoleID);
+
+        log.info("{} used /adminrole. Old ID: {}. New ID: {}. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), oldBotAdminRoleID, newBotAdminRoleID, logInfo.getGuildName(), guildID,
+                logInfo.getChannelName(), logInfo.getChannelID());
+
+        String newBotAdminRoleAsString = newBotAdminRole != null ? newBotAdminRole.getAsMention() : "Default";
+        String response = String.format(LanguageController.getMessage(language, "CHANGED-BOT-ADMIN-ROLE"), newBotAdminRoleAsString);
+        replyEphemeralToUser(event, response);
     }
 
-    @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = event.getGuild().getId(); //Can't be null since it's caught in SlashCommandInteraction.java
-        User user = event.getUser();
-        Language language = guildsCache.getGuildLanguage(guildID);
-
-        Role newBotAdminRole = getNewBotAdminRole(event);
-        if (newBotAdminRole == null) {
-            createLog(LOGGER, getFullUsernameWithDiscriminator(user) + " tried to change the bot admin " +
-                    "role of " + guildID + " but it failed because the new role was null.");
-            replyEphemeralToUser(event, LanguageController.getMessage(language, "CHANGE-BOT-ADMIN-ROLE-FAILED-ROLE-NULL"));
-            return;
-        }
-
-        String newBotAdminRoleID = newBotAdminRole.getId();
-        ClientGuild clientGuild = guildsCache.getClientGuildByID(guildID);
-        clientGuild.setGuildAdminRoleID(newBotAdminRoleID);
+    private void updateAdminRoleID(ClientGuild clientGuild, String adminRoleID) {
+        clientGuild.setGuildAdminRoleID(adminRoleID);
         databaseRequests.updateGuild(clientGuild);
-
-        createLog(LOGGER, getFullUsernameWithDiscriminator(user) + " changed the bot admin role of " +
-                guildID + " to " + newBotAdminRoleID);
-        replyEphemeralToUser(event, String.format(LanguageController.getMessage(language, "CHANGED-BOT-ADMIN-ROLE"), newBotAdminRole.getAsMention()));
     }
 
     private Role getNewBotAdminRole(SlashCommandInteractionEvent event) {
-        OptionMapping roleOption = event.getOption(ROLE_OPTION_NAME);
+        OptionMapping roleOption = event.getOption(ADMIN_ROLE_OPTION_NAME);
         return roleOption != null ? roleOption.getAsRole() : null;
     }
 }

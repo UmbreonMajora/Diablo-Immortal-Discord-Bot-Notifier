@@ -1,19 +1,19 @@
 package net.purplegoose.didnb.commands.info;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.commands.IClientCommand;
 import net.purplegoose.didnb.data.EventGameData;
+import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.languages.LanguageController;
 import net.purplegoose.didnb.utils.TimeUtil;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static net.purplegoose.didnb.utils.StringUtil.FORMATTED_MESSAGE;
@@ -21,31 +21,27 @@ import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
 
 /**
  * @author Umbreon Majora
+ * <p>
  * Send's the user a message with today's events.
+ * <p>
  * Command: /today
  */
+@Slf4j
+@AllArgsConstructor
 public class TodayCommand implements IClientCommand {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(TodayCommand.class);
 
     private final GuildsCache guildsCache;
     private final GameDataCache gameDataCache;
 
-    public TodayCommand(GuildsCache guildsCache, GameDataCache gameDataCache) {
-        this.guildsCache = guildsCache;
-        this.gameDataCache = gameDataCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
         String timeZone = guildsCache.getGuildTimeZone(guildID);
         String weekday = TimeUtil.getCurrentWeekday(timeZone);
-        Language language = guildsCache.getGuildLanguage(guildID);
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
-        LOGGER.info(getFullUsernameWithDiscriminator(event.getUser()) + " used " + event.getCommandString() + " on " +
-                event.getChannel().getId() + " at " + event.getGuild().getId());
-
+        log.info("{} used /today. Guild: {}({}). Channel: {}({})",
+                logInfo.getExecutor(), logInfo.getGuildName(), guildID, logInfo.getChannelName(), logInfo.getChannelID());
         replyEphemeralToUser(event, buildTodayEventMessage(weekday, language));
     }
 

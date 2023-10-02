@@ -14,4 +14,9 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 /.idea/
 /gradle/wrapper/
+
+# local testing config
 /client.properties
+
+# local testing logd
+/logs/

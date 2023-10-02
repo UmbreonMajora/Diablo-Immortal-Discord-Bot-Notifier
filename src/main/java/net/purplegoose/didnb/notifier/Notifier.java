@@ -1,34 +1,34 @@
 package net.purplegoose.didnb.notifier;
 
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.purplegoose.didnb.cache.ErrorCache;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.NotificationChannel;
+import net.purplegoose.didnb.exeption.InvalidMentionException;
 import net.purplegoose.didnb.gameevents.*;
+import net.purplegoose.didnb.gameevents.embedded.AncientArenaEmbed;
+import net.purplegoose.didnb.gameevents.embedded.AncientNightmareEmbed;
+import net.purplegoose.didnb.gameevents.embedded.DemonGatesEmbed;
+import net.purplegoose.didnb.gameevents.embedded.HauntedCarriageEmbed;
+import net.purplegoose.didnb.utils.ChannelLogger;
 import net.purplegoose.didnb.utils.TimeUtil;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
+@Slf4j
+public class Notifier extends NotifierHelper {
 
-public class Notifier {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(Notifier.class);
-
+    private ChannelLogger channelLogger;
+    // Cache
     private final GuildsCache guildsCache;
     private final ErrorCache errorCache;
-
+    // Notification Messages
     private final VaultEvent vaultEvent;
     private final AncientArenaEvent ancientArenaEvent;
     private final AncientNightmareEvent ancientNightmareEvent;
@@ -39,6 +39,15 @@ public class Notifier {
     private final WrathborneInvasionEvent wrathborneInvasionEvent;
     private final DemonGatesEvent demonGatesEvent;
     private final OnSlaughtEvent onSlaughtEvent;
+    private final TowerOfVictoryEvent towerOfVictoryEvent;
+    private final ShadowWarEvent shadowWarEvent;
+    // Embed Messages
+    private final HauntedCarriageEmbed hauntedCarriageEmbed;
+    private final DemonGatesEmbed demonGatesEmbed;
+    private final AncientNightmareEmbed ancientNightmareEmbed;
+    private final AncientArenaEmbed ancientArenaEmbed;
+
+    private int count = 0;
 
     public Notifier(GuildsCache guildsCache, GameDataCache gameDataCache, ErrorCache errorCache) {
         this.guildsCache = guildsCache;
@@ -54,20 +63,32 @@ public class Notifier {
         this.wrathborneInvasionEvent = new WrathborneInvasionEvent(gameDataCache);
         this.demonGatesEvent = new DemonGatesEvent(gameDataCache);
         this.onSlaughtEvent = new OnSlaughtEvent(gameDataCache);
+        this.towerOfVictoryEvent = new TowerOfVictoryEvent(gameDataCache);
+        this.shadowWarEvent = new ShadowWarEvent(gameDataCache);
+        // Embedded
+        this.hauntedCarriageEmbed = new HauntedCarriageEmbed(gameDataCache);
+        this.demonGatesEmbed = new DemonGatesEmbed(gameDataCache);
+        this.ancientArenaEmbed = new AncientArenaEmbed(gameDataCache);
+        this.ancientNightmareEmbed = new AncientNightmareEmbed(gameDataCache);
     }
 
     public void runNotificationScheduler(JDA client) {
+        channelLogger = new ChannelLogger(client.getTextChannelById(1150798272886227087L)); //todo: remove this
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
 
-                for (ClientGuild clientGuild : guildsCache.getAllGuilds().values()) {
+                int guildCount = 0;
+                int channelCount = 0;
 
-                    if (clientGuild.getNotificationChannelCount() == 0) {
+                for (ClientGuild clientGuild : guildsCache.getAllGuilds().values()) {
+                    guildCount++;
+                    if (isChannelCountZero(clientGuild)) {
                         continue;
                     }
 
                     for (NotificationChannel channel : clientGuild.getAllNotificationChannels()) {
+                        channelCount++;
                         StringBuilder notificationMessage = new StringBuilder();
                         notificationMessage.append(vaultEvent.appendVaultNotificationIfHappening(clientGuild, channel));
                         notificationMessage.append(battlegroundEvent.appendBattlegroundsNotificationIfHappening(clientGuild, channel));
@@ -79,6 +100,13 @@ public class Notifier {
                         notificationMessage.append(shadowLotteryEvent.appendShadowLotteryNotificationIfHappening(clientGuild, channel));
                         notificationMessage.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
                         notificationMessage.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
+                        notificationMessage.append(towerOfVictoryEvent.appendTowerOfVictoryNotificationIfHappening(clientGuild, channel));
+                        notificationMessage.append(shadowWarEvent.appendShadowWarNotificationIfHappening(clientGuild, channel));
+
+                        hauntedCarriageEmbed.sendHauntedCarriageEmbedIfHappening(clientGuild, channel, client);
+                        demonGatesEmbed.sendDemonGatesEmbedIfHappening(clientGuild, channel, client);
+                        ancientArenaEmbed.sendAncientArenaEmbedIfHappening(clientGuild, channel, client);
+                        ancientNightmareEmbed.sendAncientNightmareEmbedIfHappening(clientGuild, channel, client);
 
                         TextChannel textChannel = client.getTextChannelById(channel.getTextChannelID());
 
@@ -87,67 +115,50 @@ public class Notifier {
                         }
 
                         if (textChannel == null) {
-                            String log = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
+                            String logMsg = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
                                     "guild " + channel.getGuildID() + ", but it failed because the channel was null!";
-                            LOGGER.warn(log);
+                            log.error(logMsg);
                             errorCache.addChannelError(channel);
                             continue;
                         }
 
-                        addMessageMention(notificationMessage, channel, textChannel.getGuild());
-
                         try {
-                            textChannel.sendMessage(notificationMessage.toString()).queue();
-                        } catch (InsufficientPermissionException e) {
-                            String guildID = clientGuild.getGuildID();
-                            Guild guild = client.getGuildById(guildID);
-                            if (guild != null) {
-                                Member guildOwner = guild.getOwner();
-                                if (guildOwner != null) {
-                                    User guildOwnerUser = guildOwner.getUser();
-                                    guildOwnerUser.openPrivateChannel().queue(privateChannel -> {
-                                        privateChannel.sendMessage("Hey, I am missing permissions to send " +
-                                                "message in " + textChannel.getName()).queue();
-                                    });
-                                }
-                            }
-                            LOGGER.info("Failed to send notification.");
+                            addMessageMention(notificationMessage, channel, textChannel.getGuild(), clientGuild.getLanguage());
+                        } catch (InvalidMentionException e) {
+                            log.error(e.getMessage(), e);
                             continue;
                         }
 
-                        LOGGER.info("Sended notification message to " + channel.getTextChannelID());
+                        try {
+                            if (clientGuild.isAutoDeleteEnabled()) {
+                                int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
+                                sendTimedMessage(textChannel, notificationMessage.toString(), autoDeleteTimeInHours);
+                            }
+
+                            if (!clientGuild.isAutoDeleteEnabled()) {
+                                sendMessage(textChannel, notificationMessage.toString());
+                            }
+                        } catch (InsufficientPermissionException e) {
+                            log.error(e.getMessage());
+                        }
+
+                        log.info("Sended notification message to channel: " + channel.getTextChannelID() + ", GuildID: " +
+                                clientGuild.getGuildID());
                     }
                 }
+                String msg = String.format("Ran scheduler with %s guilds and %s channels.", guildCount, channelCount);
+                log.info(msg);
+
+                count++;
+                if (count == 5) {
+                    channelLogger.sendChannelLog(msg);
+                    count = 0;
+                }
             }
-        }, TimeUtil.getNextFullMinute(), 60 * 1000);
+        }, TimeUtil.getNextFullMinute(), 60L * 1000L);
     }
 
-    private void addMessageMention(StringBuilder sb, NotificationChannel channel, Guild guild) {
-        String mentionID = channel.getMentionRoleID();
-
-        if (mentionID == null) {
-            return; // add no mention role if null.
-        }
-
-        switch (mentionID.toUpperCase()) {
-            case "HERE":
-                sb.append(NEW_LINE).append("@here");
-                break;
-            case "EVERYONE":
-                sb.append(NEW_LINE).append("@everyone");
-                break;
-            default:
-                Role mentionRole = guild.getRoleById(mentionID);
-                if (mentionRole != null) {
-                    sb.append(NEW_LINE).append(mentionRole.getAsMention());
-                } else {
-                    sb.append(NEW_LINE).append("Failed to append mention role. Please re-set your mention role.");
-                    String guildID = guild.getId();
-                    String guildName = guild.getName();
-                    String textChannelID = channel.getTextChannelID();
-                    LOGGER.info("Failed to append mention role for guild " +
-                            guildName + "(" + guildID + ") in " + textChannelID);
-                }
-        }
+    private boolean isChannelCountZero(ClientGuild clientGuild) {
+        return clientGuild.getNotificationChannelCount() == 0;
     }
 }

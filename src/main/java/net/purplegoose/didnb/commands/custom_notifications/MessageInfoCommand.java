@@ -1,16 +1,18 @@
 package net.purplegoose.didnb.commands.custom_notifications;
 
-import net.purplegoose.didnb.cache.GuildsCache;
-import net.purplegoose.didnb.commands.IClientCommand;
-import net.purplegoose.didnb.data.CustomNotification;
-import net.purplegoose.didnb.enums.Language;
-import net.purplegoose.didnb.languages.LanguageController;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.purplegoose.didnb.cache.GuildsCache;
+import net.purplegoose.didnb.commands.IClientCommand;
+import net.purplegoose.didnb.data.CustomNotification;
+import net.purplegoose.didnb.data.LoggingInformation;
+import net.purplegoose.didnb.enums.Language;
+import net.purplegoose.didnb.languages.LanguageController;
+import net.purplegoose.didnb.utils.StringUtil;
 
 import java.awt.*;
 import java.util.Objects;
@@ -22,25 +24,21 @@ import static net.purplegoose.didnb.utils.CommandsUtil.CUSTOM_MESSAGE_ID_OPTION_
  * Allow's user to see all information about a custom notification.
  * /messageinfo [Required: custommessageid]
  */
+@Slf4j
+@AllArgsConstructor
 public class MessageInfoCommand implements IClientCommand {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(MessageInfoCommand.class);
 
     private final GuildsCache guildsCache;
 
-    public MessageInfoCommand(GuildsCache guildsCache) {
-        this.guildsCache = guildsCache;
-    }
-
     @Override
-    public void runCommand(SlashCommandInteractionEvent event) {
-        String guildID = Objects.requireNonNull(event.getGuild()).getId();
-        Language language = guildsCache.getGuildLanguage(guildID);
-        String executingUser = getFullUsernameWithDiscriminator(event.getUser());
+    public void runCommand(SlashCommandInteractionEvent event, LoggingInformation logInfo) {
+        String guildID = logInfo.getGuildID();
+        Language language = guildsCache.getLanguageByGuildID(guildID);
 
-        int customMessageID = getCustomMessageID(event);
-        if (customMessageID == -1) {
-            createLog(LOGGER, executingUser + " to get info about a custom notification but the id was invalid.");
+        String customMessageID = getCustomMessageID(event);
+        if (Objects.equals(customMessageID, StringUtil.FAILED_MESSAGE)) {
+            log.error("{} used /editmessage. Error: ID invalid. Guild: {}({}). Channel: {}({})",
+                    logInfo.getExecutor(), logInfo.getGuildName(), logInfo.getGuildID(), logInfo.getChannelName(), logInfo.getChannelID());
             replyEphemeralToUser(event, LanguageController.getMessage(language, "INFO-CUSTOM-MESSAGE-FAILED-ID-NULL"));
             return;
         }
@@ -48,12 +46,12 @@ public class MessageInfoCommand implements IClientCommand {
         replyEphemeralToUser(event, buildCustomMessageInfoEmbed(guildID, customMessageID));
     }
 
-    private int getCustomMessageID(SlashCommandInteractionEvent event) {
+    private String getCustomMessageID(SlashCommandInteractionEvent event) {
         OptionMapping customMessageIdOption = event.getOption(CUSTOM_MESSAGE_ID_OPTION_NAME);
-        return customMessageIdOption != null ? customMessageIdOption.getAsInt() : -1;
+        return customMessageIdOption != null ? customMessageIdOption.getAsString() : StringUtil.FAILED_MESSAGE;
     }
 
-    private MessageEmbed buildCustomMessageInfoEmbed(String guildID, final int customMessageID) {
+    private MessageEmbed buildCustomMessageInfoEmbed(String guildID, final String customMessageID) {
         CustomNotification customNotification = guildsCache.getClientGuildByID(guildID).getCustomNotificationByID(customMessageID);
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setColor(Color.ORANGE);

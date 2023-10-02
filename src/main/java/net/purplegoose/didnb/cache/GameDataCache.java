@@ -1,100 +1,54 @@
 package net.purplegoose.didnb.cache;
 
+import lombok.Getter;
+import lombok.Setter;
+import net.purplegoose.didnb.annotations.GameDataCacheSet;
 import net.purplegoose.didnb.data.EventGameData;
+import net.purplegoose.didnb.data.EventTime;
 
 import java.util.HashSet;
-import java.util.Set;
 
+
+@Getter
+@Setter
 public class GameDataCache {
 
-    private Set<EventGameData> wrathborneInvasionDataSet = new HashSet<>();
-    private Set<EventGameData> ancientNightmareDataSet = new HashSet<>();
-    private Set<EventGameData> hauntedCarriageDataSet = new HashSet<>();
-    private Set<EventGameData> shadowLotteryDataSet = new HashSet<>();
-    private Set<EventGameData> ancientArenaDataSet = new HashSet<>();
-    private Set<EventGameData> battlegroundDataSet = new HashSet<>();
-    private Set<EventGameData> demonGatesDataSet = new HashSet<>();
-    private Set<EventGameData> onSlaughtDataSet = new HashSet<>();
-    private Set<EventGameData> vaultGameDataSet = new HashSet<>();
-    private Set<EventGameData> assemblyDataSet = new HashSet<>();
+    private HashSet<EventTime> gameDataCache = new HashSet<>();
 
-    public Set<EventGameData> getVaultGameDataSet() {
-        return vaultGameDataSet;
-    }
+    @GameDataCacheSet(tableName = "wrathborne_invasion_times", everyday = true)
+    private HashSet<EventGameData> wrathborneInvasionDataSet = new HashSet<>();
 
-    public void setVaultGameDataSet(Set<EventGameData> vaultGameDataSet) {
-        this.vaultGameDataSet = vaultGameDataSet;
-    }
+    @GameDataCacheSet(tableName = "ancient_nightmare_times")
+    private HashSet<EventGameData> ancientNightmareDataSet = new HashSet<>();
 
-    public Set<EventGameData> getHauntedCarriageDataSet() {
-        return hauntedCarriageDataSet;
-    }
+    @GameDataCacheSet(tableName = "haunted_carriage_times")
+    private HashSet<EventGameData> hauntedCarriageDataSet = new HashSet<>();
 
-    public void setHauntedCarriageDataSet(Set<EventGameData> hauntedCarriageDataSet) {
-        this.hauntedCarriageDataSet = hauntedCarriageDataSet;
-    }
+    @GameDataCacheSet(tableName = "tower_of_victory_times")
+    private HashSet<EventGameData> towerOfVictoryDataSet = new HashSet<>();
 
-    public Set<EventGameData> getDemonGatesDataSet() {
-        return demonGatesDataSet;
-    }
+    @GameDataCacheSet(tableName = "shadow_lottery_times", everyday = true)
+    private HashSet<EventGameData> shadowLotteryDataSet = new HashSet<>();
 
-    public void setDemonGatesDataSet(Set<EventGameData> demonGatesDataSet) {
-        this.demonGatesDataSet = demonGatesDataSet;
-    }
+    @GameDataCacheSet(tableName = "ancient_arena_times")
+    private HashSet<EventGameData> ancientArenaDataSet = new HashSet<>();
 
-    public Set<EventGameData> getWrathborneInvasionDataSet() {
-        return wrathborneInvasionDataSet;
-    }
+    @GameDataCacheSet(tableName = "battleground_times", everyday = true)
+    private HashSet<EventGameData> battlegroundDataSet = new HashSet<>();
 
-    public void setWrathborneInvasionDataSet(Set<EventGameData> wrathborneInvasionDataSet) {
-        this.wrathborneInvasionDataSet = wrathborneInvasionDataSet;
-    }
+    @GameDataCacheSet(tableName = "demon_gates_times")
+    private HashSet<EventGameData> demonGatesDataSet = new HashSet<>();
 
-    public Set<EventGameData> getAncientNightmareDataSet() {
-        return ancientNightmareDataSet;
-    }
+    @GameDataCacheSet(tableName = "onslaught_times")
+    private HashSet<EventGameData> onSlaughtDataSet = new HashSet<>();
 
-    public void setAncientNightmareDataSet(Set<EventGameData> ancientNightmareDataSet) {
-        this.ancientNightmareDataSet = ancientNightmareDataSet;
-    }
+    @GameDataCacheSet(tableName = "vault_times", everyday = true)
+    private HashSet<EventGameData> vaultGameDataSet = new HashSet<>();
 
-    public Set<EventGameData> getAncientArenaDataSet() {
-        return ancientArenaDataSet;
-    }
+    @GameDataCacheSet(tableName = "shadow_war_times", everyday = true)
+    private HashSet<EventGameData> shadowWarDataSet = new HashSet<>();
 
-    public void setAncientArenaDataSet(Set<EventGameData> ancientArenaDataSet) {
-        this.ancientArenaDataSet = ancientArenaDataSet;
-    }
+    @GameDataCacheSet(tableName = "assembly_times")
+    private HashSet<EventGameData> assemblyDataSet = new HashSet<>();
 
-    public Set<EventGameData> getShadowLotteryDataSet() {
-        return shadowLotteryDataSet;
-    }
-
-    public void setShadowLotteryDataSet(Set<EventGameData> shadowLotteryDataSet) {
-        this.shadowLotteryDataSet = shadowLotteryDataSet;
-    }
-
-    public Set<EventGameData> getBattlegroundDataSet() {
-        return battlegroundDataSet;
-    }
-
-    public void setBattlegroundDataSet(Set<EventGameData> battlegroundDataSet) {
-        this.battlegroundDataSet = battlegroundDataSet;
-    }
-
-    public Set<EventGameData> getAssemblyDataSet() {
-        return assemblyDataSet;
-    }
-
-    public void setAssemblyDataSet(Set<EventGameData> assemblyDataSet) {
-        this.assemblyDataSet = assemblyDataSet;
-    }
-
-    public Set<EventGameData> getOnSlaughtDataSet() {
-        return onSlaughtDataSet;
-    }
-
-    public void setOnSlaughtDataSet(Set<EventGameData> onSlaughtDataSet) {
-        this.onSlaughtDataSet = onSlaughtDataSet;
-    }
 }
