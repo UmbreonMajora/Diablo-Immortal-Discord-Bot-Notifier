@@ -11,6 +11,7 @@ import net.purplegoose.didnb.database.MySQLDatabaseConnection;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.events.*;
 import net.purplegoose.didnb.exeption.StartFailureException;
+import net.purplegoose.didnb.news.NewsReader;
 import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
@@ -24,7 +25,7 @@ import java.util.Arrays;
 @Slf4j
 public class DiabloImmortalDiscordNotifier {
 
-    public static final String botId = "527511535309029407";
+    public static final String BOT_ID = "527511535309029407";
 
     private static boolean registerCommands = true;
 
@@ -37,7 +38,6 @@ public class DiabloImmortalDiscordNotifier {
     private static DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
 
     public static void main(String[] args) {
-
         // Init caches
         gameDataCache = new GameDataCache();
         guildsCache = new GuildsCache();
@@ -140,8 +140,11 @@ public class DiabloImmortalDiscordNotifier {
         InformationNotifier informationNotifier = new InformationNotifier();
         informationNotifier.runInformationNotifier(jda);
 
-        ScheduledEventCreator seCreator = new ScheduledEventCreator(guildsCache, gameDataCache);
-        seCreator.scheduler(jda);
+        //ScheduledEventCreator seCreator = new ScheduledEventCreator(guildsCache, gameDataCache);
+        //seCreator.scheduler(jda);
+
+        NewsReader newsReader = new NewsReader(databaseRequests, guildsCache, jda);
+        newsReader.runScheduler();
     }
 
     private static boolean fillGameDataCache(GameDataCache gameDataCache, DatabaseRequests databaseRequests) {

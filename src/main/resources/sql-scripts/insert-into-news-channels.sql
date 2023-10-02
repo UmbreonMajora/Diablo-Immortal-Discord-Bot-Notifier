@@ -1,0 +1,1 @@
+INSERT INTO news_channels (channelid, guildid) VALUE (?, ?);

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.purplegoose.didnb.cache.CustomMessagesCache;
@@ -19,6 +20,10 @@ import net.purplegoose.didnb.commands.server.*;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.LoggingInformation;
 import net.purplegoose.didnb.database.DatabaseRequests;
+import net.purplegoose.didnb.news.commands.ListNewsCategoriesCommand;
+import net.purplegoose.didnb.news.commands.RegisterNewsChannelCommand;
+import net.purplegoose.didnb.news.commands.ToggleNewsCommand;
+import net.purplegoose.didnb.news.commands.UnregisterNewsChannelCommand;
 import net.purplegoose.didnb.utils.PermissionUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,6 +73,11 @@ public class SlashCommandInteraction extends ListenerAdapter {
     private final ListEvents listEvents;
     private final DeleteAllEvents deleteAllEvents;
 
+    private final RegisterNewsChannelCommand registerNewsChannelCommand;
+    private final UnregisterNewsChannelCommand unregisterNewsChannelCommand;
+    private final ToggleNewsCommand toggleNewsCommand;
+    private final ListNewsCategoriesCommand listNewsCategoriesCommand;
+
     public SlashCommandInteraction(GuildsCache guildsCache,
                                    DatabaseRequests databaseRequests,
                                    GameDataCache gameDataCache,
@@ -109,6 +119,11 @@ public class SlashCommandInteraction extends ListenerAdapter {
 
         this.listEvents = new ListEvents(guildsCache);
         this.deleteAllEvents = new DeleteAllEvents();
+
+        this.registerNewsChannelCommand = new RegisterNewsChannelCommand(guildsCache, databaseRequests);
+        this.unregisterNewsChannelCommand = new UnregisterNewsChannelCommand(guildsCache, databaseRequests);
+        this.toggleNewsCommand = new ToggleNewsCommand(guildsCache, databaseRequests);
+        this.listNewsCategoriesCommand = new ListNewsCategoriesCommand();
     }
 
     @Override
@@ -116,6 +131,12 @@ public class SlashCommandInteraction extends ListenerAdapter {
         Member member = event.getMember();
         Guild guild = event.getGuild();
         String fullUsername = event.getUser().getName();
+
+        if (!isExecutedInTextChannel(event)) {
+            log.error("Command wasn't executed in a text channel or in a guild.");
+            return;
+        }
+
         if (isEventInPrivateChat(guild, member)) {
             log.error(fullUsername + " used a command in private chat.");
             return;
@@ -153,7 +174,6 @@ public class SlashCommandInteraction extends ListenerAdapter {
         switch (command) {
             case ListEvents.COMMAND -> listEvents.performCommand(event, logInfo);
             case DeleteAllEvents.COMMAND -> deleteAllEvents.performCommand(event, logInfo);
-
             case COMMAND_TODAY -> todayCommand.runCommand(event, logInfo);
             case COMMAND_UPCOMING -> upComingCommand.runCommand(event, logInfo);
             case COMMAND_CREATE_MESSAGE -> createMessageCommand.runCommand(event, logInfo);
@@ -179,6 +199,10 @@ public class SlashCommandInteraction extends ListenerAdapter {
             case COMMAND_MESSAGE -> messageCommand.runCommand(event, logInfo);
             case COMMAND_EDIT_MESSAGE -> editMessageCommand.runCommand(event, logInfo);
             case COMMAND_AUTODELETE -> autoDeleteCommand.runCommand(event, logInfo);
+            case RegisterNewsChannelCommand.COMMAND -> registerNewsChannelCommand.performCommand(event, logInfo);
+            case UnregisterNewsChannelCommand.COMMAND -> unregisterNewsChannelCommand.performCommand(event, logInfo);
+            case ToggleNewsCommand.COMMAND ->  toggleNewsCommand.performCommand(event, logInfo);
+            case ListNewsCategoriesCommand.COMMAND -> listNewsCategoriesCommand.performCommand(event, logInfo);
             default -> helpCommand.runCommand(event, logInfo);
         }
     }
@@ -192,4 +216,7 @@ public class SlashCommandInteraction extends ListenerAdapter {
         return guild == null || member == null;
     }
 
+    public boolean isExecutedInTextChannel(SlashCommandInteractionEvent event) {
+        return event.getChannel() instanceof TextChannel && event.getGuild() != null;
+    }
 }

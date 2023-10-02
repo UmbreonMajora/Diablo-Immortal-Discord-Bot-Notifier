@@ -1,0 +1,1 @@
+DELETE FROM news_channels WHERE channelid = ?;

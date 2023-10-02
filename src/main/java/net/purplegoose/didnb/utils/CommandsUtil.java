@@ -6,9 +6,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.purplegoose.didnb.commands.channel.RegisterCommand;
+import net.purplegoose.didnb.commands.channel.UnregisterCommand;
 import net.purplegoose.didnb.commands.scheduled_events.DeleteAllEvents;
 import net.purplegoose.didnb.commands.scheduled_events.ListEvents;
 import net.purplegoose.didnb.enums.*;
+import net.purplegoose.didnb.news.commands.ListNewsCategoriesCommand;
+import net.purplegoose.didnb.news.commands.RegisterNewsChannelCommand;
+import net.purplegoose.didnb.news.commands.ToggleNewsCommand;
+import net.purplegoose.didnb.news.commands.UnregisterNewsChannelCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -195,6 +201,13 @@ public class CommandsUtil {
         commandDataList.add(Commands.slash(COMMAND_CREATE_MESSAGE, COMMAND_CREATE_MESSAGE_DESC)
                 .addOptions(CREATE_CUSTOM_MESSAGE_WEEKDAY_OPTION, CREATE_CUSTOM_MESSAGE_TIME_OPTION,
                         REQUIRED_MESSAGE_BOOL_OPTION, CREATE_CUSTOM_MESSAGE_MESSAGE_OPTION));
+    }
+
+    static {
+        commandDataList.add(ToggleNewsCommand.commandData);
+        commandDataList.add(RegisterNewsChannelCommand.commandData);
+        commandDataList.add(UnregisterNewsChannelCommand.commandData);
+        commandDataList.add(ListNewsCategoriesCommand.commandData);
     }
 
     static {

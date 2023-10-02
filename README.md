@@ -84,13 +84,20 @@ Important: If you have Administrator-Permissions you do not need to have the Bot
 | `/editmessage [ID] [ValueToChange] [NewValue]`          | Allows you to edit your notification message.                                                                                                                                                                                                                                                                                      |
 | `/message [ID] [True/False]`                            | Allows you to enable or disable each of your own notification message.                                                                                                                                                                                                                                                             |
 
+### Creating own notification messages
+
+| Command                       | Description                                                                        |
+|-------------------------------|------------------------------------------------------------------------------------|
+| `/registernews`               | Registers channel this command is sent in as news channel.                         |
+| `/unregisternews`             | Unregisters channel this command is sent in as news channel.                       |
+| `/togglenews [news_category]` | Enables or disables the receiving of a news category in a registered news channel. |
+| `/newscategories`             | Show's a list with all categories in the news section.                             |
+
 ## Languages
 
-We're using Crowndin to translate the bot in other languages. Head to our discord server or check this
-out: https://crowdin.com/project/di_notifier
-
-We're currently supporting: German, French, Indonesian, Italian, Polish, Portuguese/Brazilian, Russian, Spanish &
-Ukrainian
+We're currently supporting: American-Spanish, Brazilian Portuguese, Bulgarian, Croatian, Danish, Dutch, English, Finnish,
+French, German, Greek, Indonesia, Italia, Latvian, Polish, Romanian, Russian, Czech, Slovak, Spanish, Swedish Turkish
+German, French, Indonesian, Italian, Polish, Portuguese/Brazilian, Russian, Spanish, Turkish & Ukrainian
 
 ---
 
@@ -100,7 +107,7 @@ I open-source almost everything I can, and I try to reply to everyone needing he
 this takes time. You can use this service for free.
 
 However, if you are using this project and happy with it or just want to encourage me to continue creating stuff, there
-are few ways you can do it :-
+are few ways you can do it:
 
 - Recommend the bot to others here.
 - Starring and sharing the project :rocket:
