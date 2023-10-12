@@ -12,7 +12,9 @@ public enum Categories {
     CORTEZ("cortez", "Call of Duty: Modern Warfare II"),
     D4("d4", "Diablo 4"),
     HEROES("heroes", "Heroes of the storm"),
-    NEWS("news", "Inside Blizzard");
+    NEWS("news", "Inside Blizzard"),
+    BLIZZCON("blizzcon", "Blizzcon"),
+    WAR("war", "World of Warcraft");
 
     public final String rawName;
     public final String fullName;

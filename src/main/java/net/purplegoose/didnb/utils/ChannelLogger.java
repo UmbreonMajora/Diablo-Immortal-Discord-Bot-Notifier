@@ -10,6 +10,6 @@ public class ChannelLogger {
     }
 
     public void sendChannelLog(String msg) {
-        channel.sendMessage(msg).queue();
+        //channel.sendMessage(msg).queue();
     }
 }

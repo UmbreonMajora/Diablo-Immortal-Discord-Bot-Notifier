@@ -257,10 +257,12 @@ public class DatabaseRequests {
                     boolean isD4Enabled = (resultSet.getInt("d4_enabled") == 1);
                     boolean isHeroesEnabled = (resultSet.getInt("heroes_enabled") == 1);
                     boolean isNewsEnabled = (resultSet.getInt("news_enabled") == 1);
+                    boolean isWarEnabled = (resultSet.getInt("war_enabled") == 1);
+                    boolean isBlizzconEnabled = (resultSet.getInt("blizzcon_enabled") == 1);
 
                     NewsChannelDTO newsChannelDTO = new NewsChannelDTO(id, guildID, isDiabloImmortalNewsEnabled,
                             isHearthstoneEnabled, isOverwatchEnabled, isWowWebEnabled, isBnetEnabled, isCortezEnabled,
-                            isD4Enabled, isHeroesEnabled, isNewsEnabled);
+                            isD4Enabled, isHeroesEnabled, isNewsEnabled, isWarEnabled, isBlizzconEnabled);
 
                     if (clientGuildData.containsKey(guildID)) {
                         clientGuildData.get(guildID).addNewsChannel(newsChannelDTO);

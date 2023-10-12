@@ -20,6 +20,8 @@ public class NewsChannelDTO {
     private boolean d4Enabled = false;
     private boolean heroesEnabled = false;
     private boolean newsEnabled = false;
+    private boolean warEnabled = false;
+    private boolean blizzconEnabled = false;
 
     public NewsChannelDTO(String channelID, String guildID) {
         this.channelID = channelID;

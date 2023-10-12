@@ -1,7 +1,12 @@
 package net.purplegoose.didnb.notifier;
 
+import kotlin.Triple;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.purplegoose.didnb.cache.ErrorCache;
@@ -18,11 +23,15 @@ import net.purplegoose.didnb.gameevents.embedded.HauntedCarriageEmbed;
 import net.purplegoose.didnb.utils.ChannelLogger;
 import net.purplegoose.didnb.utils.TimeUtil;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class Notifier extends NotifierHelper {
+    private static final long CHANNEL_LOGGER_ID = 1150798272886227087L;
 
     private ChannelLogger channelLogger;
     // Cache
@@ -72,8 +81,8 @@ public class Notifier extends NotifierHelper {
         this.ancientNightmareEmbed = new AncientNightmareEmbed(gameDataCache);
     }
 
-    public void runNotificationScheduler(JDA client) {
-        channelLogger = new ChannelLogger(client.getTextChannelById(1150798272886227087L)); //todo: remove this
+    public void runNotificationScheduler(JDA jdaClient) {
+        channelLogger = new ChannelLogger(jdaClient.getTextChannelById(CHANNEL_LOGGER_ID));
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -90,59 +99,19 @@ public class Notifier extends NotifierHelper {
                     for (NotificationChannel channel : clientGuild.getAllNotificationChannels()) {
                         channelCount++;
                         StringBuilder notificationMessage = new StringBuilder();
-                        notificationMessage.append(vaultEvent.appendVaultNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(battlegroundEvent.appendBattlegroundsNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(ancientArenaEvent.appendAncientArenaNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(demonGatesEvent.appendDemonGatesNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(assemblyEvent.appendAssemblyNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(hauntedCarriageEvent.appendHauntedCarriageNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(ancientNightmareEvent.appendAncientNightmareNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(shadowLotteryEvent.appendShadowLotteryNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
-                        notificationMessage.append(towerOfVictoryEvent.appendTowerOfVictoryNotificationIfHappening(clientGuild, channel));
-                        notificationMessage.append(shadowWarEvent.appendShadowWarNotificationIfHappening(clientGuild, channel));
+                        appendNotificationMessages(clientGuild, channel, notificationMessage);
+                        sendEmbedNotifications(clientGuild, channel, jdaClient);
+                        TextChannel textChannel = jdaClient.getTextChannelById(channel.getTextChannelID());
 
-                        hauntedCarriageEmbed.sendHauntedCarriageEmbedIfHappening(clientGuild, channel, client);
-                        demonGatesEmbed.sendDemonGatesEmbedIfHappening(clientGuild, channel, client);
-                        ancientArenaEmbed.sendAncientArenaEmbedIfHappening(clientGuild, channel, client);
-                        ancientNightmareEmbed.sendAncientNightmareEmbedIfHappening(clientGuild, channel, client);
-
-                        TextChannel textChannel = client.getTextChannelById(channel.getTextChannelID());
-
-                        if (notificationMessage.length() <= 0) {
+                        if (!isNotificationValid(textChannel, notificationMessage.toString(), channel)) {
                             continue;
                         }
 
-                        if (textChannel == null) {
-                            String logMsg = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
-                                    "guild " + channel.getGuildID() + ", but it failed because the channel was null!";
-                            log.error(logMsg);
-                            errorCache.addChannelError(channel);
+                        if (!sendMessage(notificationMessage, clientGuild, jdaClient, Objects.requireNonNull(textChannel), channel)) {
                             continue;
                         }
 
-                        try {
-                            addMessageMention(notificationMessage, channel, textChannel.getGuild(), clientGuild.getLanguage());
-                        } catch (InvalidMentionException e) {
-                            log.error(e.getMessage(), e);
-                            continue;
-                        }
-
-                        try {
-                            if (clientGuild.isAutoDeleteEnabled()) {
-                                int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
-                                sendTimedMessage(textChannel, notificationMessage.toString(), autoDeleteTimeInHours);
-                            }
-
-                            if (!clientGuild.isAutoDeleteEnabled()) {
-                                sendMessage(textChannel, notificationMessage.toString());
-                            }
-                        } catch (InsufficientPermissionException e) {
-                            log.error(e.getMessage());
-                        }
-
-                        log.info("Sended notification message to channel: " + channel.getTextChannelID() + ", GuildID: " +
+                        log.info("Sent notification message to channel: " + channel.getTextChannelID() + ", GuildID: " +
                                 clientGuild.getGuildID());
                     }
                 }
@@ -158,7 +127,131 @@ public class Notifier extends NotifierHelper {
         }, TimeUtil.getNextFullMinute(), 60L * 1000L);
     }
 
+    private boolean sendMessage(StringBuilder notificationMessage, ClientGuild clientGuild, JDA jdaClient,
+                                TextChannel textChannel, NotificationChannel channel) {
+        try {
+            addMessageMention(notificationMessage, channel, textChannel.getGuild(), clientGuild.getLanguage());
+        } catch (InvalidMentionException e) {
+            handleInvalidMention(textChannel.getGuild(), textChannel);
+            return false;
+        }
+
+        try {
+            sendNotificationMessage(clientGuild, textChannel, notificationMessage.toString());
+        } catch (InsufficientPermissionException e) {
+            handleInsufficientPermission(e, jdaClient);
+            return false;
+        }
+        return true;
+    }
+
+    private void handleInvalidMention(Guild jdaGuild, TextChannel jdaChannel) {
+        sendInvalidMentionMessageToAdministrators(getAdminListFromGuild(jdaGuild), jdaGuild, jdaChannel);
+    }
+
+    private boolean isNotificationValid(Channel textChannel, String message, NotificationChannel channel) {
+        if (isChannelNull(textChannel, channel)) {
+            return false;
+        }
+        return !isMessageLengthZero(message);
+    }
+
+    private boolean isChannelNull(Channel textChannel, NotificationChannel channel) {
+        String logMsg = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
+                "guild " + channel.getGuildID() + ", but it failed because the channel was null!";
+        log.error(logMsg);
+        errorCache.addChannelError(channel);
+        return textChannel == null;
+    }
+
+    private boolean isMessageLengthZero(String message) {
+        return message.length() == 0;
+    }
+
+    private void sendEmbedNotifications(ClientGuild clientGuild, NotificationChannel channel, JDA jdaClient) {
+        hauntedCarriageEmbed.sendHauntedCarriageEmbedIfHappening(clientGuild, channel, jdaClient);
+        demonGatesEmbed.sendDemonGatesEmbedIfHappening(clientGuild, channel, jdaClient);
+        ancientArenaEmbed.sendAncientArenaEmbedIfHappening(clientGuild, channel, jdaClient);
+        ancientNightmareEmbed.sendAncientNightmareEmbedIfHappening(clientGuild, channel, jdaClient);
+    }
+
+    private void appendNotificationMessages(ClientGuild clientGuild, NotificationChannel channel, StringBuilder notificationMessage) {
+        notificationMessage.append(vaultEvent.appendVaultNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(battlegroundEvent.appendBattlegroundsNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(ancientArenaEvent.appendAncientArenaNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(demonGatesEvent.appendDemonGatesNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(assemblyEvent.appendAssemblyNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(hauntedCarriageEvent.appendHauntedCarriageNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(ancientNightmareEvent.appendAncientNightmareNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(shadowLotteryEvent.appendShadowLotteryNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(wrathborneInvasionEvent.appendWrathborneInvasionNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(onSlaughtEvent.appendOnSlaughtEventIfHappening(clientGuild, channel));
+        notificationMessage.append(towerOfVictoryEvent.appendTowerOfVictoryNotificationIfHappening(clientGuild, channel));
+        notificationMessage.append(shadowWarEvent.appendShadowWarNotificationIfHappening(clientGuild, channel));
+    }
+
     private boolean isChannelCountZero(ClientGuild clientGuild) {
         return clientGuild.getNotificationChannelCount() == 0;
+    }
+
+    private void sendNotificationMessage(ClientGuild clientGuild, TextChannel textChannel, String msg)
+            throws InsufficientPermissionException {
+        if (clientGuild.isAutoDeleteEnabled()) {
+            int autoDeleteTimeInHours = clientGuild.getAutoDeleteTimeInHours();
+            sendTimedMessage(textChannel, msg, autoDeleteTimeInHours);
+        }
+
+        if (!clientGuild.isAutoDeleteEnabled()) {
+            sendMessage(textChannel, msg);
+        }
+    }
+
+    private void handleInsufficientPermission(InsufficientPermissionException exception, JDA jdaClient) {
+        Permission missingPermission = exception.getPermission();
+        Guild jdaGuild = exception.getGuild(jdaClient);
+        if (jdaGuild == null) {
+            log.error("Failed to send insufficient permission message to administrators of guild with id {}. " +
+                    "Missing permission: {}. Guild was null.", exception.getGuildId(), missingPermission.getName());
+            return;
+        }
+
+        Channel jdaChannel = exception.getChannel(jdaClient);
+        if (jdaChannel == null) {
+            log.error("Failed to send insufficient permission message to administrators of guild with id {}. " +
+                    "Missing permission: {}. Channel was null.", exception.getGuildId(), missingPermission.getName());
+            return;
+        }
+
+        Triple<String, String, String> missingPermissionInfo =
+                new Triple<>(jdaGuild.getName(), jdaChannel.getName(), missingPermission.getName());
+        sendInsufficientPermissionMessageToAdministrators(getAdminListFromGuild(jdaGuild), missingPermissionInfo);
+    }
+
+    private List<Member> getAdminListFromGuild(Guild jdaGuild) {
+        List<Member> memberList = jdaGuild.getMembers();
+        return memberList.stream()
+                .filter(member -> member.isOwner() || member.hasPermission(Permission.ADMINISTRATOR)).toList();
+    }
+
+    private void sendInsufficientPermissionMessageToAdministrators(List<Member> adminList,
+                                                                   Triple<String, String, String> missingPermissionInfo) {
+        for (Member admin : adminList) {
+            admin.getUser().openPrivateChannel().queue(privateChannel -> {
+                String msg = String.format("Hey, I've tried to send a message in your guild named %s but I " +
+                                "am missing permission '%s' in channel %s.", missingPermissionInfo.getFirst(),
+                        missingPermissionInfo.getThird(), missingPermissionInfo.getSecond());
+                privateChannel.sendMessage(msg).queue();
+            });
+        }
+    }
+
+    private void sendInvalidMentionMessageToAdministrators(List<Member> adminList, Guild jdaGuild, TextChannel channel) {
+        for (Member admin : adminList) {
+            admin.getUser().openPrivateChannel().queue(privateChannel -> {
+                String msg = String.format("Hey, I've tried to add the mention to your notification message but I " +
+                                "couldn't find it. Guild: %s, Channel: %s", jdaGuild.getName(), channel.getName());
+                privateChannel.sendMessage(msg).queue();
+            });
+        }
     }
 }

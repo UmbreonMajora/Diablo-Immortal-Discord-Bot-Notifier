@@ -19,6 +19,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.*;
 
+import static net.purplegoose.didnb.utils.StringUtil.NEW_LINE;
 import static net.purplegoose.didnb.utils.StringUtil.removeAllNonNumericCharacters;
 
 @Slf4j
@@ -77,7 +78,8 @@ public class NewsReader {
                 }
 
                 String url = BASE_BLIZZARD_NEWS_PAGE + "/" + anchorElement.attr("href");
-                ArticleDTO article = new ArticleDTO(id, url, category.rawName);
+                // category.rawName can't be empty, it will be checked in isArticleValid(int, Categories, String).
+                ArticleDTO article = new ArticleDTO(id, url, Objects.requireNonNull(category).rawName);
 
                 if (databaseRequests.insertNewArticle(article)) {
                     sendNewsNotification(category, url);
@@ -96,7 +98,6 @@ public class NewsReader {
         }
 
         if (isArticleKnown(id)) {
-
             return false;
         }
 
@@ -120,7 +121,8 @@ public class NewsReader {
                         handleNullChannel(channelID, clientGuild);
                         continue;
                     }
-                    String message = "New post in category " + category.rawName + "!\n" + url;
+                    String message = "***" + category.fullName + "***" + NEW_LINE +
+                            "Blizzard added new content to their news page." + NEW_LINE + url;
                     textChannel.sendMessage(message).queue();
                 }
             }
@@ -191,6 +193,12 @@ public class NewsReader {
             }
             case NEWS -> {
                 return newsChannel.isNewsEnabled();
+            }
+            case WAR -> {
+                return newsChannel.isWarEnabled();
+            }
+            case BLIZZCON -> {
+                return newsChannel.isBlizzconEnabled();
             }
             default -> {
                 log.error("isNewsEnabledInChannel(NewsChannelDTO, Categories) was called with an unknown category {}.",

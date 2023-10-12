@@ -10,5 +10,7 @@ CREATE TABLE IF NOT EXISTS news_channels
     cortez_enabled tinyint(1) default 0,
     d4_enabled tinyint(1) default 0,
     heroes_enabled tinyint(1) default 0,
-    news_enabled tinyint(1) default 0
+    news_enabled tinyint(1) default 0,
+    war_enabled tinyint(1) default 0,
+    blizzcon_enabled tinyint(1) default 0
 )
