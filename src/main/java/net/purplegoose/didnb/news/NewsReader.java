@@ -9,6 +9,7 @@ import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.news.dto.ArticleDTO;
 import net.purplegoose.didnb.news.dto.NewsChannelDTO;
 import net.purplegoose.didnb.news.enums.Categories;
+import net.purplegoose.didnb.utils.ChannelLogger;
 import net.purplegoose.didnb.utils.TimeUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -32,11 +33,14 @@ public class NewsReader {
     private final DatabaseRequests databaseRequests;
     private final GuildsCache guildsCache;
     private final JDA diabloImmortalNotifier;
+    private final ChannelLogger channelLogger;
 
-    public NewsReader(DatabaseRequests databaseRequests, GuildsCache guildsCache, JDA diabloImmortalNotifier) {
+    public NewsReader(DatabaseRequests databaseRequests, GuildsCache guildsCache, JDA diabloImmortalNotifier,
+                      ChannelLogger channelLogger) {
         this.databaseRequests = databaseRequests;
         this.guildsCache = guildsCache;
         this.diabloImmortalNotifier = diabloImmortalNotifier;
+        this.channelLogger = channelLogger;
 
         knownArticles.addAll(databaseRequests.getArticles());
     }
@@ -92,11 +96,14 @@ public class NewsReader {
         }
 
         if (isArticleKnown(id)) {
+
             return false;
         }
 
         if (category == null) {
-            log.error("Failed to get category, might be a new one? ({})", categoryRawName);
+            String logMessage = String.format("Failed to get category, might be a new one? (%s)", categoryRawName);
+            channelLogger.sendChannelLog(logMessage);
+            log.error(logMessage);
             return false;
         }
 

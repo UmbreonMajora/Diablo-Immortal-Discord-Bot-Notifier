@@ -16,6 +16,7 @@ import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
 import net.purplegoose.didnb.notifier.ScheduledEventCreator;
+import net.purplegoose.didnb.utils.ChannelLogger;
 import net.purplegoose.didnb.utils.ConfigUtil;
 
 import java.lang.reflect.Field;
@@ -130,7 +131,8 @@ public class DiabloImmortalDiscordNotifier {
         });
     }
 
-    private static void runScheduler(GameDataCache gameDataCache, GuildsCache guildsCache, DatabaseRequests databaseRequests, JDA jda) {
+    private static void runScheduler(GameDataCache gameDataCache, GuildsCache guildsCache,
+                                     DatabaseRequests databaseRequests, JDA jda) {
         Notifier notifier = new Notifier(guildsCache, gameDataCache, new ErrorCache(databaseRequests));
         notifier.runNotificationScheduler(jda);
 
@@ -143,7 +145,8 @@ public class DiabloImmortalDiscordNotifier {
         //ScheduledEventCreator seCreator = new ScheduledEventCreator(guildsCache, gameDataCache);
         //seCreator.scheduler(jda);
 
-        NewsReader newsReader = new NewsReader(databaseRequests, guildsCache, jda);
+        NewsReader newsReader = new NewsReader(databaseRequests, guildsCache, jda,
+                new ChannelLogger(jda.getTextChannelById(1150798272886227087L)));
         newsReader.runScheduler();
     }
 
