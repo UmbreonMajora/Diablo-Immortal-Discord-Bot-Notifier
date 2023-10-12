@@ -146,5 +146,4 @@ public class DiabloImmortalDiscordNotifier {
     private static void logContainingLanguages() {
         log.info("Loaded with these languages: " + Arrays.toString(Language.values()));
     }
-
 }
