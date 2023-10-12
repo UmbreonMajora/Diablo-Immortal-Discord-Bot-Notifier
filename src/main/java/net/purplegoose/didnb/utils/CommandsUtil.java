@@ -6,15 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.purplegoose.didnb.commands.channel.RegisterCommand;
-import net.purplegoose.didnb.commands.channel.UnregisterCommand;
-import net.purplegoose.didnb.commands.scheduled_events.DeleteAllEvents;
-import net.purplegoose.didnb.commands.scheduled_events.ListEvents;
 import net.purplegoose.didnb.enums.*;
-import net.purplegoose.didnb.news.commands.ListNewsCategoriesCommand;
-import net.purplegoose.didnb.news.commands.RegisterNewsChannelCommand;
-import net.purplegoose.didnb.news.commands.ToggleNewsCommand;
-import net.purplegoose.didnb.news.commands.UnregisterNewsChannelCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -204,13 +196,6 @@ public class CommandsUtil {
     }
 
     static {
-        commandDataList.add(ToggleNewsCommand.commandData);
-        commandDataList.add(RegisterNewsChannelCommand.commandData);
-        commandDataList.add(UnregisterNewsChannelCommand.commandData);
-        commandDataList.add(ListNewsCategoriesCommand.commandData);
-    }
-
-    static {
         COMMAND_DELETE_CUSTOM_MESSAGE_DESC = commandsProperties.get(COMMAND_DELETE_CUSTOM_MESSAGE).toString();
         commandDataList.add(Commands.slash(COMMAND_DELETE_CUSTOM_MESSAGE, COMMAND_DELETE_CUSTOM_MESSAGE_DESC)
                 .addOptions(REQUIRED_CUSTOM_MESSAGE_ID_OPTION));
@@ -314,11 +299,6 @@ public class CommandsUtil {
     static {
         COMMAND_TIMEZONES_DESC = commandsProperties.get(COMMAND_TIMEZONES).toString();
         commandDataList.add(Commands.slash(COMMAND_TIMEZONES, COMMAND_TIMEZONES_DESC));
-    }
-
-    static {
-        commandDataList.add(Commands.slash(ListEvents.COMMAND, "This commands creates a dropdown menu where you can toggle the creation of scheduled events."));
-        commandDataList.add(Commands.slash(DeleteAllEvents.COMMAND, "This command deletes all scheduled events from a server."));
     }
 
     static {

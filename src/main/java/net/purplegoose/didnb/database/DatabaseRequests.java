@@ -7,16 +7,16 @@ import net.purplegoose.didnb.data.*;
 import net.purplegoose.didnb.enums.GameEvent;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.enums.Weekday;
-import net.purplegoose.didnb.news.dto.ArticleDTO;
-import net.purplegoose.didnb.news.dto.NewsChannelDTO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @AllArgsConstructor
 @Slf4j
@@ -93,7 +93,6 @@ public class DatabaseRequests {
         addCustomMessagesData(clientGuildData);
         addNotificationChannelData(clientGuildData);
         addScheduledEventsSettingsData(clientGuildData);
-        addNewsChannelData(clientGuildData);
         return clientGuildData;
     }
 
@@ -233,41 +232,6 @@ public class DatabaseRequests {
                         clientGuildData.get(guildID).setSeSetting(seSetting);
                     } else {
                         log.error("Failed to load ScheduledEventsSettings for guild with id {}.", guildID);
-                    }
-                }
-            }
-        }
-    }
-
-    private void addNewsChannelData(Map<String, ClientGuild> clientGuildData) throws SQLException {
-        try (
-                Connection connection = databaseConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(SQLStatements.GET_ALL_NEWS_CHANNELS_STATEMENT)
-        ) {
-            try (ResultSet resultSet = ps.executeQuery()) {
-                while (resultSet.next()) {
-                    String id = resultSet.getString("channelid");
-                    String guildID = resultSet.getString(GUILD_ID);
-                    boolean isDiabloImmortalNewsEnabled = (resultSet.getInt("di_enabled") == 1);
-                    boolean isHearthstoneEnabled = (resultSet.getInt("hearthstone_enabled") == 1);
-                    boolean isOverwatchEnabled = (resultSet.getInt("overwatch_enabled") == 1);
-                    boolean isWowWebEnabled = (resultSet.getInt("wow_web_enabled") == 1);
-                    boolean isBnetEnabled = (resultSet.getInt("bnet_enabled") == 1);
-                    boolean isCortezEnabled = (resultSet.getInt("cortez_enabled") == 1);
-                    boolean isD4Enabled = (resultSet.getInt("d4_enabled") == 1);
-                    boolean isHeroesEnabled = (resultSet.getInt("heroes_enabled") == 1);
-                    boolean isNewsEnabled = (resultSet.getInt("news_enabled") == 1);
-                    boolean isWarEnabled = (resultSet.getInt("war_enabled") == 1);
-                    boolean isBlizzconEnabled = (resultSet.getInt("blizzcon_enabled") == 1);
-
-                    NewsChannelDTO newsChannelDTO = new NewsChannelDTO(id, guildID, isDiabloImmortalNewsEnabled,
-                            isHearthstoneEnabled, isOverwatchEnabled, isWowWebEnabled, isBnetEnabled, isCortezEnabled,
-                            isD4Enabled, isHeroesEnabled, isNewsEnabled, isWarEnabled, isBlizzconEnabled);
-
-                    if (clientGuildData.containsKey(guildID)) {
-                        clientGuildData.get(guildID).addNewsChannel(newsChannelDTO);
-                    } else {
-                        log.error("Failed to load news channel for guild with id {}.", guildID);
                     }
                 }
             }
@@ -558,117 +522,6 @@ public class DatabaseRequests {
             preparedStatement.setString(1, guildID);
             preparedStatement.executeUpdate();
             log.info("Deleted {} from {}.", guildID, SCHEDULED_EVENTS_SETTINGS_TABLE);
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - *
-    - THIS IS THE ARTICLES DATABASE REQUESTS PART -
-     * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
-
-    /**
-     * Get all articles from the database.
-     * @return all articles as list.
-     */
-    public List<ArticleDTO> getArticles() {
-        List<ArticleDTO> list = new ArrayList<>();
-        try (
-                Connection connection = databaseConnection.getConnection();
-                PreparedStatement ps = connection.prepareStatement(SQLStatements.GET_ALL_ARTICLES_STATEMENT)
-        ) {
-            try (ResultSet resultSet = ps.executeQuery()) {
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    String url = resultSet.getString("url");
-                    String category = resultSet.getString("category");
-                    list.add(new ArticleDTO(id, url, category));
-                }
-            }
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-        return list;
-    }
-
-    /**
-     * Inserts a new article to the database.
-     * @param articleDTO the article object.
-     * @return true if successful, false if failure.
-     */
-    public boolean insertNewArticle(ArticleDTO articleDTO) {
-        try (
-                Connection conn = databaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(SQLStatements.INSERT_ARTICLE_STATEMENT)
-        ) {
-            ps.setInt(1, articleDTO.getId());
-            ps.setString(2, articleDTO.getUrl());
-            ps.setString(3, articleDTO.getCategory());
-            ps.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /* - * - * - * - * - * - * - * - * - * - * - * - * - * - * - *
-    - THIS IS THE NEWS CHANNEL DATABASE REQUESTS PART -
-     * - * - * - * - * - * - * - * - * - * - * - * - * - * - * - */
-
-    /**
-     * Add new news channel
-     * @param newsChannelDTO the news channel object
-     */
-    public void addNewsChannel(NewsChannelDTO newsChannelDTO) {
-        try (
-                Connection conn = databaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(SQLStatements.INSERT_NEWS_CHANNEL_STATEMENT)
-        ) {
-            ps.setString(1, newsChannelDTO.getChannelID());
-            ps.setString(2, newsChannelDTO.getGuildID());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Deletes a news channel from the database
-     * @param id the news channel id
-     */
-    public void deleteNewsChannelByID(String id) {
-        try (
-                Connection conn = databaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(SQLStatements.DELETE_NEWS_CHANNEL_BY_ID_STATEMENT)
-        ) {
-            ps.setString(1, id);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Updates the news channel in the database
-     * @param newsChannelDTO the to update news channel object
-     */
-    public void updateNewsChannel(NewsChannelDTO newsChannelDTO) {
-        try (
-                Connection conn = databaseConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(SQLStatements.UPDATE_NEWS_CHANNEL_STATEMENT)
-        ) {
-            ps.setBoolean(1, newsChannelDTO.isDiabloImmortalNewsEnabled());
-            ps.setBoolean(2, newsChannelDTO.isHearthStoneNewsEnabled());
-            ps.setBoolean(3, newsChannelDTO.isOverwatchEnabled());
-            ps.setBoolean(4, newsChannelDTO.isWowWebEnabled());
-            ps.setBoolean(5, newsChannelDTO.isBnetEnabled());
-            ps.setBoolean(6, newsChannelDTO.isCortezEnabled());
-            ps.setBoolean(7, newsChannelDTO.isD4Enabled());
-            ps.setBoolean(8, newsChannelDTO.isHeroesEnabled());
-            ps.setBoolean(9, newsChannelDTO.isNewsEnabled());
-            ps.setString(10, newsChannelDTO.getChannelID());
-            ps.executeUpdate();
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
         }

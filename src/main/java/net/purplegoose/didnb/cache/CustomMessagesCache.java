@@ -18,5 +18,4 @@ public class CustomMessagesCache {
     public void removeIdentifier(String identifier) {
         usedIdentifiers.remove(identifier);
     }
-
 }

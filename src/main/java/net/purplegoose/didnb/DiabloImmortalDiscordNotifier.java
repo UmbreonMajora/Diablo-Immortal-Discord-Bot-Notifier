@@ -1,22 +1,21 @@
 package net.purplegoose.didnb;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.purplegoose.didnb.annotations.GameDataCacheSet;
-import net.purplegoose.didnb.cache.*;
-import net.purplegoose.didnb.data.ScheduledEventsSetting;
+import net.purplegoose.didnb.cache.CustomMessagesCache;
+import net.purplegoose.didnb.cache.GameDataCache;
+import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.database.DatabaseRequests;
 import net.purplegoose.didnb.database.MySQLDatabaseConnection;
 import net.purplegoose.didnb.enums.Language;
 import net.purplegoose.didnb.events.*;
 import net.purplegoose.didnb.exeption.StartFailureException;
-import net.purplegoose.didnb.news.NewsReader;
 import net.purplegoose.didnb.notifier.CustomMessagesNotifier;
 import net.purplegoose.didnb.notifier.InformationNotifier;
 import net.purplegoose.didnb.notifier.Notifier;
-import net.purplegoose.didnb.notifier.ScheduledEventCreator;
-import net.purplegoose.didnb.utils.ChannelLogger;
 import net.purplegoose.didnb.utils.ConfigUtil;
 
 import java.lang.reflect.Field;
@@ -25,15 +24,14 @@ import java.util.Arrays;
 
 @Slf4j
 public class DiabloImmortalDiscordNotifier {
+    @Getter
+    private static JDA jdaClient;
 
-    public static final String BOT_ID = "527511535309029407";
-
-    private static boolean registerCommands = true;
+    private static boolean registerCommands = false;
 
     private static GameDataCache gameDataCache = new GameDataCache();
     private static GuildsCache guildsCache = new GuildsCache();
     private static CustomMessagesCache customMessagesCache = new CustomMessagesCache();
-    private static ScheduledEventsSettingsCache sesCache = new ScheduledEventsSettingsCache();
 
     private static MySQLDatabaseConnection mySQLDatabaseConnection = new MySQLDatabaseConnection();
     private static DatabaseRequests databaseRequests = new DatabaseRequests(mySQLDatabaseConnection, customMessagesCache);
@@ -43,7 +41,6 @@ public class DiabloImmortalDiscordNotifier {
         gameDataCache = new GameDataCache();
         guildsCache = new GuildsCache();
         customMessagesCache = new CustomMessagesCache();
-        sesCache = new ScheduledEventsSettingsCache();
 
         // Init database
         mySQLDatabaseConnection = new MySQLDatabaseConnection();
@@ -52,13 +49,12 @@ public class DiabloImmortalDiscordNotifier {
         fillCaches();
         setCommandRegistrationValue(args);
 
-        JDA jda = getJdaClient();
+        JDA jdaClient = createJdaClient();
+        DiabloImmortalDiscordNotifier.jdaClient = jdaClient;
 
         // Run scheduler
-        runScheduler(gameDataCache, guildsCache, databaseRequests, jda);
+        runScheduler(gameDataCache, guildsCache, databaseRequests, jdaClient);
         logContainingLanguages();
-
-        checkForMissingSESetting(guildsCache, databaseRequests);
     }
 
     private static void setCommandRegistrationValue(String[] args) {
@@ -81,7 +77,7 @@ public class DiabloImmortalDiscordNotifier {
         return args.length > 0;
     }
 
-    private static JDA getJdaClient() {
+    private static JDA createJdaClient() {
         try {
             JDABuilder jdaBuilder = JDABuilder.createDefault(ConfigUtil.getClientToken());
             addEventListeners(jdaBuilder);
@@ -97,15 +93,13 @@ public class DiabloImmortalDiscordNotifier {
         jdaBuilder.addEventListeners(new ChannelDelete(databaseRequests, guildsCache),
                 new GuildJoin(databaseRequests, guildsCache),
                 new GuildLeave(databaseRequests, guildsCache));
-
         if (registerCommands) {
             jdaBuilder.addEventListeners(new GuildReady());
         }
-
     }
 
     private static void addEventInteractions(JDABuilder jdaBuilder) {
-        jdaBuilder.addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache, customMessagesCache, sesCache),
+        jdaBuilder.addEventListeners(new SlashCommandInteraction(guildsCache, databaseRequests, gameDataCache, customMessagesCache),
                 new StringSelectInteraction(guildsCache, databaseRequests));
     }
 
@@ -120,20 +114,9 @@ public class DiabloImmortalDiscordNotifier {
         return true;
     }
 
-    //todo: remove
-    private static void checkForMissingSESetting(GuildsCache guildsCache, DatabaseRequests databaseRequests) {
-        guildsCache.getAllGuilds().values().forEach(clientGuild -> {
-            if (clientGuild.getSeSetting() == null) {
-                ScheduledEventsSetting seSetting = new ScheduledEventsSetting(clientGuild.getGuildID());
-                clientGuild.setSeSetting(seSetting);
-                databaseRequests.createScheduledEventsSettings(seSetting.getGuildID());
-            }
-        });
-    }
-
     private static void runScheduler(GameDataCache gameDataCache, GuildsCache guildsCache,
                                      DatabaseRequests databaseRequests, JDA jda) {
-        Notifier notifier = new Notifier(guildsCache, gameDataCache, new ErrorCache(databaseRequests));
+        Notifier notifier = new Notifier(guildsCache, gameDataCache);
         notifier.runNotificationScheduler(jda);
 
         CustomMessagesNotifier customMessagesNotifier = new CustomMessagesNotifier(databaseRequests, guildsCache);
@@ -141,13 +124,6 @@ public class DiabloImmortalDiscordNotifier {
 
         InformationNotifier informationNotifier = new InformationNotifier();
         informationNotifier.runInformationNotifier(jda);
-
-        //ScheduledEventCreator seCreator = new ScheduledEventCreator(guildsCache, gameDataCache);
-        //seCreator.scheduler(jda);
-
-        NewsReader newsReader = new NewsReader(databaseRequests, guildsCache, jda,
-                new ChannelLogger(jda.getTextChannelById(1150798272886227087L)));
-        newsReader.runScheduler();
     }
 
     private static boolean fillGameDataCache(GameDataCache gameDataCache, DatabaseRequests databaseRequests) {

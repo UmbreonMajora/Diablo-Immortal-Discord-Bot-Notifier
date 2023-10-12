@@ -9,17 +9,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import net.purplegoose.didnb.cache.ErrorCache;
 import net.purplegoose.didnb.cache.GameDataCache;
 import net.purplegoose.didnb.cache.GuildsCache;
 import net.purplegoose.didnb.data.ClientGuild;
 import net.purplegoose.didnb.data.NotificationChannel;
 import net.purplegoose.didnb.exeption.InvalidMentionException;
 import net.purplegoose.didnb.gameevents.*;
-import net.purplegoose.didnb.gameevents.embedded.AncientArenaEmbed;
-import net.purplegoose.didnb.gameevents.embedded.AncientNightmareEmbed;
-import net.purplegoose.didnb.gameevents.embedded.DemonGatesEmbed;
-import net.purplegoose.didnb.gameevents.embedded.HauntedCarriageEmbed;
 import net.purplegoose.didnb.utils.ChannelLogger;
 import net.purplegoose.didnb.utils.TimeUtil;
 
@@ -27,16 +22,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class Notifier extends NotifierHelper {
-    private static final long CHANNEL_LOGGER_ID = 1150798272886227087L;
-
-    private ChannelLogger channelLogger;
     // Cache
     private final GuildsCache guildsCache;
-    private final ErrorCache errorCache;
     // Notification Messages
     private final VaultEvent vaultEvent;
     private final AncientArenaEvent ancientArenaEvent;
@@ -50,17 +40,11 @@ public class Notifier extends NotifierHelper {
     private final OnSlaughtEvent onSlaughtEvent;
     private final TowerOfVictoryEvent towerOfVictoryEvent;
     private final ShadowWarEvent shadowWarEvent;
-    // Embed Messages
-    private final HauntedCarriageEmbed hauntedCarriageEmbed;
-    private final DemonGatesEmbed demonGatesEmbed;
-    private final AncientNightmareEmbed ancientNightmareEmbed;
-    private final AncientArenaEmbed ancientArenaEmbed;
 
     private int count = 0;
 
-    public Notifier(GuildsCache guildsCache, GameDataCache gameDataCache, ErrorCache errorCache) {
+    public Notifier(GuildsCache guildsCache, GameDataCache gameDataCache) {
         this.guildsCache = guildsCache;
-        this.errorCache = errorCache;
 
         this.vaultEvent = new VaultEvent(gameDataCache);
         this.ancientArenaEvent = new AncientArenaEvent(gameDataCache);
@@ -74,15 +58,9 @@ public class Notifier extends NotifierHelper {
         this.onSlaughtEvent = new OnSlaughtEvent(gameDataCache);
         this.towerOfVictoryEvent = new TowerOfVictoryEvent(gameDataCache);
         this.shadowWarEvent = new ShadowWarEvent(gameDataCache);
-        // Embedded
-        this.hauntedCarriageEmbed = new HauntedCarriageEmbed(gameDataCache);
-        this.demonGatesEmbed = new DemonGatesEmbed(gameDataCache);
-        this.ancientArenaEmbed = new AncientArenaEmbed(gameDataCache);
-        this.ancientNightmareEmbed = new AncientNightmareEmbed(gameDataCache);
     }
 
     public void runNotificationScheduler(JDA jdaClient) {
-        channelLogger = new ChannelLogger(jdaClient.getTextChannelById(CHANNEL_LOGGER_ID));
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -100,7 +78,6 @@ public class Notifier extends NotifierHelper {
                         channelCount++;
                         StringBuilder notificationMessage = new StringBuilder();
                         appendNotificationMessages(clientGuild, channel, notificationMessage);
-                        sendEmbedNotifications(clientGuild, channel, jdaClient);
                         TextChannel textChannel = jdaClient.getTextChannelById(channel.getTextChannelID());
 
                         if (!isNotificationValid(textChannel, notificationMessage.toString(), channel)) {
@@ -120,7 +97,7 @@ public class Notifier extends NotifierHelper {
 
                 count++;
                 if (count == 5) {
-                    channelLogger.sendChannelLog(msg);
+                    ChannelLogger.sendChannelLog(msg);
                     count = 0;
                 }
             }
@@ -160,19 +137,11 @@ public class Notifier extends NotifierHelper {
         String logMsg = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
                 "guild " + channel.getGuildID() + ", but it failed because the channel was null!";
         log.error(logMsg);
-        errorCache.addChannelError(channel);
         return textChannel == null;
     }
 
     private boolean isMessageLengthZero(String message) {
         return message.length() == 0;
-    }
-
-    private void sendEmbedNotifications(ClientGuild clientGuild, NotificationChannel channel, JDA jdaClient) {
-        hauntedCarriageEmbed.sendHauntedCarriageEmbedIfHappening(clientGuild, channel, jdaClient);
-        demonGatesEmbed.sendDemonGatesEmbedIfHappening(clientGuild, channel, jdaClient);
-        ancientArenaEmbed.sendAncientArenaEmbedIfHappening(clientGuild, channel, jdaClient);
-        ancientNightmareEmbed.sendAncientNightmareEmbedIfHappening(clientGuild, channel, jdaClient);
     }
 
     private void appendNotificationMessages(ClientGuild clientGuild, NotificationChannel channel, StringBuilder notificationMessage) {
