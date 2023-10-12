@@ -59,5 +59,12 @@ VALUES
     ('thursday', 'demongates', '21:45', '22:00', 22, 00, 22, 30, 45),
     ('sunday', 'demongates', '11:45', '12:00', 12, 00, 12, 30, 46),
     ('sunday', 'demongates', '20:15', '20:30', 20, 30, 21, 00, 47),
-    ('sunday', 'demongates', '21:45', '22:00', 22, 00, 22, 30, 48)
+    ('sunday', 'demongates', '21:45', '22:00', 22, 00, 22, 30, 48),
+
+    ('monday', 'assembly', '11:45', '12:00', 12, 00, 14, 00, 49),
+    ('tuesday', 'assembly', '11:45', '12:00', 12, 00, 14, 00, 50),
+    ('wednesday', 'assembly', '11:45', '12:00', 12, 00, 14, 00, 51),
+    ('thursday', 'assembly', '11:45', '12:00', 12, 00, 14, 00, 52),
+    ('friday', 'assembly', '11:45', '12:00', 12, 00, 14, 00, 53),
+    ('saturday', 'assembly', '11:45', '12:00', 12, 00, 14, 00, 54)
 on duplicate key update id=id;
