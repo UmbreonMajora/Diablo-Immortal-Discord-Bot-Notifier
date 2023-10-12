@@ -84,15 +84,6 @@ Important: If you have Administrator-Permissions you do not need to have the Bot
 | `/editmessage [ID] [ValueToChange] [NewValue]`          | Allows you to edit your notification message.                                                                                                                                                                                                                                                                                      |
 | `/message [ID] [True/False]`                            | Allows you to enable or disable each of your own notification message.                                                                                                                                                                                                                                                             |
 
-### Creating own notification messages
-
-| Command                       | Description                                                                        |
-|-------------------------------|------------------------------------------------------------------------------------|
-| `/registernews`               | Registers channel this command is sent in as news channel.                         |
-| `/unregisternews`             | Unregisters channel this command is sent in as news channel.                       |
-| `/togglenews [news_category]` | Enables or disables the receiving of a news category in a registered news channel. |
-| `/newscategories`             | Show's a list with all categories in the news section.                             |
-
 ## Languages
 
 We're currently supporting: American-Spanish, Brazilian Portuguese, Bulgarian, Croatian, Danish, Dutch, English, Finnish,
