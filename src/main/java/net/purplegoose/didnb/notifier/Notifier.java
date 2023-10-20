@@ -134,10 +134,13 @@ public class Notifier extends NotifierHelper {
     }
 
     private boolean isChannelNull(Channel textChannel, NotificationChannel channel) {
-        String logMsg = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
-                "guild " + channel.getGuildID() + ", but it failed because the channel was null!";
-        log.error(logMsg);
-        return textChannel == null;
+        if (textChannel == null) {
+            String logMsg = "Tried to send notification message to " + channel.getTextChannelID() + " on " +
+                    "guild " + channel.getGuildID() + ", but it failed because the channel was null!";
+            log.error(logMsg);
+            return true;
+        }
+        return false;
     }
 
     private boolean isMessageLengthZero(String message) {
