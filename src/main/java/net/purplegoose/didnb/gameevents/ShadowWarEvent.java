@@ -27,7 +27,7 @@ public class ShadowWarEvent implements IGameEvent {
             return EMPTY_STRING;
         }
 
-        Set<EventGameData> eventGameDataSet = gameDataCache.getShadowLotteryDataSet();
+        Set<EventGameData> eventGameDataSet = gameDataCache.getShadowWarDataSet();
         String timeZone = guild.getTimeZone();
         Language language = guild.getLanguage();
 
